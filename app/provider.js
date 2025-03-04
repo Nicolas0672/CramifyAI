@@ -5,8 +5,10 @@ import { useUser } from '@clerk/nextjs'
 import axios from 'axios'
 import { eq } from 'drizzle-orm'
 import React, { useEffect } from 'react'
+import { ConvexProvider, ConvexReactClient } from "convex/react";
 
 function Provider({children}) {
+    const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL);
     const {user} = useUser()
 
     useEffect(() =>{
@@ -29,7 +31,8 @@ function Provider({children}) {
     }
   return (
     <div>
-        {children}
+      <ConvexProvider client={convex}>{children}</ConvexProvider>;
+        
     </div>
   )
 }

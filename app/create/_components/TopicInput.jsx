@@ -1,3 +1,4 @@
+"use client"
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -10,12 +11,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { useMutation } from 'convex/react'
+import { api } from '@/convex/_generated/api'
 
 function TopicInput({setTopic, setDifficultyLevel, setComment, handleUserInput, formData}) {
     const [hasPdf, setHasPdf] = useState(false)
 
-    const handleFileChange = (event) =>{
+    const handleFileUpload = (event) =>{
         const file = event.target.files[0]
+
         if(file && file.type == "application/pdf"){
             handleUserInput("pdfFile", file)
         }
@@ -23,6 +27,8 @@ function TopicInput({setTopic, setDifficultyLevel, setComment, handleUserInput, 
             alert("Please upload a valid PDF file.");
         }
     }
+
+    
 
     return (
         <div className="w-full max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -77,7 +83,7 @@ function TopicInput({setTopic, setDifficultyLevel, setComment, handleUserInput, 
                             
                             {formData.pdfFile ? formData.pdfFile.name : "Upload PDF"}
                         </span>
-                        <input onChange={handleFileChange} type="file" accept="application/pdf" className="hidden" />
+                        <input onChange={handleFileUpload} type="file" accept="application/pdf" className="hidden" />
                     </label>
                     
                 </div>

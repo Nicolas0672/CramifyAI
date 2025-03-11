@@ -33,7 +33,7 @@ function TopicInput({ setTopic, setDifficultyLevel, setComment, handleUserInput,
             {/* Topic Input */}
             <div className="mb-6">
                 <h2 className="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2">
-                    <BookOpen size={20} className="text-blue-500" /> What topic are you studying?
+                    <BookOpen size={20} className="text-blue-500" /> Please enter your topic
                 </h2>
                 <Input
                     required

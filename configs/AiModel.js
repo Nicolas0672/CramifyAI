@@ -37,8 +37,39 @@ const {
       },
     ],
 })
+
+export const generateNotesAIModel = model.startChat({
+  generationConfig,
+  history: [
+    {
+      role: "user",
+      parts: [
+        {text: "Generate exam material detail content for each chapter, make sure to include all topic point in the content, make sure to give content in HTML format (Do not Add HTMLK, Head, Body, title tag). The chapter {\n      \"title\": \"Chapter 1: Getting Started with JavaScript\",\n      \"summary\": \"This chapter introduces JavaScript, its importance in web development, and what you'll learn in this course. You'll set up your development environment and write your first JavaScript code.\",\n      \"topics\": [\n        \"What is JavaScript and Why Learn It?\",\n        \"Setting Up Your Development Environment\"\n      ]\n    },\n    {"},
+      ],
+    },
+    {
+      role: "model",
+      parts: [
+        {text: "```html\n    <h2>Chapter 1: Getting Started with JavaScript</h2>\n    <p><strong>Summary:</strong> This chapter introduces JavaScript, its importance in web development, and what you'll learn in this course. You'll set up your development environment and write your first JavaScript code.</p>\n\n    <h3>Topics:</h3>\n    <h4>1. What is JavaScript and Why Learn It?</h4>\n    <ul>\n        <li><strong>Definition of JavaScript:</strong>\n            <ul>\n                <li>Explain what JavaScript is: a high-level, interpreted programming language.</li>\n                <li>Describe JavaScript's original purpose (adding interactivity to web pages).</li>\n                <li>Explain that JavaScript is now used for front-end, back-end, and mobile development.</li>\n            </ul>\n        </li>\n        <li><strong>Importance of JavaScript in Web Development:</strong>\n            <ul>\n                <li>Discuss JavaScript's role in creating dynamic and interactive web pages.</li>\n                <li>Highlight its use in front-end frameworks and libraries (e.g., React, Angular, Vue.js).</li>\n                <li>Mention its use in back-end development with Node.js.</li>\n            </ul>\n        </li>\n        <li><strong>Benefits of Learning JavaScript:</strong>\n            <ul>\n                <li>Explain the high demand for JavaScript developers.</li>\n                <li>Discuss the versatility of JavaScript (front-end, back-end, mobile).</li>\n                <li>Highlight the large and active JavaScript community and extensive resources available.</li>\n            </ul>\n        </li>\n        <li><strong>JavaScript vs. Other Languages (Brief Overview):</strong>\n            <ul>\n                <li>Briefly differentiate JavaScript from HTML (structure) and CSS (styling).</li>\n                <li>Explain that JavaScript adds behavior and interactivity.</li>\n            </ul>\n        </li>\n    </ul>\n\n    <h4>2. Setting Up Your Development Environment</h4>\n    <ul>\n        <li><strong>Text Editors/IDEs:</strong>\n            <ul>\n                <li>Define what a text editor and IDE are.</li>\n                <li>List popular text editors (e.g., VS Code, Sublime Text, Atom) and IDEs (e.g., WebStorm).</li>\n                <li>Discuss the features of a good text editor/IDE (e.g., syntax highlighting, code completion, debugging).</li>\n            </ul>\n        </li>\n        <li><strong>Web Browsers and Developer Tools:</strong>\n            <ul>\n                <li>Explain the role of web browsers in running JavaScript code.</li>\n                <li>Introduce browser developer tools (e.g., Chrome DevTools, Firefox Developer Tools).</li>\n                <li>Show how to access the console for debugging and logging.</li>\n            </ul>\n        </li>\n        <li><strong>Writing Your First JavaScript Code:</strong>\n            <ul>\n                <li>Explain different ways to include JavaScript in HTML:\n                    <ul>\n                        <li>Inline (within HTML tags) - Explain why this is generally not recommended.</li>\n                        <li>Internal (within `<script>` tags in the HTML document).</li>\n                        <li>External (linking a separate `.js` file).  Emphasize this as best practice.</li>\n                    </ul>\n                </li>\n                <li>Write a simple \"Hello, World!\" program using `console.log()`.</li>\n                <li>Explain how to run the code in a web browser.</li>\n            </ul>\n        </li>\n        <li><strong>Basic Syntax and Structure:</strong>\n            <ul>\n                <li>Briefly introduce basic JavaScript syntax elements: statements, variables, comments.</li>\n                <li>Explain the importance of semicolons.</li>\n                <li>Illustrate how to write single-line and multi-line comments.</li>\n            </ul>\n        </li>\n    </ul>\n```"},
+      ],
+    },
+  ],
+});
   
-    // const result = await chatSession.sendMessage("INSERT_INPUT_HERE");
-    // console.log(result.response.text());
-  
-  
+export const GenerateFlashCardAI = model.startChat({
+  generationConfig,
+  history: [
+    {
+      role: "user",
+      parts: [
+        {text: "Generate the flashcard on topic: Flutter Fundementals. user interface and basic app navigation in JSON format with front back content. max 10\n"},
+      ],
+    },
+    {
+      role: "model",
+      parts: [
+        {text: "```json\n[\n  {\n    \"front\": \"What is Flutter?\",\n    \"back\": \"Flutter is a cross-platform UI toolkit for building natively compiled applications for mobile, web, and desktop from a single codebase.\"\n  },\n  {\n    \"front\": \"What is a Widget in Flutter?\",\n    \"back\": \"A Widget is the basic building block of Flutter's UI. Everything you see on screen is a widget (text, buttons, layouts).\"\n  },\n  {\n    \"front\": \"Differentiate between Stateful and Stateless Widgets.\",\n    \"back\": \"StatelessWidgets are immutable; their properties cannot change after they are created.  StatefulWidgets maintain state that can change during the lifetime of the widget.\"\n  },\n  {\n    \"front\": \"What is the `build()` method used for?\",\n    \"back\": \"The `build()` method is the most important method of a widget. It describes the part of the user interface represented by the widget.\"\n  },\n  {\n    \"front\": \"What is the purpose of `MaterialApp` Widget?\",\n    \"back\": \"`MaterialApp` is the root widget for applications that use Material Design. It sets up the theme, home route, and navigation.\"\n  },\n  {\n    \"front\": \"How do you implement navigation between screens in Flutter?\",\n    \"back\": \"Using `Navigator` widget and its methods like `Navigator.push()` (to push a new route onto the stack) and `Navigator.pop()` (to remove the current route).\"\n  },\n  {\n    \"front\": \"What are `Routes` in Flutter Navigation?\",\n    \"back\": \"Routes are named paths in your application that you can navigate to. They're defined in the `routes` property of the `MaterialApp`.\"\n  },\n  {\n    \"front\": \"What is `Scaffold` Widget?\",\n    \"back\": \"`Scaffold` provides a basic layout structure for an app screen, including an AppBar, body, floating action button, and more. It implements the basic Material Design visual layout structure.\"\n  },\n  {\n    \"front\": \"What is a `Layout` Widget? Give Examples.\",\n    \"back\": \"Layout widgets control the size, position, and arrangement of other widgets. Examples: `Row`, `Column`, `Stack`, `Center`, `Padding`.\"\n  },\n  {\n    \"front\": \"Explain `Hot Reload` in Flutter.\",\n    \"back\": \"Hot Reload allows you to quickly see the effects of your changes without restarting the entire application. It injects the updated code into the running Dart VM.\"\n  }\n]\n```"},
+      ],
+    },
+  ],
+})

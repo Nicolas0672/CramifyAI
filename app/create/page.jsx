@@ -15,6 +15,7 @@ import { toast } from "react-hot-toast";
 import { useStudy } from '../StudyContext'
 import axios from 'axios'
 import { desc, eq } from 'drizzle-orm'
+import { useRouter } from 'next/navigation'
 
 function Create() {
 
@@ -23,6 +24,7 @@ function Create() {
     const [pdfFile, setPdfFile] = useState(null)
     const [hasPdf, setHasPdf] = useState(false)
     const { selectedStudyType } = useStudy()
+    const router = useRouter()
 
     const { user } = useUser()
 
@@ -53,15 +55,7 @@ function Create() {
             toast.error("Please provide either a PDF file or text.");
             return;
         }
-        // const formDataToSend = new FormData()
-        // formDataToSend.append("studyType", formData.studyType)
-        // formDataToSend.append("topic", formData.topic)
-        // formDataToSend.append("difficultyLevel", formData.difficult)
-        // formDataToSend.append("comment", formData.comment)
-        // formDataToSend.append('file', pdfFile)
-
         setLoading(true);
-
 
         if (hasPdf) {
 
@@ -118,10 +112,11 @@ function Create() {
                 // Handle the failure case (e.g., show an error message)
             }
         }
-        setLoading(false)
+       
     }
 
     const GenerateCourseOutline = async () => {
+        setLoading(true);
         try {
             // Fetch data from the database
             const resData = await db
@@ -150,10 +145,13 @@ function Create() {
                 // Send the POST request
                 const res = await axios.post('/api/generate-course-outline', payload);
                 console.log("Response from API:", res.data);
+                toast("Your course content is generating...")
             }
         } catch (error) {
             console.error("Error in GenerateCourseOutline:", error);
         }
+        setLoading(false)
+        router.replace('/dashboard')
     };
 
 
@@ -168,7 +166,7 @@ function Create() {
                     Let's get started on your journey
                 </h2>
                 <p className="mt-4 text-gray-600 text-lg text-center">
-                    Fill in the details to create your study plan
+                    Fill in the details to create your plan
                 </p>
 
                 {/* Topic Input - Takes Full Width */}
@@ -187,6 +185,7 @@ function Create() {
                 <div className="flex justify-center mt-10">
                     <Button
                         onClick={OnUpload}
+                        disabled={loading}
                         className="cursor-pointer w-full max-w-xs py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
                     >
                         {loading ? (

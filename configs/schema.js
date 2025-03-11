@@ -1,5 +1,5 @@
 import { boolean, integer, json, text, timestamp } from "drizzle-orm/gel-core";
-import { pgTable, serial, varchar } from "drizzle-orm/pg-core";
+import { date, pgTable, serial, time, varchar } from "drizzle-orm/pg-core";
 
 export const USER_TABLE=pgTable('users',{
     id:serial().primaryKey(),
@@ -24,5 +24,22 @@ export const AI_TEXT_RESPONSE_TABLE=pgTable('aiTextResp',{
     id:serial().primaryKey(),
     studyMaterialId: varchar().notNull(),
     aiResponse: json(),
+    status:varchar().default('Generating'),
+    createdAt: varchar('createdAt'),
     createdBy:varchar().notNull(),
+})
+
+export const CHAPTER_NOTE_TABLE=pgTable('chapterNotes',{
+    id:serial().primaryKey(),
+    courseId:varchar().notNull(),
+    chapterId: integer().notNull(),
+    notes:text()
+})
+
+export const FLASHCARD_CONTENT = pgTable('flashCardContent',{
+    id:serial().primaryKey(),
+    courseId:varchar().notNull(),
+    content: json(),
+    type: varchar().notNull(),
+    status: varchar().default('Generating')
 })

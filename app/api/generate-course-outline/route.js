@@ -1,7 +1,10 @@
 import { courseOutline } from "@/configs/AiModel";
 import { db } from "@/configs/db";
 import { AI_TEXT_RESPONSE_TABLE } from "@/configs/schema";
+import { inngest } from "@/inngest/client";
+import moment from "moment/moment";
 import { NextResponse } from "next/server";
+
 
 export async function POST(req) {
     try {
@@ -15,13 +18,11 @@ Generate a high-quality study guide for the course. The topic is "${topic}", the
 
 1. **Introduction**: Provide a clear and engaging introduction to the course topic "${topic}". Explain why this topic is important, its relevance, and what learners can expect to gain from studying it.
 
-2. **Chapter Breakdown**: Break down the course into 3 chapters and 3 topics based on the provided course layout ("${courseLayout}" as a guide). For each chapter, provide:
+2. **Chapter Breakdown**: Break down the course into 3 chapters and 2 topics based on the provided course layout ("${courseLayout}" as a guide). For each chapter, provide:
    - **Chapter Title**: A descriptive and engaging title for the chapter.
    - **Chapter Summary**: A concise yet insightful summary of the chapter, outlining the key concepts and objectives.
-   - **Topic List**: A detailed list of topics that will be covered in this chapter. For each topic, provide:
-     - **Topic Name**: A clear and specific title for the topic.
-     - **Description**: A detailed, insightful, and engaging explanation of the topic. Include examples, analogies, and practical insights to help learners deeply understand the concept.
-   - **Key Takeaways**: A bullet-point list of the most important insights or concepts from the chapter.
+   - **Topic List**: 3 topics name that will be covered in this chapter. For each topic, provide:
+     
 
 3. **Content Quality**: Ensure the content is:
    - **Insightful**: Provide deep, meaningful explanations that go beyond surface-level descriptions.
@@ -29,28 +30,26 @@ Generate a high-quality study guide for the course. The topic is "${topic}", the
    - **Structured**: Organize the content logically, with a clear flow from one topic to the next.
    - **Actionable**: Include practical tips or insights that learners can apply immediately.
 
-4. **Output in JSON Format**: Output the entire study guide in a well-structured JSON format. Each chapter should be an object with the following keys: "title", "summary", "topics", and "keyTakeaways". Each topic should have a detailed description.
+4. **Output in JSON Format**: Output the entire study guide in a well-structured JSON format. Each chapter should be an object with the following keys: "title", "summary", and "topics". Each topic should only include the topic name.
 5. DO NOT INCLUDE ANYTHING IN THE CONTENT THAT WILL RUIN A JSON PARSE** ENSURE THAT THE CONTENT GENERATED CAN PARSE THROUGH AS A JSON**
 Please output in the following JSON structure:
+6. **INCLUDE EMOJI ICON FOR EACH CHAPTER**
 
 {
   "courseTitle": "Course Title Here",
   "courseType": "${courseType}",
   "difficultyLevel": "${difficultyLevel}",
+  "courseSummary" : summary
   "courseLayout": "${courseLayout}",
+  
   "chapters": [
     {
       "title": "Chapter 1: Introduction to ${topic}",
+        "emoji: "
       "summary": "Brief yet insightful summary of the chapter.",
-      "topics": [
-        {
-          "topicName": "Topic 1",
-          "description": "Detailed, insightful, and engaging explanation of the topic. Include examples, analogies, and practical insights."
-        }
-      ],
-      "keyTakeaways": [
-        "Key insight 1",
-        "Key insight 2"
+      "  topics": [
+        "Topic 1",
+        "Topic 2"
       ]
     }
   ]
@@ -86,25 +85,34 @@ Please output in the following JSON structure:
             const aiResult = JSON.parse(cleanedText);
             console.log("Parsed AI Result:", aiResult);
 
-            
+
             const dbResult = await db.insert(AI_TEXT_RESPONSE_TABLE).values({
                 studyMaterialId: courseId,
                 aiResponse: aiResult,
-                createdBy: createdBy
-            }).returning({ AI_TEXT_RESPONSE_TABLE });
+                createdBy: createdBy,
+                createdAt: moment().format("DD-MM-yyyy")
 
-            
+            }).returning({ resp: AI_TEXT_RESPONSE_TABLE });
 
-            
-            return NextResponse.json({result:dbResult[0] });
+            // Triggering INGEST FUNCTION
+
+            const result = await inngest.send({
+                name:'notes.generate',
+                data:{
+                    course: dbResult[0].resp
+                }
+            })
+
+
+            return NextResponse.json({ result: dbResult[0] });
 
         } catch (parseError) {
             console.error("Error parsing AI response:", parseError);
             console.error("Cleaned AI Response Text that failed to parse:", cleanedText);
 
             // Return the raw AI response for debugging
-            return NextResponse.json({ 
-                success: false, 
+            return NextResponse.json({
+                success: false,
                 error: "AI response is not valid JSON",
                 rawAIResponse: aiText,
                 cleanedText: cleanedText

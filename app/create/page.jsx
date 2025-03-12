@@ -127,26 +127,43 @@ function Create() {
                 .limit(1);
     
             const firstItem = resData[0];
-    
-            if (!hasPdf) {
-                console.log("res is going thru");
-    
-                // Prepare the payload
-                const payload = {
+
+            if(firstItem.courseType == 'Study'){
+                if (!hasPdf) {
+                    console.log("res is going thru");
+        
+                    // Prepare the payload
+                    const payload = {
+                        courseId: firstItem.courseId,
+                        courseType: firstItem.courseType,
+                        topic: firstItem.topic,
+                        difficultyLevel: firstItem.difficultyLevel,
+                        courseLayout: firstItem.courseLayout,
+                        createdBy: firstItem.createdBy,
+                    };
+                    console.log("Request Payload:", payload);
+        
+                    // Send the POST request
+                    const res = await axios.post('/api/generate-course-outline', payload);
+                    console.log("Response from API:", res.data);
+                    toast("Your course content is generating...")
+                }
+            }
+            else if(firstItem.courseType == 'Practice'){
+                const practicePayload = {
                     courseId: firstItem.courseId,
                     courseType: firstItem.courseType,
                     topic: firstItem.topic,
                     difficultyLevel: firstItem.difficultyLevel,
-                    courseLayout: firstItem.courseLayout,
                     createdBy: firstItem.createdBy,
                 };
-                console.log("Request Payload:", payload);
-    
-                // Send the POST request
-                const res = await axios.post('/api/generate-course-outline', payload);
+        
+                const res = await axios.post('/api/generate-practice-questions', practicePayload);
                 console.log("Response from API:", res.data);
-                toast("Your course content is generating...")
+                toast("Your practice questions are generating...");
             }
+    
+           
         } catch (error) {
             console.error("Error in GenerateCourseOutline:", error);
         }

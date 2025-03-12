@@ -73,3 +73,20 @@ export const GenerateFlashCardAI = model.startChat({
     },
   ],
 })
+
+export const GenerateQuizAiModel = model.startChat({
+  generationConfig,
+  history: [
+    {
+      role: "user",
+      parts: [
+        {text: "Generate quiz on topic: calc 1, Difficulty: Medium and content: chain rule with questions and options along with correct answer in jSON format\n"},
+      ],
+    },
+    {
+      role: "model",
+      parts: [
+        {text: "```json\n{\n  \"quizTitle\": \"Chain Rule Calculus Quiz (Medium)\",\n  \"questions\": [\n    {\n      \"questionText\": \"Find the derivative of y = sin(3x² + 1).\",\n      \"options\": [\n        \"6x cos(3x² + 1)\",\n        \"cos(3x² + 1)\",\n        \"6x sin(3x² + 1)\",\n        \"-6x cos(3x² + 1)\"\n      ],\n      \"correctAnswer\": \"6x cos(3x² + 1)\"\n    },\n    {\n      \"questionText\": \"If f(x) = (2x + 1)⁵, what is f'(x)?\",\n      \"options\": [\n        \"5(2x + 1)⁴\",\n        \"10(2x + 1)⁴\",\n        \"2(2x + 1)⁴\",\n        \"(2x + 1)⁴\"\n      ],\n      \"correctAnswer\": \"10(2x + 1)⁴\"\n    },\n    {\n      \"questionText\": \"What is the derivative of  y = e^(cos(x))?\",\n      \"options\": [\n        \"e^(cos(x))\",\n        \"-sin(x) * e^(cos(x))\",\n        \"sin(x) * e^(cos(x))\",\n        \"-e^(sin(x))\"\n      ],\n      \"correctAnswer\": \"-sin(x) * e^(cos(x))\"\n    },\n    {\n      \"questionText\": \"Determine dy/dx if y = ln(x³ + 2x).\",\n      \"options\": [\n        \"1/(x³ + 2x)\",\n        \"(3x² + 2) / (x³ + 2x)\",\n        \"3x² + 2\",\n        \"(x³ + 2x) / (3x² + 2)\"\n      ],\n      \"correctAnswer\": \"(3x² + 2) / (x³ + 2x)\"\n    },\n    {\n      \"questionText\": \"Find the derivative of y = √(4x - 1)\",\n      \"options\": [\n        \"4 / (2√(4x - 1))\",\n        \"1 / (2√(4x - 1))\",\n        \"2 / √(4x - 1)\",\n        \"√(4x-1)\"\n      ],\n      \"correctAnswer\": \"4 / (2√(4x - 1))\"\n    },\n    {\n      \"questionText\": \"If y = tan²(x), then dy/dx = ?\",\n      \"options\": [\n        \"2tan(x)\",\n        \"2tan(x)sec²(x)\",\n        \"sec⁴(x)\",\n        \"2sec²(x)\"\n      ],\n      \"correctAnswer\": \"2tan(x)sec²(x)\"\n    },\n    {\n      \"questionText\": \"What is the derivative of f(x) = sin(e^x)?\",\n      \"options\": [\n        \"cos(e^x)\",\n        \"e^x cos(e^x)\",\n        \"-e^x cos(e^x)\",\n        \"e^x sin(e^x)\"\n      ],\n      \"correctAnswer\": \"e^x cos(e^x)\"\n    },\n    {\n      \"questionText\": \"Find the derivative of y = (x² + 3)^(3/2)\",\n      \"options\": [\n        \"3x√(x² + 3)\",\n        \"(3/2)(x² + 3)^(1/2)\",\n        \"(3/2)(2x)\",\n        \"3x(x² + 3)^(1/2)\"\n      ],\n      \"correctAnswer\": \"3x√(x² + 3)\"\n    },\n        {\n      \"questionText\": \"Find the derivative of y = cos(sin(x))\",\n      \"options\": [\n        \"-sin(cos(x))\",\n        \"-sin(x)sin(cos(x))\",\n        \"-cos(x)cos(sin(x))\",\n        \"-sin(x)\"\n      ],\n      \"correctAnswer\": \"-sin(x)sin(cos(x))\"\n    },\n    {\n      \"questionText\": \"What is the derivative of f(x) = 2^(x^2)?\",\n      \"options\": [\n        \"2^(x^2) * ln(2)\",\n        \"x * 2^(x^2)\",\n        \"2x * 2^(x^2) * ln(2)\",\n        \"2x * 2^(x^2)\"\n      ],\n      \"correctAnswer\": \"2x * 2^(x^2) * ln(2)\"\n    }\n  ]\n}\n```"},
+      ],
+    },
+  ]})

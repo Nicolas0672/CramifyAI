@@ -43,3 +43,12 @@ export const FLASHCARD_CONTENT = pgTable('flashCardContent',{
     type: varchar().notNull(),
     status: varchar().default('Generating')
 })
+
+export const PRACTICE_QUIZ_TABLE = pgTable('PracticeQuiz',{
+    id:serial().primaryKey(),
+    aiResponse: json(),
+    courseId:varchar().notNull(),
+    status: varchar().default('Ready'),
+    createdBy:varchar().notNull(),
+    createdAt: varchar()
+})

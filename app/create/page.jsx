@@ -156,6 +156,7 @@ function Create() {
                     topic: firstItem.topic,
                     difficultyLevel: firstItem.difficultyLevel,
                     createdBy: firstItem.createdBy,
+                    courseLayout: firstItem.courseLayout
                 };
         
                 const res = await axios.post('/api/generate-practice-questions', practicePayload);

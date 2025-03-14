@@ -1,5 +1,5 @@
 import { db } from "@/configs/db"
-import { CHAPTER_NOTE_TABLE, FLASHCARD_CONTENT, PRACTICE_QUIZ_TABLE } from "@/configs/schema"
+import { CHAPTER_NOTE_TABLE, FILL_BLANK_TABLE, FLASHCARD_CONTENT, PRACTICE_QUIZ_TABLE } from "@/configs/schema"
 import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
@@ -31,6 +31,20 @@ export async function POST(req) {
         
 
         return NextResponse.json(flashcard[0])
+    }
+    else if(studyType == 'quizAll'){
+        const practiceSheet = await db.select().from(PRACTICE_QUIZ_TABLE)
+        .where(eq(PRACTICE_QUIZ_TABLE?.courseId, courseId))
+
+        const fillBlank = await db.select().from(FILL_BLANK_TABLE)
+        .where(eq(FILL_BLANK_TABLE?.courseId, courseId))
+
+        const result = {
+            quiz: practiceSheet[0],
+            Fill: fillBlank[0]
+        }
+        
+        return NextResponse.json(result)
     }
     else if(studyType == 'quiz'){
         const practiceSheet = await db.select().from(PRACTICE_QUIZ_TABLE)

@@ -131,6 +131,13 @@
 /* global.css */
 
 /* Consistent spacing for headings */
+.notes-content {
+  /* Add max-width and overflow handling for the container */
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
 .notes-content h1 {
   font-size: 2rem;
   font-weight: bold;
@@ -159,8 +166,7 @@
 }
 
 /* Consistent spacing for lists */
-.notes-content ul,
-.notes-content ol {
+.notes-content ul, .notes-content ol {
   margin-bottom: 1rem;
   margin-left: 1.5rem;
 }
@@ -173,7 +179,7 @@
   list-style-type: decimal;
 }
 
-/* Consistent spacing for code blocks */
+/* Improved code blocks */
 .notes-content pre {
   background-color: #2d2d2d;
   color: #f8f8f2;
@@ -181,11 +187,14 @@
   border-radius: 0.5rem;
   overflow-x: auto;
   margin-bottom: 1.5rem;
+  max-width: 100%;
+  white-space: pre-wrap;
 }
 
 .notes-content code {
   font-family: 'Courier New', monospace;
   background-color: #2d2d2d;
+  color: #f8f8f2;
   padding: 0.2rem 0.4rem;
   border-radius: 0.25rem;
 }
@@ -203,4 +212,33 @@
   margin: 1.5rem 0;
   border: 0;
   border-top: 1px solid #e5e7eb;
+}
+
+/* Additional styles for equations and math content */
+.notes-content .math-container {
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  margin-top: 8rem;
+  margin-bottom: 8rem;
+}
+
+/* Table styling */
+.notes-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  display: block;
+}
+
+.notes-content table td, .notes-content table th {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+}
+
+/* Images */
+.notes-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
 }

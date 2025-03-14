@@ -1,40 +1,46 @@
+"use client"
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import React, { useState } from 'react';
-import { motion } from 'framer-motion'; // For animations
-import { ArrowRight, RefreshCcw, Sparkles } from 'lucide-react'; // Modern icon
-import axios from 'axios';
+import { motion } from 'framer-motion';
+import { ArrowRight, RefreshCcw, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
-
-function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
-  const [loading, setLoading] = useState(false);
+function PracticeContentCard({quizTypeContent, item, refreshData, practiceCourse}) {
+  const [loading, setLoading] = useState();
+  const router = useRouter()
 
   const GenerateContent = async () => {
-    toast('Generating content');
-    setLoading(true);
-    let CHAPTERS = '';
-    course?.aiResponse.chapters.forEach((chapter) => {
-      CHAPTERS = (chapter.title || chapter?.courseTitle) + ',' + CHAPTERS;
-    });
-    const result = await axios.post('/api/generate-content', {
-      courseId: course?.studyMaterialId,
-      type: item.name,
-      chapters: CHAPTERS
-    });
-    console.log('generating flashcards', result);
     setLoading(false);
-    refreshData(true);
-    toast('Your content is ready to view');
-  };
+    toast('Generating Content');
+    const result = await axios.post('/api/generate-fill-blank',{
+      courseId: practiceCourse?.courseId,
+     
+      courseLayout: practiceCourse?.courseLayout,
+      difficultyLevel: practiceCourse?.difficultyLevel,
+      topic: practiceCourse?.topic
+
+    })
+
+    
+    toast('Content is generated');
+    refreshData(true)
+    router.push('/quiz/' + practiceCourse?.courseId + item.path)
+    setLoading(true);
+    
+  }
+
+  const isReady = quizTypeContent?.[item.type]?.status == 'Ready';
 
   return (
-    <Link href={'/course/' + course?.studyMaterialId + item.path}>
+    <Link href={'/quiz/' + practiceCourse?.courseId + item.path}>
       <motion.div
         className={`relative mt-3 border border-gray-200 shadow-lg p-6 rounded-xl
           flex flex-col items-center backdrop-blur-sm
-          ${studyTypeContent?.[item.type]?.length > 0 ? 'bg-gradient-to-br from-white/80 to-blue-50/50' : 'bg-gradient-to-br from-white/80 to-purple-50/50'}
+          ${isReady? 'bg-gradient-to-br from-white/80 to-blue-50/50' : 'bg-gradient-to-br from-white/80 to-purple-50/50'}
           hover:shadow-xl transition-all duration-300 h-full overflow-hidden`}
         whileHover={{ scale: 1.03, boxShadow: '0px 10px 25px rgba(0, 0, 0, 0.1)' }}
         whileTap={{ scale: 0.98 }}
@@ -53,7 +59,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
-              {studyTypeContent?.[item.type]?.length > 0 ? (
+              {isReady ? (
                 <div className='flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full text-xs mb-4 shadow-sm'>
                   <Sparkles className="w-3 h-3" />
                   <span>Ready</span>
@@ -96,7 +102,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
           >
-            {studyTypeContent?.[item.type]?.length > 0 ? (
+            {isReady ? (
               <Button
                 className='cursor-pointer w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-0 hover:from-blue-600 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 py-5'
               >
@@ -123,4 +129,4 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
   );
 }
 
-export default MaterialCardItem;
+export default PracticeContentCard;

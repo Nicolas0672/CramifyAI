@@ -1,7 +1,7 @@
 "use client";
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { LayoutDashboard, Shield, UserCircle, Menu } from 'lucide-react'; // Import Menu icon
+import { LayoutDashboard, Shield, UserCircle, Menu, BookOpen, Brain, Sparkles } from 'lucide-react'; // Added education/AI themed icons
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -131,71 +131,93 @@ function SideBar() {
     return (
         <>
             
-            {!isSidebarExpanded&& <div
-                className={`fixed top-4 mr-5 z-50 p-2 bg-white rounded-r-md shadow-sm cursor-pointer transition-all ${isSidebarExpanded ? 'ml-64' : 'ml-4'}`}
+            {!isSidebarExpanded && <div
+                className={`fixed top-4 mr-5 z-50 p-2 bg-white rounded-full shadow-md cursor-pointer transition-all hover:bg-blue-50 hover:scale-110 ${isSidebarExpanded ? 'ml-64' : 'ml-4'}`}
                 onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
             >
-                <Menu className="w-6 h-6 text-gray-700" />
+                <Menu className="w-6 h-6 text-blue-600" />
             </div>}
 
             {/* Sidebar */}
             <div
-                className={`fixed h-screen shadow-md p-5 bg-white ${isSidebarExpanded ? 'w-64' : 'w-0 overflow-hidden'}`}
+                className={`fixed h-screen shadow-lg p-5 bg-gradient-to-b from-white to-blue-50 ${isSidebarExpanded ? 'w-64' : 'w-0 overflow-hidden'} transition-all duration-300 ease-in-out`}
             >
              
-                {/* Logo */}
+                {/* Logo with glowing effect */}
                 <div className='flex gap-2 items-center'>
-    {/* Logo */}
-    <Image src={'/logo.svg'} color='black' alt='logo' width={40} height={40} />
+                    {/* Logo with subtle animation */}
+                    <div className="relative">
+                        <div className="absolute -inset-1 bg-blue-400 rounded-full blur-sm opacity-40 animate-pulse"></div>
+                        <Image src={'/logo.svg'} color='black' alt='logo' width={40} height={40} className="relative drop-shadow-md" />
+                    </div>
 
-    {/* Title */}
-    {isSidebarExpanded&&<h2 className='font-bold text-2xl text-gray-800'>CramifyAI</h2>}
+                    {/* Title */}
+                    {isSidebarExpanded && <h2 className='font-bold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600'>CramifyAI</h2>}
 
-    {/* Hamburger Menu */}
-    <div
-        className='p-2 bg-white rounded-r-md shadow-sm cursor-pointer transition-all'
-        onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
-    >
-        <Menu className="w-6 h-6 text-gray-700" />
-    </div>
-</div>
+                    {/* Hamburger Menu */}
+                    <div
+                        className='p-2 bg-white rounded-full shadow-md cursor-pointer transition-all hover:bg-blue-50 hover:rotate-180 duration-300'
+                        onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+                    >
+                        <Menu className="w-6 h-6 text-blue-600" />
+                    </div>
+                </div>
 
                 {/* Create New Button */}
-                {isSidebarExpanded&&<div className='mt-10'>
+                {isSidebarExpanded && <div className='mt-10'>
                     <Button
-                        className='w-full cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition-all'
+                        className='w-full cursor-pointer bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-xl transform hover:-translate-y-1'
                         onClick={() => setOpenDialogue(true)}
                     >
-                        + Create New
+                        <Sparkles className="w-4 h-4 mr-2" /> Create New
                     </Button>
                 </div>}
 
                 {/* Menu List */}
-                {isSidebarExpanded&&<div className='mt-5'>
-                    {MenuList.map((menu, index) => (
-                        <Link href={menu.path} key={index}>
-                            <div
-                                className={`mt-3 flex gap-5 items-center p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-all
-                                    ${path === menu.path ? 'bg-blue-50 text-blue-600' : 'text-gray-700'}`}
-                            >
-                                <menu.icon className={`w-5 h-5 ${path === menu.path ? 'text-blue-600' : 'text-gray-500'}`} />
-                                <h2 className='text-md font-medium'>{menu.name}</h2>
-                            </div>
-                        </Link>
-                    ))}
+                {isSidebarExpanded && <div className='mt-8 space-y-2'>
+    {MenuList.map((menu, index) => (
+        <Link href={menu.path} key={index}>
+            <div
+                className={`flex gap-4 items-center p-3.5 rounded-xl cursor-pointer transition-all duration-300
+                    ${path === menu.path 
+                        ? 'bg-gradient-to-r from-blue-100 to-blue-50 text-blue-600 shadow-md border-l-4 border-blue-500' 
+                        : 'text-gray-700 hover:bg-white hover:shadow-sm border-l-4 border-transparent'}`}
+            >
+                <div className={`p-2 rounded-lg ${path === menu.path ? 'bg-white/80' : 'bg-gray-100/70'}`}>
+                    <menu.icon className={`w-5 h-5 ${path === menu.path ? 'text-blue-600' : 'text-gray-600'}`} />
                 </div>
-}
+                <h2 className={`text-md font-medium transition-all ${path === menu.path ? 'font-semibold' : ''}`}>
+                    {menu.name}
+                </h2>
+            </div>
+        </Link>
+    ))}
+</div>}
+                    <div className='mt-64'>
+                {/* AI Tips/Suggestion */}
+                {isSidebarExpanded && <div className="mt-6 bg-purple-50 p-3 rounded-lg border border-purple-100 shadow-sm">
+                    <div className="flex items-center mb-2">
+                        <Brain className="w-5 h-5 text-purple-500 mr-2" />
+                        <span className="text-sm font-medium text-purple-700">AI Study Tip</span>
+                    </div>
+                    <p className="text-xs text-purple-600 italic">Try studying in 25-minute sessions with 5-minute breaks for optimal retention!</p>
+                </div>}
+                
                 {/* Credits Section */}
-                {isSidebarExpanded&&<div className="relative mt-64 bottom-4">
-                    <div className="absolute mt-52 w-[100%] left-1/2 transform -translate-x-1/2 border p-4 bg-blue-50 rounded-lg shadow-sm">
-                        <h2 className="text-md mb-2 text-gray-800">Available Credits:</h2>
-                        <Progress value={30} className="h-2 bg-blue-100" />
-                        <h2 className="text-sm text-gray-600 mt-1">Out of 5 Credits Used</h2>
-                        <Link href={'/dashboard/upgrade'} className="text-blue-600 text-xs mt-2 hover:underline">
-                            Upgrade to create more
+                {isSidebarExpanded && <div className="relative mt-auto m">
+                    <div className="mt-8 w-full border p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg shadow-sm">
+                        <div className="flex items-center justify-between mb-2">
+                            <h2 className="text-md text-gray-800 font-medium">Study Credits:</h2>
+                            <span className="text-blue-600 font-bold">30%</span>
+                        </div>
+                        <Progress value={30} className="h-3 bg-blue-100/50 rounded-full overflow-hidden" indicatorClassName="bg-gradient-to-r from-blue-500 to-purple-500" />
+                        <h2 className="text-sm text-gray-600 mt-1">3 out of 10 Credits Used</h2>
+                        <Link href={'/dashboard/upgrade'} className="flex items-center justify-center mt-3 text-white text-sm bg-gradient-to-r from-blue-400 to-purple-400 p-2 rounded-md hover:from-blue-500 hover:to-purple-500 transition-all shadow-sm hover:shadow-md">
+                            <Sparkles className="w-4 h-4 mr-1" /> Upgrade for More
                         </Link>
                     </div>
                 </div>}
+                </div>
 
                 {/* Dialog for Study Material Selection */}
                 <Dialog open={openDialogue} onOpenChange={setOpenDialogue}>

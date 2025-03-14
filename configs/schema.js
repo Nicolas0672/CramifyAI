@@ -50,5 +50,17 @@ export const PRACTICE_QUIZ_TABLE = pgTable('PracticeQuiz',{
     courseId:varchar().notNull(),
     status: varchar().default('Ready'),
     createdBy:varchar().notNull(),
-    createdAt: varchar()
+    createdAt: varchar(),
+    quiz:varchar().default('quiz'),
+    courseLayout:text(),
+    topic:varchar().notNull(),
+    difficultyLevel:varchar().default('Easy'),
+})
+
+export const FILL_BLANK_TABLE = pgTable('Fill-Blank',{
+    id:serial().primaryKey(),
+    aiResponse: json(),
+    courseId: varchar().notNull(),
+    type: varchar().notNull(),
+    status: varchar().default('Generating')
 })

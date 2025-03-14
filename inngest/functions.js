@@ -1,8 +1,8 @@
 import { db } from "@/configs/db";
 import { inngest } from "./client";
-import { AI_TEXT_RESPONSE_TABLE, CHAPTER_NOTE_TABLE, FLASHCARD_CONTENT, USER_TABLE } from "@/configs/schema";
+import { AI_TEXT_RESPONSE_TABLE, CHAPTER_NOTE_TABLE, FILL_BLANK_TABLE, FLASHCARD_CONTENT, USER_TABLE } from "@/configs/schema";
 import { eq } from "drizzle-orm";
-import { GenerateFlashCardAI, generateNotesAIModel } from "@/configs/AiModel";
+import { GenerateFillBlank, GenerateFlashCardAI, generateNotesAIModel } from "@/configs/AiModel";
 
 export const helloWorld = inngest.createFunction(
   { id: "hello-world" },
@@ -151,7 +151,7 @@ export const GenerateMaterialContent= inngest.createFunction(
   {event:'studyType.content'},
 
   async({event, step}) =>{
-    const {studyType, prompt, courseId, recordId} = event.data;
+    const {prompt, courseId, recordId} = event.data;
     
     const FlashCardAiResult = await step.run('Generating Flashcard using AI', async() => {
       const result = await GenerateFlashCardAI.sendMessage(prompt)
@@ -176,6 +176,35 @@ export const GenerateMaterialContent= inngest.createFunction(
       return 'Data Inserted'
 
     })
+  }
+)
+
+export const GenerateFillContent= inngest.createFunction(
+  {id: 'Generating Fill-Blank Content'},
+  {event: 'fill-blank.content'},
+
+  async({event, step}) => {
+    const {prompt, recordId} = event.data;
+
+    const FillAiResult = await step.run('Generating Fill Cards', async()=>{
+      const result = await GenerateFillBlank.sendMessage(prompt)
+      const AIResult = JSON.parse(
+        result.response.text()
+         .replace(/\\"/g, '"') // Fix double-escaped quotes
+         .replace(/\\n/g, '')  // Clean newlines
+         .trim()
+     );
+     return AIResult
+    })
+
+    const DbResult = await step.run('Saving to DB', async()=>{
+      const result = await db.update(FILL_BLANK_TABLE).set({
+        aiResponse: {data : FillAiResult},
+        status: 'Ready'
+      }).where(eq(FILL_BLANK_TABLE.id, recordId))
+      return 'Data Inserted'
+    })
+
   }
 )
 

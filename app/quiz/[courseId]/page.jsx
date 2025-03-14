@@ -17,13 +17,14 @@ function ViewQuiz() {
     const GetPracticeDetails=async()=>{
         const res = await axios.get(`/api/quizzes?courseId=${courseId}`);
         setPracticeCourse(res.data.result) 
-        console.log(res.data.result)
+        
     }
 
   return (
     <div>
-        <QuizSection course={practiceCourse} courseId={courseId}/>
+        
         <PracticeIntroCard course={practiceCourse}/>
+        <QuizSection course={practiceCourse} courseId={courseId}/>
     </div>
   )
 }

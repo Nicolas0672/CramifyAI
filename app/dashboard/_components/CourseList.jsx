@@ -12,67 +12,99 @@ function CourseList() {
     const [quizList, setQuizList] = useState([])
     const [loading, setLoading] = useState(false)
     const [mode, setMode] = useState('study')  // NEW - Switch between Study & Practice
-
+    
     useEffect(() => {
         user && getCourseList();
         user && getQuizList();  // NEW - Fetch quizzes too
         console.log(mode)
     }, [user])
-
+    
     const getCourseList = async () => {
         setLoading(true);
         const result = await axios.post('/api/courses', { createdBy: user?.primaryEmailAddress.emailAddress });
         setCourseList(result.data.result);
         setLoading(false);
     }
-
+    
     const getQuizList = async () => {
         setLoading(true);
         const result = await axios.post('/api/quizzes', { createdBy: user?.primaryEmailAddress.emailAddress });
         setQuizList(result.data.result);
         setLoading(false);
     }
-
+    
     return (
-        <div className='mt-5'>
-            <h2 className='font-bold text-2xl flex justify-between items-center'>
-                {mode === 'study' ? 'Your Study Material' : 'Your Practice Quizzes'}
-
-                <div className="flex gap-2">
-                    <Button className='cursor-pointer'onClick={() => setMode('study')} 
-                            variant={mode === 'study' ? 'default' : 'outline'}>
-                        Study
-                    </Button>
-                    <Button className='cursor-pointer' onClick={() => setMode('practice')} 
-                            variant={mode === 'practice' ? 'default' : 'outline'}>
-                        Practice
-                    </Button>
-                    <Button className='cursor-pointer'onClick={() => setMode('exam')} 
-                            variant={mode === 'exam' ? 'default' : 'outline'} >Exam</Button>
-                    <Button 
-                        onClick={mode === 'study' ? getCourseList : getQuizList}
-                        variant='outline'
-                        className='cursor-pointer border-black-500'
-                    >
-                        <RefreshCcw className=''/> Refresh
-                    </Button>
+        <div className='mt-5 px-2'>
+            <div className='mb-8 pb-4 border-b border-gray-100'>
+                <h2 className='font-bold text-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
+                    <span className='text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800 pb-1'>
+                        {mode === 'study' ? 'Your Study Material' : mode === 'practice' ? 'Your Practice Quizzes' : 'Your Exam Sets'}
+                    </span>
                     
-                </div>
-            </h2>
-
-            <div className='mt-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5'>
+                    <div className="flex flex-wrap gap-2">
+                        <div className='p-1 gap-3 bg-gray-50 rounded-lg shadow-sm flex gap-1'>
+                            <Button 
+                                className={`cursor-pointer px-4 py-2 transition-all duration-300 ${mode === 'study' ? 'shadow-md' : ''}`}
+                                onClick={() => setMode('study')}
+                                variant={mode === 'study' ? 'default' : 'outline'}>
+                                Study
+                            </Button>
+                            <Button 
+                                className={`cursor-pointer px-4 py-2 transition-all duration-300 ${mode === 'practice' ? 'shadow-md' : ''}`} 
+                                onClick={() => setMode('practice')}
+                                variant={mode === 'practice' ? 'default' : 'outline'}>
+                                Practice
+                            </Button>
+                            <Button 
+                                className={`cursor-pointer px-4 py-2 transition-all duration-300 ${mode === 'exam' ? 'shadow-md' : ''}`}
+                                onClick={() => setMode('exam')}
+                                variant={mode === 'exam' ? 'default' : 'outline'}>
+                                Exam
+                            </Button>
+                            <Button
+                            onClick={mode === 'study' ? getCourseList : getQuizList}
+                            variant='outline'
+                            className='cursor-pointer border-gray-300 hover:border-blue-500 hover:text-blue-500 transition-colors duration-300 shadow-sm'
+                        >
+                            <RefreshCcw className='mr-1 h-4 w-4'/> Refresh
+                        </Button>
+                        </div>
+                       
+                    </div>
+                </h2>
+            </div>
+            
+            <div className='mt-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5'>
                 {!loading ? 
-                    (mode === 'study' ? 
-                        courseList.map((course, index) => (
-                            <CourseCardItem course={course} key={index} mode={mode} loading={loading} />
-                        ))
+                    (mode === 'study' ?
+                        courseList.length > 0 ? (
+                            courseList.map((course, index) => (
+                                <CourseCardItem course={course} key={index} mode={mode} loading={loading} />
+                            ))
+                        ) : (
+                            <div className="col-span-full py-8 text-center text-gray-500">
+                                No study materials found. Create your first one!
+                            </div>
+                        )
                         :
-                        quizList.map((quiz, index) => (
-                            <CourseCardItem course={quiz} key={index} mode={mode} loading={loading}/>
-                        ))
-                    ) :
-                    [1, 2, 3, 4, 5, 6].map((item, index) => (
-                        <div key={index} className='h-56 w-full bg-slate-200 rounded-lg animate-pulse'></div>
+                        quizList.length > 0 ? (
+                            quizList.map((quiz, index) => (
+                                <CourseCardItem course={quiz} key={index} mode={mode} loading={loading}/>
+                            ))
+                        ) : (
+                            <div className="col-span-full py-8 text-center text-gray-500">
+                                No {mode === 'practice' ? 'practice quizzes' : 'exam sets'} found. Create your first one!
+                            </div>
+                        )
+                    ) : 
+                    [1, 2, 3, 4].map((item, index) => (
+                        <div key={index} className='h-56 w-full bg-gradient-to-r from-slate-200 to-slate-100 rounded-lg animate-pulse shadow-sm'>
+                            <div className="h-28 bg-slate-300/50 rounded-t-lg"></div>
+                            <div className="p-3">
+                                <div className="h-4 bg-slate-300/70 rounded-full w-3/4 mb-2"></div>
+                                <div className="h-3 bg-slate-300/50 rounded-full w-1/2"></div>
+                            </div>
+                        </div>
                     ))
                 }
             </div>

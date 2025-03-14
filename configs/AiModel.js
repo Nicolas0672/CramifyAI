@@ -90,3 +90,82 @@ export const GenerateQuizAiModel = model.startChat({
       ],
     },
   ]})
+
+
+    export const GenerateFillBlank = model.startChat({
+      generationConfig,
+      history: [
+        {
+          role: "user",
+          parts: [
+            {text: "Generate 5 **fill-in-the-blank** question based on the given topic. Ensure the question has **only one correct answer**. Provide the correct answer separately.\n\nTopic: ${topic}, ContentType: ${courseLayout}, DifficultyLevel: ${difficultyLevel}\n\nRequirements:\n- Keep the question concise but clear.\n- Ensure only **one** word, phrase, or number is missing.\n- If it's a **math question**, format the question using LaTeX syntax and return it as a **string** that can be rendered with MathJax.\n- The correct answer should also be formatted properly but kept as a plain string.\n\nOutput Format (JSON-compatible):\n{\n  \"question\": \"Solve for x: \\\\( 2x + 3 = 7 \\\\), so \\\\( x = \\\\) ____\",\n  \"answer\": \"2\"\n}\n`;"},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {text: "Okay, I understand. I will generate 5 fill-in-the-blank questions based on your specified topic, content type, and difficulty level, following all the requirements.\n\n```json\n[\n  {\n    \"question\": \"Topic: Photosynthesis, ContentType: Definition, DifficultyLevel: Easy - Photosynthesis is the process by which plants convert light energy into _______ energy.\",\n    \"answer\": \"chemical\"\n  },\n  {\n    \"question\": \"Topic: Cell Biology, ContentType: Cell Structure, DifficultyLevel: Medium - The powerhouse of the cell, responsible for generating ATP, is the ________.\",\n    \"answer\": \"mitochondria\"\n  },\n  {\n    \"question\": \"Topic: Genetics, ContentType: Mendelian Genetics, DifficultyLevel: Medium - If a heterozygous tall plant (Tt) is crossed with a homozygous dwarf plant (tt), the probability of offspring being dwarf is ____ %.\",\n    \"answer\": \"50\"\n  },\n  {\n    \"question\": \"Topic: Ecology, ContentType: Food Webs, DifficultyLevel: Medium - In a food web, organisms that eat only plants are called ________.\",\n    \"answer\": \"herbivores\"\n  },\n  {\n    \"question\": \"question\": \"Topic: Evolution, ContentType: Natural Selection, DifficultyLevel: Hard -  The process by which organisms better adapted to their environment tend to survive and reproduce more successfully is called natural ________.\",\n    \"answer\": \"selection\"\n  }\n]\n```"},
+          ],
+        },
+        {
+          role: "user",
+          parts: [
+            {text: "try with math \n"},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {text: "Okay, I will generate 5 fill-in-the-blank math questions, following all the requirements.\n\n```json\n[\n  {\n    \"question\": \"Topic: Algebra, ContentType: Linear Equations, DifficultyLevel: Easy - Solve for x: \\\\( x + 5 = 12 \\\\), so \\\\( x = \\\\) ____\",\n    \"answer\": \"7\"\n  },\n  {\n    \"question\": \"Topic: Geometry, ContentType: Area of a Square, DifficultyLevel: Easy - The area of a square with side length 6 is ____.\",\n    \"answer\": \"36\"\n  },\n  {\n    \"question\": \"Topic: Calculus, ContentType: Derivatives, DifficultyLevel: Medium - If \\\\( f(x) = x^2 \\\\), then \\\\( f'(x) = \\\\) ____\",\n    \"answer\": \"2x\"\n  },\n  {\n    \"question\": \"Topic: Trigonometry, ContentType: Basic Trig Functions, DifficultyLevel: Medium -  \\\\( sin(π/2) = \\\\) ____\",\n    \"answer\": \"1\"\n  },\n  {\n    \"question\": \"Topic: Number Theory, ContentType: Prime Numbers, DifficultyLevel: Hard - The smallest prime number greater than 20 is ____.\",\n    \"answer\": \"23\"\n  }\n]\n```"},
+          ],
+        },
+        {
+          role: "user",
+          parts: [
+            {text: "Generate 5 **fill-in-the-blank** question based on the given Topic: ${topic}, ContentType: ${courseLayout}, DifficultyLevel: ${difficultyLevel}. Ensure the question has **only one correct answer**. Provide the correct answer separately.\n\n\n\nRequirements:\n- Keep the question concise but clear.\n- Ensure only **one** word, phrase, or number is missing.\n- If it's a **math question**, format the question using LaTeX syntax and return it as a **string** that can be rendered with MathJax.\n- The correct answer should also be formatted properly but kept as a plain string.\n\nOutput Format (JSON-compatible):\n{\n  \"question\": \"Solve for x: \\\\( 2x + 3 = 7 \\\\), so \\\\( x = \\\\) ____\",\n  \"answer\": \"2\"\n}\n`;"},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {text: "Okay, I'm ready. Please provide the following values:\n\n*   **topic:** (e.g., Chemistry, History, Literature, etc.)\n*   **courseLayout:** (e.g., Atomic Structure, World War II, Shakespearean Plays, etc.)\n*   **difficultyLevel:** (e.g., Easy, Medium, Hard)\n\nOnce you provide these, I will generate the JSON output with 5 fill-in-the-blank questions.\n"},
+          ],
+        },
+        {
+          role: "user",
+          parts: [
+            {text: "Generate 5 **fill-in-the-blank** question based on the given Topic: ${calc}, ContentType: ${derive}, DifficultyLevel: ${medium\n}. Ensure the question has **only one correct answer**. Provide the correct answer separately.\n\n\n\nRequirements:\n- Keep the question concise but clear.\n- Ensure only **one** word, phrase, or number is missing.\n- If it's a **math question**, format the question using LaTeX syntax and return it as a **string** that can be rendered with MathJax.\n- The correct answer should also be formatted properly but kept as a plain string.\n\nOutput Format (JSON-compatible):\n{\n  \"question\": \"Solve for x: \\\\( 2x + 3 = 7 \\\\), so \\\\( x = \\\\) ____\",\n  \"answer\": \"2\"\n}\n"},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {text: "Okay, I'll assume the missing values are as follows:\n\n*   **topic:** Calculus\n*   **courseLayout:** Derivatives\n*   **difficultyLevel:** Medium\n\nHere are 5 fill-in-the-blank questions based on those assumptions:\n\n```json\n[\n  {\n    \"question\": \"Topic: Calculus, ContentType: Derivatives, DifficultyLevel: Medium -  If \\\\( f(x) = x^3 \\\\), then \\\\( f'(x) = \\\\) ____\",\n    \"answer\": \"3x^2\"\n  },\n  {\n    \"question\": \"Topic: Calculus, ContentType: Derivatives, DifficultyLevel: Medium -  The derivative of a constant is always ____.\",\n    \"answer\": \"0\"\n  },\n  {\n    \"question\": \"Topic: Calculus, ContentType: Derivatives, DifficultyLevel: Medium -  If \\\\( f(x) = sin(x) \\\\), then \\\\( f'(x) = \\\\) ____\",\n    \"answer\": \"cos(x)\"\n  },\n  {\n    \"question\": \"Topic: Calculus, ContentType: Derivatives, DifficultyLevel: Medium - \\\\( \\\\frac{d}{dx} (5x^2 + 2x - 1) = \\\\) ____\",\n    \"answer\": \"10x + 2\"\n  },\n  {\n    \"question\": \"Topic: Calculus, ContentType: Derivatives, DifficultyLevel: Medium -  If \\\\( f(x) = e^x \\\\), then \\\\( f'(x) = \\\\) ____\",\n    \"answer\": \"e^x\"\n  }\n]\n```\n"},
+          ],
+        },
+        {
+          role: "user",
+          parts: [
+            {text: "Generate 5 **fill-in-the-blank** question based on the given Topic: ${topic}, ContentType: ${courseLayout}, DifficultyLevel: ${difficultyLevel}. Ensure the question has **only one correct answer**. Provide the correct answer separately.\n\n\n\nRequirements:\n- Keep the question concise but clear.\n- Ensure only **one** word, phrase, or number is missing.\n- If it's a **math question**, format the question using LaTeX syntax and return it as a **string** that can be rendered with MathJax.\n- The correct answer should also be formatted properly but kept as a plain string.\n\nMake SURE TO  Output  THIS  Format (JSON-compatible):\n{\n  \"question\": \"Solve for x: \\\\( 2x + 3 = 7 \\\\), so \\\\( x = \\\\) ____\",\n  \"answer\": \"2\"\n}\n`;"},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {text: "I understand. To generate the questions, I need you to provide the following:\n\n*   **topic:** (e.g., Chemistry, History, Literature, etc.)\n*   **courseLayout:** (e.g., Atomic Structure, World War II, Shakespearean Plays, etc.)\n*   **difficultyLevel:** (e.g., Easy, Medium, Hard)\n\nOnce you provide these values, I will create the JSON output with 5 fill-in-the-blank questions in the exact format you specified. I'm waiting for your input!\n"},
+          ],
+        },
+        {
+          role: "user",
+          parts: [
+            {text: "Generate 5 fill-in-the-blank question based on the given Topic: ${calc}, ContentType: ${derive}, DifficultyLevel: ${medium\n}. Ensure the question has only one correct answer. Provide the correct answer separately.\n\nRequirements:\n\nKeep the question concise but clear.\n\nEnsure only one word, phrase, or number is missing.\n\nIf it's a math question, format the question using LaTeX syntax and return it as a string that can be rendered with MathJax.\n\nThe correct answer should also be formatted properly but kept as a plain string.\n\nMake SURE TO  Output  THIS  Format (JSON-compatible):\n{\n\"question\": \"Solve for x: \n2\nx\n+\n3\n=\n7\n2x+3=7\n, so \nx\n=\nx=\n ____\",\n\"answer\": \"2\"\n}"},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {text: "You've provided the Topic, ContentType and DifficultyLevel as `${calc}`, `${derive}` and `${medium}` respectively. However, those are placeholders and I need actual values to create the questions. I'll assume you meant:\n\n*   **Topic:** Calculus\n*   **ContentType:** Derivatives\n*   **DifficultyLevel:** Medium\n\nBased on these assumptions, here are 5 fill-in-the-blank questions in the requested JSON format:\n\n```json\n[\n  {\n    \"question\": \"Topic: Calculus, ContentType: Derivatives, DifficultyLevel: Medium - If \\\\( f(x) = 4x^3 \\\\), then \\\\( f'(x) = \\\\) ____\",\n    \"answer\": \"12x^2\"\n  },\n  {\n    \"question\": \"Topic: Calculus, ContentType: Derivatives, DifficultyLevel: Medium - The derivative of \\\\( x \\\\) with respect to \\\\( x \\\\) is ____.\",\n    \"answer\": \"1\"\n  },\n  {\n    \"question\": \"Topic: Calculus, ContentType: Derivatives, DifficultyLevel: Medium - If \\\\( f(x) = cos(x) \\\\), then \\\\( f'(x) = \\\\) ____\",\n    \"answer\": \"-sin(x)\"\n  },\n  {\n    \"question\": \"Topic: Calculus, ContentType: Derivatives, DifficultyLevel: Medium - \\\\( \\\\frac{d}{dx} (x^4 - 3x^2 + 6) = \\\\) ____\",\n    \"answer\": \"4x^3 - 6x\"\n  },\n  {\n    \"question\": \"Topic: Calculus, ContentType: Derivatives, DifficultyLevel: Medium - If \\\\( f(x) = ln(x) \\\\), then \\\\( f'(x) = \\\\) ____\",\n    \"answer\": \"\\\\frac{1}{x}\"\n  }\n]\n```\n"},
+          ],
+        },
+      ],
+    });

@@ -10,8 +10,8 @@ function DashboardLayout({children}) {
       <div className='md:w-64 hidden md:block fixed'>
         
       </div>
-      <div className='md:ml-64'>
-        <DashboardHeader/>
+      <div className='md:ml-60'>
+        
         <div className='p-10'>
         {children}
       </div>

@@ -52,4 +52,10 @@ export async function POST(req) {
 
         return NextResponse.json(practiceSheet[0])
     }
+    else if(studyType == 'fill'){
+        const fillBlank = await db.select().from(FILL_BLANK_TABLE)
+        .where(eq(FILL_BLANK_TABLE?.courseId, courseId))
+
+        return NextResponse.json(fillBlank[0])
+    }
 }

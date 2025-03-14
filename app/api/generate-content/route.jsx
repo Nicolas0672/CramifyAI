@@ -14,6 +14,7 @@ Each flashcard should include:
 Format the output as an array of objects with "front", "back", and "isMath" keys.
 ** DO NOT INCLUDE CHAPTER NUMBER
 MAKE SURE IT'S IN JSON FORMAT
+If it's a **math question**, format the question using LaTeX syntax and return it as a **string** that can be rendered with MathJax.
 `
 
 

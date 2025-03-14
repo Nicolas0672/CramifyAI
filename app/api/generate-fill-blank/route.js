@@ -16,24 +16,34 @@ export async function POST(req) {
         }
 
         const prompt = `
-        Generate 5 **fill-in-the-blank** questions based on the given Topic: ${topic}, ContentType: ${courseLayout}, DifficultyLevel: ${difficultyLevel}.
-        Ensure the question has **only one correct answer**. Provide the correct answer separately.
+    Generate 5 **fill-in-the-blank** questions based on the given Topic: ${topic}, ContentType: ${courseLayout}, DifficultyLevel: ${difficultyLevel}.
+    Ensure the question has **only one correct answer**. Provide the correct answer separately.
 
-        Requirements:
-        - Keep the question concise but clear.
-        - Ensure only **one** word, phrase, or number is missing.
-        - If it's a **math question**, format the question using LaTeX syntax and return it as a **string** that can be rendered with MathJax.
-        - The correct answer should also be formatted properly but kept as a plain string.
+    Requirements:
+    - Keep the question concise but clear.
+    - Ensure only **one** word, phrase, or number is missing.
+    - If it's a **math question**, format the question using LaTeX syntax and return it as a **string** that can be rendered with MathJax.
+    - The correct answer should also be formatted properly but kept as a plain string.
+    - Format the response as an array of objects with the structure below:
+    -ENSURE THAT QUESTION ONLY CONTAINS QUESTION AND ANSWER ONLY CONTAINS ANSWER. DO NOT PUT ANYTHING ELSE IN THE FORMAT. PLEASE USE REFERENCE BELOW
+    Example Output:
+    [
+      {
+        "question": "The capital of France is ____.",
+        "answer": "Paris"
+      },
+      {
+        "question": "Water boils at ____ degrees Celsius.",
+        "answer": "100"
+      },
+      {
+        "question": "Solve for x: \\( 2x + 3 = 7 \\), so \\( x = \\) ____",
+        "answer": "2"
+      },
+      ...
+    ]
+`
 
-        Make SURE TO Output THIS Format (JSON-compatible):
-        [
-          {
-            "question": "Solve for x: \\( 2x + 3 = 7 \\), so \\( x = \\) ____",
-            "answer": "2"
-          },
-          ...
-        ]
-        `;
 
         const result = await db.insert(FILL_BLANK_TABLE).values({
             courseId: courseId,

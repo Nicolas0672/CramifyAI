@@ -52,7 +52,19 @@ function ViewFlashCards() {
         courseId: courseId,
         studyType: 'Flashcard'
       })
-      setFlashCards(result.data.content.data)
+      
+      // Pass the data directly to avoid any string manipulation that could break LaTeX
+      // The FlashcardItem component will handle fixing the slash issues
+      const processedData = result.data.content.data.map(card => {
+        return {
+          ...card,
+          front: card.front || card.question || '',
+          back: card.back || card.answer || ''
+        };
+      });
+      
+      console.log("Raw flashcard data:", processedData);
+      setFlashCards(processedData)
     } catch (error) {
       console.error('Error fetching flashcards:', error)
     }

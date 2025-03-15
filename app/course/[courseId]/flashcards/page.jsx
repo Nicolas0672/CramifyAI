@@ -44,6 +44,10 @@ function ViewFlashCards() {
     setProgress(progressValue)
   }
 
+  const nextCard = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % flashCards.length);
+  };
+
   const handleClick = () => setIsFlipped(!isFlipped)
 
   const GetFlashCards = async () => {
@@ -91,6 +95,7 @@ function ViewFlashCards() {
                   flashcard={flashcard}
                   isFlipped={isFlipped}
                   onClick={handleClick}
+                  cardIndex={currentIndex}
                 />
               </CarouselItem>
             ))}

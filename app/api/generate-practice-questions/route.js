@@ -2,6 +2,7 @@ import { GenerateQuizAiModel } from "@/configs/AiModel";
 import { db } from "@/configs/db";
 import { PRACTICE_QUIZ_TABLE } from "@/configs/schema";
 import moment from "moment";
+import { NextResponse } from "next/server";
 
 export async function POST (req) {
     const { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy } = await req.json();
@@ -31,7 +32,7 @@ export async function POST (req) {
     },`;
 
     const aiResp = await GenerateQuizAiModel.sendMessage(prompt)
-    const aiText = aiResp.response.text()
+    const aiText =  aiResp.response.text()
 
     const cleanedText = aiText
             .replace(/^```json\n/, '')   // Remove leading ```json followed by a newline

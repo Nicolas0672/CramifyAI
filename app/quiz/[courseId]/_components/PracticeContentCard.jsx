@@ -14,7 +14,7 @@ function PracticeContentCard({quizTypeContent, item, refreshData, practiceCourse
   const router = useRouter()
 
   const GenerateContent = async () => {
-    setLoading(false);
+    setLoading(true);
     toast('Generating Content');
     const result = await axios.post('/api/generate-fill-blank',{
       courseId: practiceCourse?.courseId,
@@ -28,8 +28,8 @@ function PracticeContentCard({quizTypeContent, item, refreshData, practiceCourse
     
     toast('Content is generated');
     refreshData(true)
-    router.push('/quiz/' + practiceCourse?.courseId + item.path)
-    setLoading(true);
+    
+    setLoading(false);
     
   }
 

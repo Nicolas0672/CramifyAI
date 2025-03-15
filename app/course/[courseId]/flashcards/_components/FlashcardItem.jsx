@@ -2,34 +2,42 @@ import React, { useEffect, useState } from 'react';
 import ReactCardFlip from 'react-card-flip';
 import { MathJax, MathJaxContext } from 'better-react-mathjax';
 
-function FlashcardItem({ flashcard, isFlipped, onClick }) {
-  // IMPORTANT: Remove the following line from your code if it exists
-  // const santiziedContent = content.replace(/\\/g, '')
+function FlashcardItem({ flashcard, isFlipped, onClick, cardIndex }) {
+  // Add state to track the current card index
+  const [previousCardIndex, setPreviousCardIndex] = useState(cardIndex);
   
   useEffect(() => {
     console.log("Raw flashcard content:", flashcard);
   }, [flashcard]);
   
+  // Add effect to reset flip state when card changes
+  useEffect(() => {
+    // Check if we've moved to a new card
+    if (previousCardIndex !== cardIndex) {
+      // Update our tracked index
+      setPreviousCardIndex(cardIndex);
+      
+      // If the card is currently flipped (showing answer), reset it
+      if (isFlipped) {
+        // Call the onClick handler which should toggle the flip state
+        onClick();
+      }
+    }
+  }, [cardIndex, previousCardIndex, isFlipped, onClick]);
+  
   const renderContent = (content) => {
     if (!content) return "No content";
     
-    // CRITICAL: Check if we need to replace single backslashes
-    // This handles cases where the content already has / instead of \
     let fixedContent = content;
     
-    // If we see math delimiters with forward slashes instead of backslashes, fix them
     if (content.includes('$') && content.includes('/') && !content.includes('\\')) {
-      // Replace forward slashes with backslashes but only between $ delimiters
       fixedContent = content.replace(/(\$)(.*?)(\$)/g, function(match, opener, formula, closer) {
-        // Replace / with \ only within the formula part
         return opener + formula.replace(/\//g, '\\') + closer;
       });
       
       console.log("Fixed content with backslashes:", fixedContent);
     }
     
-    // Always wrap in MathJax regardless of content detection
-    // This ensures all math gets processed
     return (
       <MathJax>
         {fixedContent}

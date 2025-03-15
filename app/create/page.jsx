@@ -163,6 +163,16 @@ function Create() {
                 console.log("Response from API:", res.data);
                 toast("Your practice questions are generating...");
             }
+            else if(firstItem.courseType == 'Exam'){
+                const examPayload = {
+                    courseId: firstItem.courseId,
+                    courseLayout: firstItem.courseLayout,
+                    topic: firstItem.topic,
+                    difficultyLevel: firstItem.difficultyLevel,
+                    createdBy: firstItem.createdBy,
+
+                }
+            }
     
            
         } catch (error) {

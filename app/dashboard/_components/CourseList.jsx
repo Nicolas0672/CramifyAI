@@ -16,6 +16,7 @@ function CourseList() {
     useEffect(() => {
         user && getCourseList();
         user && getQuizList();  // NEW - Fetch quizzes too
+        user && GetExamList()
         console.log(mode)
     }, [user])
     
@@ -31,6 +32,16 @@ function CourseList() {
         const result = await axios.post('/api/quizzes', { createdBy: user?.primaryEmailAddress.emailAddress });
         setQuizList(result.data.result);
         setLoading(false);
+    }
+
+    const GetExamList = () =>{
+        console.log('hi')
+    }
+
+    const handleClick = ()=>{
+        if(mode == 'study') return getCourseList
+        if(mode == 'quiz') return getQuizList
+        if(mode == 'exam') return GetExamList
     }
     
     return (
@@ -62,7 +73,7 @@ function CourseList() {
                                 Exam
                             </Button>
                             <Button
-                            onClick={mode === 'study' ? getCourseList : getQuizList}
+                            onClick={mode === 'study' ? getCourseList : mode === 'practice' ? getQuizList : GetExamList}
                             variant='outline'
                             className='cursor-pointer border-gray-300 hover:border-blue-500 hover:text-blue-500 transition-colors duration-300 shadow-sm'
                         >

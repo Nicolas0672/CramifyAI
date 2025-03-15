@@ -1,7 +1,7 @@
 "use client";
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { LayoutDashboard, Shield, UserCircle, Menu, BookOpen, Brain, Sparkles } from 'lucide-react'; // Added education/AI themed icons
+import { LayoutDashboard, Shield, UserCircle, Menu, BookOpen, Brain, Sparkles, Loader2Icon } from 'lucide-react'; // Added education/AI themed icons
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -16,9 +16,11 @@ import {
 import { useStudy } from '@/app/StudyContext';
 import { useUser } from '@clerk/nextjs';
 import { db } from '@/configs/db';
-import { STUDY_MATERIAL_TABLE } from '@/configs/schema';
-import { desc, eq } from 'drizzle-orm';
+import { AI_TEXT_RESPONSE_TABLE, STUDY_MATERIAL_TABLE } from '@/configs/schema';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import { SidebarContext } from '../../SidebarContext';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 
 
 
@@ -34,7 +36,7 @@ function SideBar() {
     const [openDialogue, setOpenDialogue] = useState(false);
     const [selectedTopic, setSelectedTopic] = useState(null);
     const { isSidebarExpanded, setIsSidebarExpanded } = useContext(SidebarContext) // State for sidebar expansion
-
+    const [loading, setLoading] = useState()
     const MenuList = [
         {
             name: 'Dashboard',
@@ -107,11 +109,11 @@ function SideBar() {
         try {
             const res = await db
                 .select()
-                .from(STUDY_MATERIAL_TABLE)
-                .where(eq(STUDY_MATERIAL_TABLE.createdBy, user?.primaryEmailAddress?.emailAddress))
-                .orderBy(desc(STUDY_MATERIAL_TABLE.id));
+                .from(AI_TEXT_RESPONSE_TABLE)
+                .where(eq(AI_TEXT_RESPONSE_TABLE.createdBy, user?.primaryEmailAddress?.emailAddress))
+                .orderBy(desc(AI_TEXT_RESPONSE_TABLE.id));
 
-            const topicsList = res.map(item => item.topic);
+            const topicsList = res.map(item => item?.aiResponse?.courseTitle);
             setTopics(topicsList);
         } catch (error) {
             console.error("Error fetching topics:", error);
@@ -120,7 +122,60 @@ function SideBar() {
 
     const handleSelectTopic = (topic) => {
         setSelectedTopic(topic);
+
     };
+
+    useEffect(() => {
+        console.log(selectedTopic)
+    }, [selectedTopic])
+
+    const GenerateSelectedTopic = async () => {
+        setLoading(true)
+        toast('Your content is generating')
+        const dbResult = await db.select().from(AI_TEXT_RESPONSE_TABLE)
+            .where(
+                and(
+                    eq(AI_TEXT_RESPONSE_TABLE.createdBy, user?.primaryEmailAddress?.emailAddress),
+                    sql`${AI_TEXT_RESPONSE_TABLE.aiResponse} ->> 'courseTitle' = ${selectedTopic}`
+                )
+            );
+
+        
+
+        const firstItem = dbResult[0]
+
+        const chapters = firstItem?.aiResponse?.chapters
+
+        const combinedCourseLayout = chapters.map(chapter =>{
+            const title = chapter.title;
+            const summary = chapter.summary
+            const topic = (chapter.topics || []).join(", ");
+            return `${title}: ${summary}. Topics covered: ${topic}`;
+        })
+        .join(' || ')
+
+        const payLoad = {
+            courseId: firstItem?.studyMaterialId,
+            topic: firstItem?.aiResponse?.courseTitle,
+            courseType: firstItem?.aiResponse?.courseType,
+            courseLayout: combinedCourseLayout,
+            difficultyLevel: firstItem?.aiResponse?.difficultyLevel,
+            createdBy: user?.primaryEmailAddress?.emailAddress
+        }
+
+        console.log("paylod",payLoad)
+
+        
+
+        const res = await axios.post('/api/generate-practice-questions', payLoad)
+        console.log("data is generated", res.data)
+        setLoading(false)
+        toast("Your content is generated")
+        
+        router.replace('/dashboard')
+    }
+
+    // const { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy }
 
     useEffect(() => {
         if (isLoaded && user) {
@@ -130,7 +185,7 @@ function SideBar() {
 
     return (
         <>
-            
+
             {!isSidebarExpanded && <div
                 className={`fixed top-4 mr-5 z-50 p-2 bg-white rounded-full shadow-md cursor-pointer transition-all hover:bg-blue-50 hover:scale-110 ${isSidebarExpanded ? 'ml-64' : 'ml-4'}`}
                 onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
@@ -142,7 +197,7 @@ function SideBar() {
             <div
                 className={`fixed h-screen shadow-lg p-5 bg-gradient-to-b from-white to-blue-50 ${isSidebarExpanded ? 'w-64' : 'w-0 overflow-hidden'} transition-all duration-300 ease-in-out`}
             >
-             
+
                 {/* Logo with glowing effect */}
                 <div className='flex gap-2 items-center'>
                     {/* Logo with subtle animation */}
@@ -175,48 +230,48 @@ function SideBar() {
 
                 {/* Menu List */}
                 {isSidebarExpanded && <div className='mt-8 space-y-2'>
-    {MenuList.map((menu, index) => (
-        <Link href={menu.path} key={index}>
-            <div
-                className={`flex gap-4 items-center p-3.5 rounded-xl cursor-pointer transition-all duration-300
-                    ${path === menu.path 
-                        ? 'bg-gradient-to-r from-blue-100 to-blue-50 text-blue-600 shadow-md border-l-4 border-blue-500' 
-                        : 'text-gray-700 hover:bg-white hover:shadow-sm border-l-4 border-transparent'}`}
-            >
-                <div className={`p-2 rounded-lg ${path === menu.path ? 'bg-white/80' : 'bg-gray-100/70'}`}>
-                    <menu.icon className={`w-5 h-5 ${path === menu.path ? 'text-blue-600' : 'text-gray-600'}`} />
-                </div>
-                <h2 className={`text-md font-medium transition-all ${path === menu.path ? 'font-semibold' : ''}`}>
-                    {menu.name}
-                </h2>
-            </div>
-        </Link>
-    ))}
-</div>}
-                    <div className='mt-64'>
-                {/* AI Tips/Suggestion */}
-                {isSidebarExpanded && <div className="mt-6 bg-purple-50 p-3 rounded-lg border border-purple-100 shadow-sm">
-                    <div className="flex items-center mb-2">
-                        <Brain className="w-5 h-5 text-purple-500 mr-2" />
-                        <span className="text-sm font-medium text-purple-700">AI Study Tip</span>
-                    </div>
-                    <p className="text-xs text-purple-600 italic">Try studying in 25-minute sessions with 5-minute breaks for optimal retention!</p>
-                </div>}
-                
-                {/* Credits Section */}
-                {isSidebarExpanded && <div className="relative mt-auto m">
-                    <div className="mt-8 w-full border p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg shadow-sm">
-                        <div className="flex items-center justify-between mb-2">
-                            <h2 className="text-md text-gray-800 font-medium">Study Credits:</h2>
-                            <span className="text-blue-600 font-bold">30%</span>
-                        </div>
-                        <Progress value={30} className="h-3 bg-blue-100/50 rounded-full overflow-hidden" indicatorClassName="bg-gradient-to-r from-blue-500 to-purple-500" />
-                        <h2 className="text-sm text-gray-600 mt-1">3 out of 10 Credits Used</h2>
-                        <Link href={'/dashboard/upgrade'} className="flex items-center justify-center mt-3 text-white text-sm bg-gradient-to-r from-blue-400 to-purple-400 p-2 rounded-md hover:from-blue-500 hover:to-purple-500 transition-all shadow-sm hover:shadow-md">
-                            <Sparkles className="w-4 h-4 mr-1" /> Upgrade for More
+                    {MenuList.map((menu, index) => (
+                        <Link href={menu.path} key={index}>
+                            <div
+                                className={`flex gap-4 items-center p-3.5 rounded-xl cursor-pointer transition-all duration-300
+                    ${path === menu.path
+                                        ? 'bg-gradient-to-r from-blue-100 to-blue-50 text-blue-600 shadow-md border-l-4 border-blue-500'
+                                        : 'text-gray-700 hover:bg-white hover:shadow-sm border-l-4 border-transparent'}`}
+                            >
+                                <div className={`p-2 rounded-lg ${path === menu.path ? 'bg-white/80' : 'bg-gray-100/70'}`}>
+                                    <menu.icon className={`w-5 h-5 ${path === menu.path ? 'text-blue-600' : 'text-gray-600'}`} />
+                                </div>
+                                <h2 className={`text-md font-medium transition-all ${path === menu.path ? 'font-semibold' : ''}`}>
+                                    {menu.name}
+                                </h2>
+                            </div>
                         </Link>
-                    </div>
+                    ))}
                 </div>}
+                <div className='mt-64'>
+                    {/* AI Tips/Suggestion */}
+                    {isSidebarExpanded && <div className="mt-6 bg-purple-50 p-3 rounded-lg border border-purple-100 shadow-sm">
+                        <div className="flex items-center mb-2">
+                            <Brain className="w-5 h-5 text-purple-500 mr-2" />
+                            <span className="text-sm font-medium text-purple-700">AI Study Tip</span>
+                        </div>
+                        <p className="text-xs text-purple-600 italic">Try studying in 25-minute sessions with 5-minute breaks for optimal retention!</p>
+                    </div>}
+
+                    {/* Credits Section */}
+                    {isSidebarExpanded && <div className="relative mt-auto m">
+                        <div className="mt-8 w-full border p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg shadow-sm">
+                            <div className="flex items-center justify-between mb-2">
+                                <h2 className="text-md text-gray-800 font-medium">Study Credits:</h2>
+                                <span className="text-blue-600 font-bold">30%</span>
+                            </div>
+                            <Progress value={30} className="h-3 bg-blue-100/50 rounded-full overflow-hidden" indicatorClassName="bg-gradient-to-r from-blue-500 to-purple-500" />
+                            <h2 className="text-sm text-gray-600 mt-1">3 out of 10 Credits Used</h2>
+                            <Link href={'/dashboard/upgrade'} className="flex items-center justify-center mt-3 text-white text-sm bg-gradient-to-r from-blue-400 to-purple-400 p-2 rounded-md hover:from-blue-500 hover:to-purple-500 transition-all shadow-sm hover:shadow-md">
+                                <Sparkles className="w-4 h-4 mr-1" /> Upgrade for More
+                            </Link>
+                        </div>
+                    </div>}
                 </div>
 
                 {/* Dialog for Study Material Selection */}
@@ -322,9 +377,13 @@ function SideBar() {
                                     </div>
                                     <Button
                                         className='cursor-pointer mt-4 w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 rounded-lg transition-all'
-                                        onClick={() => setShowTopicSelection(false)}
+                                        onClick={() => GenerateSelectedTopic()}
                                     >
-                                        Back
+                                        {loading ? (
+                                            <Loader2Icon className="animate-spin h-6 w-6" />
+                                        ) : (
+                                            "Submit"
+                                        )}
                                     </Button>
                                 </>
                             )}

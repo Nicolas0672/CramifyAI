@@ -16,7 +16,7 @@ export async function POST(req) {
         }
 
         const prompt = `
-    Generate 5 **fill-in-the-blank** questions based on the given Topic: ${topic}, ContentType: ${courseLayout}, DifficultyLevel: ${difficultyLevel}.
+    Generate 5 **fill-in-the-blank** on Topic: ${topic}, ContentType: ${courseLayout}, DifficultyLevel: ${difficultyLevel} questions  
     Ensure the question has **only one correct answer**. Provide the correct answer separately.
 
     Requirements:

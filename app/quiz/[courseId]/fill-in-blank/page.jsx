@@ -1,8 +1,10 @@
 "use client"
 import axios from 'axios'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState, useRef } from 'react'
 import { MathJax, MathJaxContext } from 'better-react-mathjax'
+import { Button } from '@/components/ui/button'
+
 
 function ViewFillBlank() {
   const { courseId } = useParams()
@@ -11,6 +13,7 @@ function ViewFillBlank() {
   const [submitted, setSubmitted] = useState({})
   const [correctAnswers, setCorrectAnswers] = useState({})
   const inputRefs = useRef({})
+  const router = useRouter()
 
   useEffect(() => {
     GetFillDetails()
@@ -150,8 +153,10 @@ function ViewFillBlank() {
                 )
               }
             </div>
+            
           )}
         </div>
+        
         
         <MathJax hideUntilTypeset="first">{parts[1]}</MathJax>
       </div>
@@ -216,6 +221,10 @@ function ViewFillBlank() {
               )}
             </div>
           ))}
+        </div>
+        <div className='flex justify-between'>
+        <Button onClick={()=>router.back()}variant='outline'className='mt-6 cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300'>Go back to Quiz Page</Button>
+        <Button variant='outline' className='mt-6 cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300'>Mark as completed</Button>
         </div>
       </div>
     </MathJaxContext>

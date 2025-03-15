@@ -64,3 +64,16 @@ export const FILL_BLANK_TABLE = pgTable('Fill-Blank',{
     type: varchar().notNull(),
     status: varchar().default('Generating')
 })
+
+export const EXAM_SESSION_TABLE = pgTable('Exam-Session',{
+    id: serial().primaryKey(),
+    courseLayout: text(),
+    courseId: varchar().notNull(),
+    createdBy: varchar().notNull(),
+    createdAt: varchar().notNull(),
+    status: varchar().default('Generating'),
+    questionCount: integer().default(0),
+    topic: varchar().notNull(),
+    difficultyLevel:varchar().default('Easy')
+
+})

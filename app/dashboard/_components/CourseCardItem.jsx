@@ -19,7 +19,7 @@ function CourseCardItem({ course, index, mode, loading }) {
         <div className="flex items-center gap-2">
         {mode === 'study' && <Image src={'/knowledge.png'} alt='other' width={50} height={50} />}
           {mode === 'practice' && <Image src={'/practice.png'} alt='other' width={50} height={50} />}
-          {mode === 'exam' && <Image src={'/exam.png'} alt='other' width={50} height={50} />}
+          {mode === 'exam' && <Image src={'/exam_1.png'} alt='other' width={50} height={50} />}
 
           <span className="text-xl font-medium text-gray-700">
             {mode.charAt(0).toUpperCase() + mode.slice(1)}

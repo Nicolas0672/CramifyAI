@@ -11,17 +11,26 @@ import toast from 'react-hot-toast';
 function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
   const [loading, setLoading] = useState(false);
 
+
+ 
   const GenerateContent = async () => {
     toast('Generating content');
     setLoading(true);
-    let CHAPTERS = '';
-    course?.aiResponse.chapters.forEach((chapter) => {
-      CHAPTERS = (chapter.title || chapter?.courseTitle) + ',' + CHAPTERS;
-    });
+    const chapters = course?.aiResponse?.chapters
+
+    const combinedCourseLayout = chapters.map(chapter =>{
+        const title = chapter.title;
+        const summary = chapter.summary
+        const topic = (chapter.topics || []).join(", ");
+        return `${title}: ${summary}. Topics covered: ${topic}`;
+    })
+    .join(' || ')
+  
     const result = await axios.post('/api/generate-content', {
       courseId: course?.studyMaterialId,
       type: item.name,
-      chapters: CHAPTERS
+      chapters: combinedCourseLayout,
+      
     });
     console.log('generating flashcards', result);
     setLoading(false);

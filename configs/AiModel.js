@@ -169,3 +169,53 @@ export const GenerateQuizAiModel = model.startChat({
         },
       ],
     });
+
+    export const GenerateStartExam = model.startChat({
+      generationConfig,
+      history: [
+        {
+          role: "user",
+          parts: [
+            {text: "const prompt = `Pretend you are a teacher giving a student an exam. Generate a randomized question based on the following parameters:\n\n- Topic: ${calc}\n- Course Layout: ${chain rule}\n- Difficulty Level: ${hard}\n- Time to complete the question: ${30} minutes\n\nThe question should require a **long or short answer** (no multiple choices). The generated question should be challenging yet appropriate for the specified difficulty level, and it should be able to be answered within the given time.\n\nFor **math-related questions**:\n- Ensure the problem involves solving an equation, performing calculations, or explaining mathematical concepts. \n- Only provide **one answer** unless the question is designed to check the student’s understanding of the process (e.g., if asking about the steps involved, then include steps).\n- Avoid dragging the answer out—if it requires a single answer, provide it concisely.\n\nFor rendering math equations, output the question and answer using **LaTeX format**:\n- Use `$ ... $` for inline math.\n- Use `$$ ... $$` for display math.\n\nFor example:\n\n{\n  \"question\": \"What is the derivative of the function $f(x) = 3x^2 + 5x$?\",\n  \"answer\": \"The derivative of $f(x) = 3x^2 + 5x$ is $f'(x) = 6x + 5$.\"\n}\n`\n\n"},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {text: "```json\n{\n  \"question\": \"A particle's position in space is given by the vector function $\\\\mathbf{r}(t) = \\\\langle \\\\cos(t^2), \\\\sin(t^2), t \\\\rangle$.  Find the magnitude of the particle's acceleration vector at time $t = \\\\sqrt{\\\\frac{\\\\pi}{2}}$. Show all steps.\",\n  \"answer\": \"First, we find the velocity vector $\\\\mathbf{v}(t)$ by taking the derivative of the position vector $\\\\mathbf{r}(t)$ with respect to time $t$:\\n\\n$$\\\\mathbf{v}(t) = \\\\frac{d\\\\mathbf{r}}{dt} = \\\\langle -2t\\\\sin(t^2), 2t\\\\cos(t^2), 1 \\\\rangle$$\\n\\nNext, we find the acceleration vector $\\\\mathbf{a}(t)$ by taking the derivative of the velocity vector $\\\\mathbf{v}(t)$ with respect to time $t$:\\n\\n$$\\\\mathbf{a}(t) = \\\\frac{d\\\\mathbf{v}}{dt} = \\\\langle -2\\\\sin(t^2) - 4t^2\\\\cos(t^2), 2\\\\cos(t^2) - 4t^2\\\\sin(t^2), 0 \\\\rangle$$\\n\\nNow, we evaluate the acceleration vector at $t = \\\\sqrt{\\\\frac{\\\\pi}{2}}$:\\n\\n$$\\\\mathbf{a}\\\\left(\\\\sqrt{\\\\frac{\\\\pi}{2}}\\\\right) = \\\\langle -2\\\\sin\\\\left(\\\\frac{\\\\pi}{2}\\\\right) - 4\\\\left(\\\\frac{\\\\pi}{2}\\\\right)\\\\cos\\\\left(\\\\frac{\\\\pi}{2}\\\\right), 2\\\\cos\\\\left(\\\\frac{\\\\pi}{2}\\\\right) - 4\\\\left(\\\\frac{\\\\pi}{2}\\\\right)\\\\sin\\\\left(\\\\frac{\\\\pi}{2}\\\\right), 0 \\\\rangle$$\\n\\n$$\\\\mathbf{a}\\\\left(\\\\sqrt{\\\\frac{\\\\pi}{2}}\\\\right) = \\\\langle -2(1) - 2\\\\pi(0), 2(0) - 2\\\\pi(1), 0 \\\\rangle = \\\\langle -2, -2\\\\pi, 0 \\\\rangle$$\\n\\nFinally, we find the magnitude of the acceleration vector at $t = \\\\sqrt{\\\\frac{\\\\pi}{2}}$:\\n\\n$$|\\\\mathbf{a}| = \\\\sqrt{(-2)^2 + (-2\\\\pi)^2 + 0^2} = \\\\sqrt{4 + 4\\\\pi^2} = \\\\sqrt{4(1 + \\\\pi^2)} = 2\\\\sqrt{1 + \\\\pi^2}$$\\n\\nTherefore, the magnitude of the particle's acceleration vector at time $t = \\\\sqrt{\\\\frac{\\\\pi}{2}}$ is $2\\\\sqrt{1 + \\\\pi^2}$.\"\n}\n```"},
+          ],
+        },
+        {
+          role: "user",
+          parts: [
+            {text: "const prompt = `Pretend that you are a teacher giving a student an exam. Generate a randomized question based on the following parameters:\n\n- Topic: ${calc}\n- Course Layout: ${chain rule}\n- Difficulty Level: ${hard}\n- Time to complete the question: 5 minutes\n\nThe question should require a **short or long answer** (no multiple choices) and should challenge the student but be solvable within 5 minutes. Only the final answer is required (no steps or intermediate reasoning needed).\n\nFor **math-related questions**:\n- Provide the complete problem without breaking it into steps.\n- Ensure that the answer is the final result, and use LaTeX formatting for rendering.\n\nExample:\n\n{\n  \"question\": \"A particle's position in space is given by the vector function $\\\\mathbf{r}(t) = \\\\langle \\\\cos(t^2), \\\\sin(t^2), t \\\\rangle$. Find the magnitude of the particle's acceleration vector at time $t = \\\\sqrt{\\\\frac{\\\\pi}{2}}$.\",\n  \"answer\": \"2\\\\sqrt{1 + \\\\pi^2}\"\n}\n"},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {text: "```json\n{\n  \"question\": \"Find $\\\\frac{dy}{dx}$ if $y = \\\\sin(\\\\tan(\\\\sqrt{x}))$.\",\n  \"answer\": \"\\\\frac{\\\\sec^2(\\\\sqrt{x}) \\\\cdot \\\\cos(\\\\tan(\\\\sqrt{x}))}{2\\\\sqrt{x}}\"\n}\n```"},
+          ],
+        },
+      ],
+    });
+
+    export const GenerateNextQuestion = model.startChat({
+      generationConfig,
+      history: [
+        {
+          role: "user",
+          parts: [
+            {text: "const prompt = `\nBased on the student's answer: \"${5}\", the correct answer: \"${3}\", the difficulty level: \"${difficultyLevel}\", and the question: \"${5-2}\", please assume the role of a professional educator dynamically grading the student's response.\n\n1. Provide a numerical rating (out of 10) for the student's answer.\n2. Offer a concise but thorough explanation of the student's response, indicating areas where they performed well and where they could improve.\n3. If the student's answer contains mathematical content, ensure that the explanation includes proper LaTeX formatting for equations (e.g., $f(x) = (2x + 1)^5$) for clarity.\n4. Point out any mistakes and offer actionable steps for the student to improve their understanding and approach.\n5. Finally, generate a new question tailored to the student's strengths and weaknesses, adjusting the difficulty to either reinforce or challenge their learning as needed.\n\nPlease structure the response as a JSON object with the following fields:\n\n{\n  \n  \"feedback\": {\n    \"rating\": \"Numerical rating for the student's answer (out of 10)\",\n    \"explanation\": \"A thorough explanation of the student's response, including the correct mathematical steps and proper LaTeX formatting if necessary\",\n    \"strengths\": \"The student's strengths in this particular problem\",\n    \"weaknesses\": \"Any mistakes or areas where the student can improve\",\n    \"improvementSuggestions\": \"Suggestions to help the student improve their understanding\",\n    \"question\": \"A new question generated based on the student's performance\"\n  }\n}\n\nPlease ensure the response is clear, professional, and instructional, providing not just the feedback but also opportunities for further improvement.\n`;\n"},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {text: "```json\n{\n  \"feedback\": {\n    \"rating\": \"2\",\n    \"explanation\": \"The student answered 5 to the question 5-2. The correct answer is 3. The student clearly didn't understand the subtraction operation. 5 - 2 means taking away 2 from 5.  This can be visually represented or counted out to aid understanding.  The student seems to have added instead of subtracted.\",\n    \"strengths\": \"None evident in this response. Potentially, the student understands basic number recognition.\",\n    \"weaknesses\": \"Lack of understanding of subtraction. Confusion between addition and subtraction.\",\n    \"improvementSuggestions\": \"1. **Review Subtraction Basics:**  Use concrete objects (like blocks or fingers) to demonstrate subtraction. Start with simple examples and gradually increase complexity.  For example, show 5 blocks, then remove 2 and count how many are left. 2. **Visual Aids:**  Use number lines or pictures to represent subtraction problems.  For 5 - 2, start at 5 on the number line and move 2 spaces to the left. 3. **Practice with Flashcards:**  Create flashcards with simple subtraction problems.  4. **Relate to Real-Life Scenarios:**  Present subtraction in relatable scenarios, such as 'You have 5 candies and give away 2. How many do you have left?'\",\n    \"question\": \"You have 4 apples and eat 1. How many apples do you have left?\"\n  }\n}\n```"},
+          ],
+        },
+      ],
+    });
+  
+   

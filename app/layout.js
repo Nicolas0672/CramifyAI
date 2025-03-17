@@ -7,6 +7,7 @@ import { StudyProvider } from "./StudyContext";
 import Provider from "./provider";
 import SideBar from "./dashboard/_components/SideBar"; // Correct import path
 import { SidebarProvider } from "./SidebarContext";
+import FloatingStudyElements from "./FloatingStudyElemens";
 
 export const metadata = {
   title: "CramifyAI",
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
       <StudyProvider>
         <html lang="en">
           <body className={outfit.className}>
+          <FloatingStudyElements />
             <Toaster position="bottom-right" reverseOrder={false} />
             <Provider>
               <SidebarProvider>

@@ -74,6 +74,23 @@ export const EXAM_SESSION_TABLE = pgTable('Exam-Session',{
     status: varchar().default('Generating'),
     questionCount: integer().default(0),
     topic: varchar().notNull(),
-    difficultyLevel:varchar().default('Easy')
+    difficultyLevel:varchar().default('Easy'),
+    exam_time: integer().default(30),
+    currQuestionAiResp: json(),
+    question: text(),
+    userAns: text(),
+    remainingTime: integer()
+})
+
+export const EXAM_RESPONSE_TABLE = pgTable('Exam-Response',{
+    id:serial().primaryKey(),
+    userAns: text(),
+    exam_time: integer().notNull(),
+    start_time: text().notNull(),
+    aiResponse: json(),
+    courseId: varchar().notNull(),
+    status: varchar().default('Generating'),
+    createdBy: varchar().notNull(),
+    question: text(),
 
 })

@@ -32,7 +32,7 @@ function CourseCardItem({ course, index, mode, loading }) {
       
       {/* Title Section */}
       <h3 className="text-lg font-semibold mb-2 text-gray-800 line-clamp-2">
-        {course?.aiResponse?.courseTitle || course?.aiResponse?.quizTitle}
+        {course?.aiResponse?.courseTitle || course?.aiResponse?.quizTitle || course?.currQuestionAiResp?.courseTitle}
       </h3>
       
       {/* Dynamic Content Section */}
@@ -46,9 +46,13 @@ function CourseCardItem({ course, index, mode, loading }) {
             {course?.aiResponse?.courseSummary || "Learn and master new concepts"}
           </p>
         ) : (
-          <div className="text-sm text-gray-600">
-            {course?.aiResponse?.questions?.length || 0} Questions
+          <>
+          <div className="text-sm text-gray-600 flex justify-between">
+            {course?.aiResponse?.questions?.length || 5} Questions 
+            <div className='flex items-end text-sm text-gray-600'>{course?.exam_time + ' Minutes'}</div>
           </div>
+          <div></div>
+          </>
         )}
       </div>
 
@@ -66,17 +70,22 @@ function CourseCardItem({ course, index, mode, loading }) {
               </span>
             </div>
             <Link
-            href={
-              mode === 'study'
-                ? '/course/' + course?.studyMaterialId
-                : '/quiz/' + course?.courseId
-            }
-          >
+  href={
+    mode === 'study'
+      ? '/course/' + course?.studyMaterialId
+      : mode === 'practice'
+      ? '/quiz/' + course?.courseId
+      : '/exam/' + course?.courseId // Assuming `examId` exists
+  }
+>
+  <Button
+    variant="outline"
+    className="cursor-pointer w-full text-sm bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:text-blue-800"
+  >
+    {mode === 'study' ? 'View' : mode === 'practice' ? 'Practice' : 'Take Exam'}
+  </Button>
+</Link>
 
-              <Button variant="outline" className="cursor-pointer w-full text-sm bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:text-blue-800">
-                {mode === 'study' ? 'View' : 'Practice'}
-              </Button>
-            </Link>
           </div>
         )}
       </div>

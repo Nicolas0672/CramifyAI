@@ -125,10 +125,7 @@ function SideBar() {
 
     };
 
-    useEffect(() => {
-        console.log(selectedTopic)
-    }, [selectedTopic])
-
+    
     const GenerateSelectedTopic = async () => {
         setLoading(true)
         toast('Your content is generating')

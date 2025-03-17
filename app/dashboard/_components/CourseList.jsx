@@ -12,6 +12,7 @@ function CourseList() {
     const [quizList, setQuizList] = useState([])
     const [loading, setLoading] = useState(false)
     const [mode, setMode] = useState('study')  // NEW - Switch between Study & Practice
+    const [examList, setExamList] = useState([])
     
     useEffect(() => {
         user && getCourseList();
@@ -34,9 +35,17 @@ function CourseList() {
         setLoading(false);
     }
 
-    const GetExamList = () =>{
-        console.log('hi')
+    const GetExamList = async () =>{
+        setLoading(true);
+        const result = await axios.post('/api/exam', { createdBy: user?.primaryEmailAddress.emailAddress })
+        setExamList(result.data.result)
+        console.log(result.data)
+        setLoading(false)
     }
+
+    useEffect(()=>{
+        console.log(mode)
+    },[mode])
 
     const handleClick = ()=>{
         if(mode == 'study') return getCourseList
@@ -87,7 +96,8 @@ function CourseList() {
             
             <div className='mt-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5'>
                 {!loading ? 
-                    (mode === 'study' ?
+                  (
+                    mode === 'study' ? (
                         courseList.length > 0 ? (
                             courseList.map((course, index) => (
                                 <CourseCardItem course={course} key={index} mode={mode} loading={loading} />
@@ -97,16 +107,27 @@ function CourseList() {
                                 No study materials found. Create your first one!
                             </div>
                         )
-                        :
+                    ) : mode === 'practice' ? (
                         quizList.length > 0 ? (
                             quizList.map((quiz, index) => (
-                                <CourseCardItem course={quiz} key={index} mode={mode} loading={loading}/>
+                                <CourseCardItem course={quiz} key={index} mode={mode} loading={loading} />
                             ))
                         ) : (
                             <div className="col-span-full py-8 text-center text-gray-500">
-                                No {mode === 'practice' ? 'practice quizzes' : 'exam sets'} found. Create your first one!
+                                No practice quizzes found. Create your first one!
                             </div>
                         )
+                    ) : (
+                        examList.length > 0 ? (
+                            examList.map((exam, index) => (
+                                <CourseCardItem course={exam} key={index} mode={mode} loading={loading} />
+                            ))
+                        ) : (
+                            <div className="col-span-full py-8 text-center text-gray-500">
+                                No exam sets found. Create your first one!
+                            </div>
+                        )
+                    )
                     ) : 
                     [1, 2, 3, 4].map((item, index) => (
                         <div key={index} className='h-56 w-full bg-gradient-to-r from-slate-200 to-slate-100 rounded-lg animate-pulse shadow-sm'>

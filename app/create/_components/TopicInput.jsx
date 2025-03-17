@@ -109,6 +109,7 @@ function TopicInput({ setTopic, setDifficultyLevel, setComment, handleUserInput,
                 </div>
             )}
         </div>
+        
     )
 }
 

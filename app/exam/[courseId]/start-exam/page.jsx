@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import axios from 'axios'
 import { MathJax, MathJaxContext } from 'better-react-mathjax'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import ExamPage from '../_components/ExamPage'
 import { ArrowRight, CheckCircle, Clock } from 'lucide-react'
@@ -17,6 +17,7 @@ function ExamStart() {
     const [startTime, setStartTime] = useState(null)
     const [timeLeft, setTimeLeft] = useState(null)
     const [elapsedTime, setElapstedTime] = useState(0)
+    const router = useRouter()
 
     const { courseId } = useParams()
 
@@ -170,7 +171,7 @@ function ExamStart() {
            
                 const newQuestion = resUpdate.data.res.question || "";
                 console.log(newQuestion)
-                setQuestionCount(questionUpdate.data.res.questionCount);
+                setQuestionCount(questionUpdate.data.res.questionCount + 1);
                 setCurrentQuestion(newQuestion);
                 setUserAnswer(""); // Clear input field
                 
@@ -276,7 +277,7 @@ function ExamStart() {
               <div className="flex justify-between">
               {questionCount<=5&&<Button onClick={()=> handleSave()}className={`cursor-pointer bg-gradient-to-r from-blue-400 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}>Save Answer</Button>}
                 {questionCount >= 5 ? (
-                  <Button className="cursor-poiner z-20 bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center">
+                  <Button onClick={()=> router.push('/exam/'+courseId+'/feedback')}className="cursor-poiner z-20 bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center">
                     <CheckCircle className="w-5 h-5 mr-2" />
                     Finish
                   </Button>

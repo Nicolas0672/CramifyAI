@@ -6,12 +6,15 @@ import React, { useEffect, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { MathJax, MathJaxContext } from 'better-react-mathjax';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 function ViewNotes() {
   const { courseId } = useParams();
   const [notes, setNotes] = useState([]);
   const [stepCount, setStepCount] = useState(0);
+  const [showComplete, setShowComplete] = useState(true)
   const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     GetNotes();
@@ -32,6 +35,8 @@ function ViewNotes() {
     }
   };
 
+
+
   
 
   const handlePrevious = () => {
@@ -46,6 +51,24 @@ function ViewNotes() {
       window.MathJax.typeset();
     }
   }, [stepCount, notes]);
+
+  const handleComplete=async()=>{
+    setLoading(true)
+    const res = await axios.post('/api/handle-complete',{
+      courseId: courseId,
+      studyType: 'notes',
+      type: 'study'
+    })
+    toast('Congratulations on finishing this section!')
+    setLoading(false)
+    setShowComplete(false)
+    
+  }
+
+  useEffect(()=>{
+    {notes.isDone? setShowComplete(true) : setShowComplete(false)}
+    console.log(notes.isDone?'1':'2')
+   },[notes])
 
   return (
     <MathJaxContext>
@@ -120,6 +143,9 @@ function ViewNotes() {
                     .replace(/\\\\/g, '\\')  // Fixes double backslashes (critical fix)
                 }}
               />
+              {showComplete&&stepCount == notes.length - 1&&<div className='flex justify-end'>
+              <Button disabled={loading}onClick={()=>handleComplete()}variant='outline' className='mt-5 cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300'>Mark as completed</Button>
+              </div>}
             </div>
           </div>
         </div>

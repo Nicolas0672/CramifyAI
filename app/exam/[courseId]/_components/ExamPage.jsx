@@ -24,7 +24,8 @@ function ExamPage({course}) {
 
    useEffect(()=>{
     if (course && course.questionCount) {
-        setProgress(course.questionCount * 20); // Update the progress when questionCount changes
+        console.log(course.questionCount)
+        setProgress((course.questionCount + 1) * 20); // Update the progress when questionCount changes
       }
    },[course])
  

@@ -49,7 +49,7 @@ function CourseCardItem({ course, index, mode, loading }) {
           <>
           <div className="text-sm text-gray-600 flex justify-between">
             {course?.aiResponse?.questions?.length || 5} Questions 
-            <div className='flex items-end text-sm text-gray-600'>{course?.exam_time + ' Minutes'}</div>
+            {mode=='exam'&&<div className='flex items-end text-sm text-gray-600'>{course?.exam_time + ' Minutes'}</div>}
           </div>
           <div></div>
           </>
@@ -62,12 +62,18 @@ function CourseCardItem({ course, index, mode, loading }) {
             <span className="text-sm text-gray-600">Generating...</span>
           </div>
         ) : (
+         
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <Progress value={course?.progress || 0} className="h-2 flex-grow" />
+             
+              {mode=='exam'&&<Progress value={course?.questionCount * 20 || 0} className="h-2 flex-grow" />}
+              {mode == 'study'&&<Progress value={course?.progress  || 0} className="h-2 flex-grow"/>}
+              {mode == 'practice'&&<Progress value={course?.progress || 0} className="h-2 flex-grow"/>}
               <span className="text-xs text-gray-500 whitespace-nowrap">
-                {course?.progress || 0}%
+                {mode=='exam'? course?.questionCount * 20 : mode=='study' ? course.progress : course.progress}%
+          
               </span>
+              
             </div>
             <Link
   href={

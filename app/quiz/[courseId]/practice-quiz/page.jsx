@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import QuizCardItem from '../_components/QuizCardItem'
 import { Check, X, ChevronLeft, ChevronRight, BookOpen, RotateCw } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 function QuizContent() {
   const { courseId } = useParams()
@@ -18,6 +19,7 @@ function QuizContent() {
   const [showAnswer, setShowerAnswer] = useState(false)
   const [showExplaination, SetShowExplaination] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [showComplete, setShowComplete] = useState(true)
 
   useEffect(() => {
     GetQuiz()
@@ -38,6 +40,25 @@ function QuizContent() {
       setLoading(false)
     }
   }
+
+  const handleComplete=async()=>{
+    setLoading(true)
+    const res = await axios.post('/api/handle-complete',{
+      courseId: courseId,
+      studyType: 'quiz',
+      type: 'practice'
+    })
+    setShowComplete(false)
+    toast('You have successfully finished this section!')
+    setLoading(false)
+    router.back()
+    
+  }
+
+  useEffect(()=>{
+    {quizData.isDone? setShowComplete(false) : setShowComplete(true)}
+    console.log(quizData.isDone?'1':'2')
+   },[quizData])
 
   const handleNext = () => {
     if (stepCount < quizData?.aiResponse?.questions.length - 1) {
@@ -208,13 +229,21 @@ function QuizContent() {
           >
             Next <ChevronRight className="w-4 h-4" />
           </Button>
-        ) : (
-          <Button 
-            onClick={() => router.back()} 
+        ) : (showComplete?
+          <Button
+            disabled={loading} 
+            onClick={() => handleComplete()} 
             className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600"
           >
             Complete Quiz
+          </Button>:(
+            <Button 
+            onClick={() => router.back()} 
+            className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600"
+          >
+            Quiz Completed
           </Button>
+          )
         )}
       </div>
     </div>

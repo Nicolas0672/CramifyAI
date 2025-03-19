@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/carousel"
 import { Progress } from "@/components/ui/progress"
 import { Button } from '@/components/ui/button'
+import toast from 'react-hot-toast'
 
 function ViewFlashCards() {
   const { courseId } = useParams()
@@ -22,6 +23,8 @@ function ViewFlashCards() {
   const [api, setApi] = useState()
   const [progress, setProgress] = useState(0)
   const router = useRouter()
+  const [showComplete, setShowComplete] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     GetFlashCards()
@@ -44,9 +47,23 @@ function ViewFlashCards() {
     setProgress(progressValue)
   }
 
+  
+
   const nextCard = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % flashCards.length);
   };
+
+  const handleComplete=async()=>{
+    setLoading(true)
+    const res = await axios.post('/api/handle-complete',{
+      courseId: courseId,
+      studyType: 'flashcard',
+      type: 'study'
+    })
+    toast("Congratulations on finishing this section!")
+    setLoading(false)
+    setShowComplete(false)
+  }
 
   const handleClick = () => setIsFlipped(!isFlipped)
 
@@ -73,6 +90,11 @@ function ViewFlashCards() {
       console.error('Error fetching flashcards:', error)
     }
   }
+
+  useEffect(()=>{
+    {flashCards.isDone? setShowComplete(false) : setShowComplete(true)}
+   console.log(flashCards.isDone?'1':'2')
+  },[flashCards])
 
   return (
     <div className='p-4 sm:p-6 md:p-10 bg-gradient-to-b from-gray-50 to-gray-100'>
@@ -116,12 +138,18 @@ function ViewFlashCards() {
           </div>
           <Progress value={progress} className="h-3 bg-gray-200 rounded-full" indicatorClassName="bg-gradient-to-r from-blue-500 to-purple-500" />
           
+          {showComplete?<Button disabled={loading}className='mt-12 w-full shadow-sm cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300' 
+          onClick={()=> handleComplete()}
+        >
+          Mark as complete
+          </Button>:
           <Button 
-            className='mt-12 w-full shadow-sm cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300' 
-            onClick={()=> router.back()}
-          >
-            Return to Course
-          </Button>
+          className='mt-12 w-full shadow-sm cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300' 
+          onClick={()=> router.back()}
+        >
+          Return to Course
+        </Button>
+          }
         </div>
       </div>
     </div>

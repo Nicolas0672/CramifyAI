@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState, useRef } from 'react'
 import { MathJax, MathJaxContext } from 'better-react-mathjax'
 import { Button } from '@/components/ui/button'
+import toast from 'react-hot-toast'
 
 
 function ViewFillBlank() {
@@ -13,7 +14,9 @@ function ViewFillBlank() {
   const [submitted, setSubmitted] = useState({})
   const [correctAnswers, setCorrectAnswers] = useState({})
   const inputRefs = useRef({})
+  const [showComplete, setShowComplete] = useState(true)
   const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     GetFillDetails()
@@ -64,6 +67,25 @@ function ViewFillBlank() {
     }, 100),
     []
   );
+
+  const handleComplete=async()=>{
+    setLoading(true)
+    const res = await axios.post('/api/handle-complete',{
+      courseId: courseId,
+      studyType: 'fill-blank',
+      type: 'practice'
+    })
+    setShowComplete(false)
+    setLoading(false)
+    toast('You have sucessfully completed this')
+    router.back()
+    
+  }
+
+  useEffect(()=>{
+    {fillData.isDone? setShowComplete(false) : setShowComplete(true)}
+    console.log(fillData.isDone?'1':'2')
+   },[fillData])
 
   const handleInputChange = (index, value) => {
     // Update immediately for a responsive feel
@@ -222,9 +244,12 @@ function ViewFillBlank() {
             </div>
           ))}
         </div>
-        <div className='flex justify-between'>
-        <Button onClick={()=>router.back()}variant='outline'className='mt-6 cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300'>Go back to Quiz Page</Button>
-        <Button variant='outline' className='mt-6 cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300'>Mark as completed</Button>
+        <div className='flex justify-end'>
+        
+        {showComplete?<Button disabled={loading} onClick={handleComplete}variant='outline' className='mt-6 cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300'>Mark as completed</Button>
+          :  
+          <Button onClick={()=>router.back()}variant='outline' className='mt-6 cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300'>Completed</Button>
+      }
         </div>
       </div>
     </MathJaxContext>

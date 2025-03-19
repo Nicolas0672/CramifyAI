@@ -27,13 +27,15 @@ export const AI_TEXT_RESPONSE_TABLE=pgTable('aiTextResp',{
     status:varchar().default('Generating'),
     createdAt: varchar('createdAt'),
     createdBy:varchar().notNull(),
+    progress: integer().default(0)
 })
 
 export const CHAPTER_NOTE_TABLE=pgTable('chapterNotes',{
     id:serial().primaryKey(),
     courseId:varchar().notNull(),
     chapterId: integer().notNull(),
-    notes:text()
+    notes:text(),
+    isDone: boolean().default(false)
 })
 
 export const FLASHCARD_CONTENT = pgTable('flashCardContent',{
@@ -41,7 +43,8 @@ export const FLASHCARD_CONTENT = pgTable('flashCardContent',{
     courseId:varchar().notNull(),
     content: json(),
     type: varchar().notNull(),
-    status: varchar().default('Generating')
+    status: varchar().default('Generating'),
+    isDone: boolean().default(false)
 })
 
 export const PRACTICE_QUIZ_TABLE = pgTable('PracticeQuiz',{
@@ -55,6 +58,8 @@ export const PRACTICE_QUIZ_TABLE = pgTable('PracticeQuiz',{
     courseLayout:text(),
     topic:varchar().notNull(),
     difficultyLevel:varchar().default('Easy'),
+    progress: integer().default(0),
+    isDone: boolean().default(false)
 })
 
 export const FILL_BLANK_TABLE = pgTable('Fill-Blank',{
@@ -62,7 +67,8 @@ export const FILL_BLANK_TABLE = pgTable('Fill-Blank',{
     aiResponse: json(),
     courseId: varchar().notNull(),
     type: varchar().notNull(),
-    status: varchar().default('Generating')
+    status: varchar().default('Generating'),
+    isDone: boolean().default(false)
 })
 
 export const EXAM_SESSION_TABLE = pgTable('Exam-Session',{

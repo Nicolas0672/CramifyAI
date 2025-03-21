@@ -14,15 +14,17 @@ import {
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
-function TopicInput({ setTopic, setDifficultyLevel, setComment, handleUserInput, formData, onFileChange }) {
+function TopicInput({ setFileName ,setTopic, setDifficultyLevel, setComment, handleUserInput, formData, onFileChange }) {
     const [hasPdf, setHasPdf] = useState(false);
 
      const handleFileUpload = (event) => {
         const file = event.target.files[0];
+        const fileName = event.target.value
 
         if (file && file.type === "application/pdf") {
              handleUserInput("pdfFile", file);
              onFileChange(file)
+             setFileName(fileName)
          } else {
              alert("Please upload a valid PDF file.");
          }

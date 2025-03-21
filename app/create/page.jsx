@@ -17,6 +17,7 @@ import axios from 'axios'
 import { desc, eq } from 'drizzle-orm'
 import { useRouter } from 'next/navigation'
 
+
 function Create() {
 
     const [step, setStep] = useState(0)
@@ -25,6 +26,10 @@ function Create() {
     const [hasPdf, setHasPdf] = useState(false)
     const { selectedStudyType } = useStudy()
     const router = useRouter()
+    const AddFileEntry = useMutation(api.fileStorage.AddFileEntryToDb)
+    const GetFileUrl=useMutation(api.fileStorage.getFileUrl)
+    const [fileName, setFileName] = useState()
+
 
     const { user } = useUser()
 
@@ -55,7 +60,7 @@ function Create() {
             toast.error("Please provide either a PDF file or text.");
             return;
         }
-        setLoading(true);
+        //setLoading(true);
 
         if (hasPdf) {
 
@@ -63,14 +68,28 @@ function Create() {
 
             const fileData = new FormData()
             fileData.append("file", pdfFile)
-            console.log(fileData)
-
+           
+            console.log("Upload URL:", postUrl);
 
             const result = await fetch(postUrl, {
                 method: "POST",
-                body: fileData,
+                headers:{"Content-Type": pdfFile?.type},
+                body: pdfFile,
             });
             const { storageId } = await result.json();
+            const fileUrl = await GetFileUrl({storageId: storageId})
+
+            // Maybe considering using this fileId as courseId
+            const fileId= uuidv4()
+            const res = await AddFileEntry({
+                fileId: fileId,
+                storageId: storageId,
+                fileName: fileName??'Untitled File',
+                fileUrl: fileUrl,
+                createdBy:  user?.primaryEmailAddress?.emailAddress
+            })
+
+            console.log(res)
 
             const resp = await db.insert(STUDY_MATERIAL_TABLE).values({
                 courseId: uuidv4(),
@@ -82,14 +101,16 @@ function Create() {
                 storageId: storageId  // Save only if provided
             }).returning()
 
-            if (resp) {
-                GenerateCourseOutline()
-                console.log('Insert successful w storageID', resp);
-                // Optionally show a success message to the user
-            } else {
-                console.log('Insert failed from storageID');
-                // Handle the failure case (e.g., show an error message)
-            }
+            console.log('storageId',storageId)
+
+            // if (resp) {
+            //     GenerateCourseOutline()
+            //     console.log('Insert successful w storageID', resp);
+            //     // Optionally show a success message to the user
+            // } else {
+            //     console.log('Insert failed from storageID');
+            //     // Handle the failure case (e.g., show an error message)
+            // }
 
         }
         else {
@@ -204,6 +225,7 @@ function Create() {
                 {/* Topic Input - Takes Full Width */}
                 <div className="w-full mt-8 space-y-6">
                     <TopicInput
+                        setFileName={setFileName}
                         handleUserInput={handleUserInput}
                         formData={formData}
                         setTopic={(value) => handleUserInput('topic', value)}

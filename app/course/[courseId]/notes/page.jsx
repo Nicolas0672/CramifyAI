@@ -64,11 +64,12 @@ function ViewNotes() {
     setShowComplete(false)
     
   }
+  useEffect(() => {
+    setShowComplete(!notes[0]?.isDone);
+    console.log(notes);
+  }, [notes]);
 
-  useEffect(()=>{
-    {notes.isDone? setShowComplete(true) : setShowComplete(false)}
-    console.log(notes.isDone?'1':'2')
-   },[notes])
+  
 
   return (
     <MathJaxContext>

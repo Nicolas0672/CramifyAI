@@ -35,10 +35,15 @@ export async function POST(req) {
                 isDone: true
             }).where(eq(PRACTICE_QUIZ_TABLE.courseId, courseId))
         }
-        else if(studyType == 'fill-blank'){
-            const fillUpdate = await db.update(FILL_BLANK_TABLE).set({
-                isDone: true
-            }).where(eq(FLASHCARD_CONTENT.courseId, courseId))
+        else if(studyType === 'fill-blank'){
+            try {
+                await db.update(FILL_BLANK_TABLE).set({
+                    isDone: true
+                }).where(eq(FILL_BLANK_TABLE.courseId, courseId));
+                console.log("fill-blank update successful");
+            } catch (err) {
+                console.error("Error updating fill-blank:", err);
+            }
         }
         const session = await db.select().from(PRACTICE_QUIZ_TABLE)
             .where(eq(PRACTICE_QUIZ_TABLE.courseId, courseId))

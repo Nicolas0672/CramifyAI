@@ -27,7 +27,7 @@ function PracticeContentCard({quizTypeContent, item, refreshData, practiceCourse
 
     
     toast('Content is generated');
-    refreshData(true)
+    await refreshData();
     
     setLoading(false);
     

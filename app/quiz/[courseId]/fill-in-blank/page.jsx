@@ -17,6 +17,7 @@ function ViewFillBlank() {
   const [showComplete, setShowComplete] = useState(true)
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [fillWholeData, setFillWholeData] = useState([])
 
   useEffect(() => {
     GetFillDetails()
@@ -32,6 +33,8 @@ function ViewFillBlank() {
       // Extract data and store correct answers separately
       const data = res.data.aiResponse.data
       setFillData(data)
+      setFillWholeData(res.data)
+      console.log(res.data)
       
       // Create a mapping of correct answers
       const answerMap = {}
@@ -70,11 +73,14 @@ function ViewFillBlank() {
 
   const handleComplete=async()=>{
     setLoading(true)
-    const res = await axios.post('/api/handle-complete',{
+    const payload = {
       courseId: courseId,
       studyType: 'fill-blank',
       type: 'practice'
-    })
+    }
+    console.log(payload)
+    const res = await axios.post('/api/handle-complete',payload)
+    
     setShowComplete(false)
     setLoading(false)
     toast('You have sucessfully completed this')
@@ -83,8 +89,8 @@ function ViewFillBlank() {
   }
 
   useEffect(()=>{
-    {fillData.isDone? setShowComplete(false) : setShowComplete(true)}
-    console.log(fillData.isDone?'1':'2')
+    setShowComplete(!fillWholeData.isDone)
+    console.log(!fillWholeData.isDone)
    },[fillData])
 
   const handleInputChange = (index, value) => {

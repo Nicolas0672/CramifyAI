@@ -92,7 +92,7 @@ function ViewFlashCards() {
   }
 
   useEffect(()=>{
-    {flashCards.isDone? setShowComplete(false) : setShowComplete(true)}
+    setShowComplete(!flashCards[0]?.isDone)
    console.log(flashCards.isDone?'1':'2')
   },[flashCards])
 

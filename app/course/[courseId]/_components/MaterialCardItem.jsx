@@ -34,7 +34,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
     });
     console.log('generating flashcards', result);
     setLoading(false);
-    refreshData(true);
+    await refreshData();
     toast('Your content is ready to view');
   };
 

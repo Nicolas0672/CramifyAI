@@ -108,7 +108,7 @@ function CourseIntroCard({ course }) {
               </div>
               <div>
                 <p className="text-xs text-gray-500">Knowledge Level</p>
-                <p className="font-medium text-gray-900">Intermediate</p>
+                <p className="font-medium text-gray-900">{course?.progress <= 50 ?'Intermediate':'Expert'}</p>
               </div>
             </div>
           </motion.div>

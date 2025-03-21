@@ -56,7 +56,7 @@ function QuizContent() {
   }
 
   useEffect(()=>{
-    {quizData.isDone? setShowComplete(false) : setShowComplete(true)}
+    setShowComplete(!quizData.isDone)
     console.log(quizData.isDone?'1':'2')
    },[quizData])
 
@@ -233,13 +233,13 @@ function QuizContent() {
           <Button
             disabled={loading} 
             onClick={() => handleComplete()} 
-            className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600"
+            className="cursor-pointer bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600"
           >
             Complete Quiz
           </Button>:(
             <Button 
             onClick={() => router.back()} 
-            className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600"
+            className="cursor-pointer bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600"
           >
             Quiz Completed
           </Button>

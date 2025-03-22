@@ -1,6 +1,6 @@
 import { GenerateTeachQuestions } from "@/configs/AiModel";
 import { db } from "@/configs/db";
-import { TEACH_QUESTIONS_TABLE } from "@/configs/schema";
+import { TEACH_ME_QUESTIONS_TABLE } from "@/configs/schema";
 import { v4 as uuidv4 } from "uuid";
 import moment from "moment";
 import { NextResponse } from "next/server";
@@ -11,9 +11,9 @@ export async function GET() {
 
 export async function POST(req) {
   try {
-    const { difficultyLevel, amount, courseLayout, topic } = await req.json();
+    const { difficultyLevel, amount, courseLayout, topic, createdBy} = await req.json();
 
-    if (!difficultyLevel || !amount || !courseLayout || !topic) {
+    if (!difficultyLevel || !amount || !courseLayout || !topic ) {
       return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 });
     }
 
@@ -31,36 +31,54 @@ export async function POST(req) {
     console.log("Raw AI Response:", aiText); // Debugging
 
     // Clean the response
-    const cleanedText = aiText
-      .replace(/^```json\n/, "") // Remove leading ```json followed by a newline
-      .replace(/```$/, "") // Remove trailing ```
-      .replace(/\\n/g, " ") // Replace escaped newlines with spaces
-      .replace(/\\"/g, '"') // Replace escaped quotes with regular quotes
-      .trim();
+    // Clean the response more thoroughly
+const cleanedText = aiText
+.replace(/^```(?:json)?\n?/, "") // Remove leading code block markers with or without json
+.replace(/```$/, "") // Remove trailing code block markers
+.replace(/\\n/g, " ") // Replace escaped newlines
+.replace(/\\"/g, '"') // Replace escaped quotes
+.trim();
 
-    let aiResult;
-    try {
-      aiResult = JSON.parse(cleanedText);
-      if (!Array.isArray(aiResult)) {
-        throw new Error("AI response is not an array");
-      }
-    } catch (error) {
-      console.error("Error parsing AI response:", error);
-      return NextResponse.json({ success: false, error: "Failed to parse AI response" }, { status: 500 });
+let aiResult;
+try {
+// Try direct parsing first
+aiResult = JSON.parse(cleanedText);
+
+// If it's not an array, check if it's an object with a data property
+if (!Array.isArray(aiResult)) {
+  if (aiResult.data && Array.isArray(aiResult.data)) {
+    aiResult = aiResult.data;
+  } else {
+    // Try to extract array from text using regex as last resort
+    const arrayMatch = cleanedText.match(/\[(.*)\]/s);
+    if (arrayMatch) {
+      aiResult = JSON.parse(arrayMatch[0]);
+    } else {
+      throw new Error("AI response is not an array");
     }
+  }
+}
+} catch (error) {
+console.error("Error parsing AI response:", error, "Raw text:", cleanedText);
+return NextResponse.json({ success: false, error: "Failed to parse AI response", rawResponse: cleanedText }, { status: 500 });
+}
+    
+   
+  
+    const dbRes = await db.insert(TEACH_ME_QUESTIONS_TABLE).values({
+        courseId: uuidv4(),
+        question: aiResult,
+        createdAt: moment().format("DD-MM-yyyy"),
+        difficultyLevel: difficultyLevel,
+        status: "Ready",
+        createdBy: createdBy || 'unknown', // initially inserting with a placeholder
+        topic: topic,
+    })
 
-    // Insert into DB
-    const dbRes = await db.insert(TEACH_QUESTIONS_TABLE).values({
-      courseId: uuidv4(),
-      question: aiResult,
-      createdAt: moment().format("DD-MM-yyyy"),
-      difficultyLevel,
-      status: "Ready",
-      createdBy: 'hi',
-      topic: topic,
-    }).returning({ resp: TEACH_QUESTIONS_TABLE });
+    
+ 
 
-    return NextResponse.json({ success: true, aiResp: aiResult, dbRes }, { status: 200 });
+    return NextResponse.json({ success: true, aiResp: aiResult }, { status: 200 });
 
   } catch (err) {
     console.error("Server Error:", err);

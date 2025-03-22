@@ -38,7 +38,7 @@ yarn-error.log*
 
 .env.local
 
-drizzle.config.js
+
 
 # typescript
 *.tsbuildinfo

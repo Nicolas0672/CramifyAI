@@ -100,3 +100,15 @@ export const EXAM_RESPONSE_TABLE = pgTable('Exam-Response',{
     question: text(),
 
 })
+
+export const TEACH_QUESTIONS_TABLE = pgTable('TeachQuestion',{
+    id: serial().primaryKey(),
+    courseId: varchar().notNull(),
+    question: json(),
+    createdBy: varchar().notNull(),
+    createdAt: varchar(),
+    difficultyLevel: varchar().notNull(),
+    status: varchar().default('Generating'),
+    isDone: boolean().default(false),
+    questions: json()
+})

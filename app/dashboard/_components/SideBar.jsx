@@ -76,6 +76,12 @@ function SideBar() {
             color: 'bg-red-50',
             hoverColor: 'hover:bg-red-100',
         },
+        {
+            name: 'Teach',
+            icon: '/interview.png',
+            color: 'bg-purple-50',
+            hoverColor: 'hover:bg-purple-100'
+        }
     ];
 
     const handleSelectStudyType = (type) => {
@@ -94,8 +100,11 @@ function SideBar() {
     const handleProceed = () => {
         if (selectOption === 'Practice' || selectOption === 'Exam') {
             setConfirmSelection(true);
-        } else {
+        } else if(selectOption === 'Study'){
             router.push('/create');
+            setOpenDialogue(false);
+        } else{
+            router.push('/create-teach-me')
             setOpenDialogue(false);
         }
     };
@@ -288,7 +297,7 @@ function SideBar() {
 
                 {/* Dialog for Study Material Selection */}
                 <Dialog open={openDialogue} onOpenChange={setOpenDialogue}>
-                    <DialogContent className='bg-white rounded-xl shadow-xl max-w-md border border-indigo-100/30'>
+                    <DialogContent className='bg-white rounded-xl shadow-xl max-w-lg border border-indigo-100/30'>
                         <DialogHeader>
                             <DialogTitle className='text-center text-2xl font-bold text-gray-800'>
                                 Select Study Material Type
@@ -300,11 +309,11 @@ function SideBar() {
                                         ? "Challenge yourself with a realistic, timed exam"
                                         : selectOption === 'Practice'
                                             ? "Sharpen your memory with AI-generated quizzes"
-                                            : ''}
+                                            : 'Teach an AI'}
                             </DialogDescription>
 
                             {/* Study Material Options */}
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
                                 {Options.map((option, index) => (
                                     <div
                                         key={index}

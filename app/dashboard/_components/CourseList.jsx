@@ -13,11 +13,13 @@ function CourseList() {
     const [loading, setLoading] = useState(false)
     const [mode, setMode] = useState('study')  // NEW - Switch between Study & Practice
     const [examList, setExamList] = useState([])
+    const [teachMeList, setTeachMeList] = useState([])
     
     useEffect(() => {
         user && getCourseList();
         user && getQuizList();  // NEW - Fetch quizzes too
         user && GetExamList()
+        user && GetTeachList()
         console.log(mode)
     }, [user])
     
@@ -39,6 +41,14 @@ function CourseList() {
         setLoading(true);
         const result = await axios.post('/api/exam', { createdBy: user?.primaryEmailAddress.emailAddress })
         setExamList(result.data.result)
+       
+        setLoading(false)
+    }
+
+    const GetTeachList = async ()=>{
+        setLoading(true)
+        const result = await axios.post('/api/teach-me', {createdBy : user?.primaryEmailAddress.emailAddress})
+        setTeachMeList(result.data.result)
         console.log(result.data)
         setLoading(false)
     }
@@ -81,13 +91,17 @@ function CourseList() {
                                 variant={mode === 'exam' ? 'default' : 'outline'}>
                                 Exam
                             </Button>
-                            <Button
+                            {/* <Button
                             onClick={mode === 'study' ? getCourseList : mode === 'practice' ? getQuizList : GetExamList}
                             variant='outline'
                             className='cursor-pointer border-gray-300 hover:border-blue-500 hover:text-blue-500 transition-colors duration-300 shadow-sm'
                         >
                             <RefreshCcw className='mr-1 h-4 w-4'/> Refresh
-                        </Button>
+                        </Button> */}
+                        <Button className={`cursor-pointer px-4 py-2 transition-all duration-300 ${mode === 'exam' ? 'shadow-md' : ''}`}
+                                onClick={() => setMode('teach Me')}
+                                variant={mode === 'teach Me' ? 'default' : 'outline'}
+                                >Teach Me</Button>
                         </div>
                        
                     </div>
@@ -117,7 +131,7 @@ function CourseList() {
                                 No practice quizzes found. Create your first one!
                             </div>
                         )
-                    ) : (
+                    ) : mode == 'exam' ? (
                         examList.length > 0 ? (
                             examList.map((exam, index) => (
                                 <CourseCardItem course={exam} key={index} mode={mode} loading={loading} />
@@ -125,6 +139,16 @@ function CourseList() {
                         ) : (
                             <div className="col-span-full py-8 text-center text-gray-500">
                                 No exam sets found. Create your first one!
+                            </div>
+                        )
+                    ) : (
+                        teachMeList.length > 0 ? (
+                            teachMeList.map((teach, index) => (
+                                <CourseCardItem course={teach} key={index} mode={mode} loading={loading} />
+                            ))
+                        ) : (
+                            <div className="col-span-full py-8 text-center text-gray-500">
+                                No teaching sets found. Create your first one!
                             </div>
                         )
                     )

@@ -20,7 +20,7 @@ export async function POST(req) {
     const prompt = `Imagine you are new to the concept of ${courseLayout} ${topic} and want to learn it. 
     Generate ${amount} questions to ask the user, progressively increasing in difficulty. 
     Each question should be categorized under the difficulty level '${difficultyLevel}'.
-    Please return only questions without any additional text.
+    Return the courseTitle that symbolizes teach me mode and a course summary of whats its about
     The questions are going to be read by a voice assistant so do not use '/' or any other special characters which might break the voice assistant.
     Return the questions formatted like this: ["Question 1", "Question 2", "Question 3"]`;
 

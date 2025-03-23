@@ -111,5 +111,6 @@ export const TEACH_ME_QUESTIONS_TABLE = pgTable('TeachQuestion',{
     createdAt: varchar(),
     difficultyLevel: varchar().notNull(),
     status: varchar().default('Generating'),   
-    topic: varchar().notNull()
+    topic: varchar().notNull(),
+    progress: integer().default(0)
 })

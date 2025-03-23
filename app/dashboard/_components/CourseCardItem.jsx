@@ -20,6 +20,7 @@ function CourseCardItem({ course, index, mode, loading }) {
           {mode === 'study' && <Image src={'/knowledge.png'} alt='study icon' width={40} height={40} className="w-10 h-10 sm:w-12 sm:h-12" />}
           {mode === 'practice' && <Image src={'/practice.png'} alt='practice icon' width={40} height={40} className="w-10 h-10 sm:w-12 sm:h-12" />}
           {mode === 'exam' && <Image src={'/exam_1.png'} alt='exam icon' width={40} height={40} className="w-10 h-10 sm:w-12 sm:h-12" />}
+          {mode === 'teach Me' && <Image src={'/interview.png'} alt='teach me' width={40} height={40} className="w-10 h-10 sm:w-12 sm:h-12"/>}
           <span className="text-base sm:text-xl font-medium text-gray-700">
             {mode.charAt(0).toUpperCase() + mode.slice(1)}
           </span>
@@ -31,8 +32,11 @@ function CourseCardItem({ course, index, mode, loading }) {
       
       {/* Title Section */}
       <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-800 line-clamp-2 min-h-[2.5rem]">
-        {course?.aiResponse?.courseTitle || course?.aiResponse?.quizTitle || course?.currQuestionAiResp?.courseTitle}
+        {course?.aiResponse?.courseTitle || course?.aiResponse?.quizTitle || course?.currQuestionAiResp?.courseTitle || course?.topic}
+
       </h3>
+
+      
       
       {/* Dynamic Content Section */}
       
@@ -47,7 +51,7 @@ function CourseCardItem({ course, index, mode, loading }) {
             <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
               {course?.aiResponse?.learningObjectives || "Learn and master new concepts"}
             </p>
-          ) : (
+          ) : mode === 'exam' ? (
             <div>
               <div className="text-xs sm:text-sm text-gray-600 flex justify-between">
                 <span>{course?.aiResponse?.questions?.length || 5} Questions</span>
@@ -58,7 +62,12 @@ function CourseCardItem({ course, index, mode, loading }) {
                 )}
               </div>
             </div>
-          )}
+          ):(
+            <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
+              {course?.question?.courseSummary || "Learn and master new concepts"}
+            </p>
+          )
+        }
         </div>
         
         {course?.status === 'Generating' ? (
@@ -72,6 +81,7 @@ function CourseCardItem({ course, index, mode, loading }) {
               {mode=='exam' && <Progress value={course?.questionCount * 20 || 0} className="h-1.5 sm:h-2 flex-grow" />}
               {mode=='study' && <Progress value={course?.progress || 0} className="h-1.5 sm:h-2 flex-grow"/>}
               {mode=='practice' && <Progress value={course?.progress || 0} className="h-1.5 sm:h-2 flex-grow"/>}
+              {mode=='teach Me' && <Progress value={course?.progress || 0} className="h-1.5 sm:h-2 flex-grow"/>}
               <span className="text-xs text-gray-500 whitespace-nowrap">
                 {mode=='exam'? course?.questionCount * 20 : mode=='study' ? course.progress : course.progress}%
               </span>
@@ -82,6 +92,8 @@ function CourseCardItem({ course, index, mode, loading }) {
                   ? '/course/' + course?.studyMaterialId
                   : mode === 'practice'
                   ? '/quiz/' + course?.courseId
+                  : mode === 'teach Me' 
+                  ? '/teach-me/' + course?.courseId
                   : mode=='exam'&&course?.questionCount<5
                   ? '/exam/' + course?.courseId
                   : '/exam/'+course?.courseId
@@ -92,7 +104,7 @@ function CourseCardItem({ course, index, mode, loading }) {
                 variant="outline"
                 className="cursor-pointer w-full text-xs sm:text-sm bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:text-blue-800 py-1.5 sm:py-2 px-2 sm:px-3 h-auto min-h-[2rem]"
               >
-                {mode === 'study' ? 'View' : mode === 'practice' ? 'Practice' : mode == 'exam'&&course?.questionCount>=5 ? 'View Exam' : 'Take Exam'}
+                {mode === 'study' ? 'View' : mode === 'practice' ? 'Practice' : mode == 'teach Me' ? 'Teach Me' : mode == 'exam'&&course?.questionCount>=5 ? 'View Exam' : 'Take Exam'}
               </Button>
             </Link>
           </div>

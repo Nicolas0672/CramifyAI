@@ -1,7 +1,7 @@
 import { GenerateTeachQuestions } from "@/configs/AiModel";
 import { db } from "@/configs/db";
 import { TEACH_ME_QUESTIONS_TABLE } from "@/configs/schema";
-
+import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import { NextResponse } from "next/server";
 

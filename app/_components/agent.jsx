@@ -1,5 +1,6 @@
 "use client"
 import { Button } from '@/components/ui/button';
+import { teachMeAssistant } from '@/lib/teachMeAssistant';
 import { cn } from '@/lib/utils';
 import { vapi } from '@/lib/vapi.sdk';
 import { useUser } from '@clerk/nextjs';
@@ -10,7 +11,7 @@ import React, { useEffect, useState } from 'react'
 
 
 
-function AgentLayout({ userName, userId, type }) {
+function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
   const CallStatus = {
     INACTIVE: "INACTIVE",
     CONNECTING: "CONNECTING",
@@ -19,6 +20,7 @@ function AgentLayout({ userName, userId, type }) {
   };
   const [courseTitle, setCourseTitle] = useState([])
   const { user } = useUser()
+  const [avatar, setAvatar] = useState('')
 
 
   const SavedMessage = {
@@ -45,6 +47,9 @@ function AgentLayout({ userName, userId, type }) {
   }
   useEffect(() => {
     GetCourseTitle()
+    if(type == 'generate'){
+      setAvatar('boy')
+    } else { setAvatar('girl')}
   }, [user])
 
   useEffect(() => {
@@ -96,8 +101,28 @@ function AgentLayout({ userName, userId, type }) {
     }
   }, [])
 
+  // const handleGenerateFeedback=async(messages: SavedMessage[])=>{
+  //   const {sucess, id} = {
+
+  //   }
+  //   if(sucess && id){
+  //     router.push(`/teach-me/${courseId}/feedback`)
+  //   }
+  //   else{
+  //     router.push('/')
+  //   }
+  // }
+
   useEffect(() => {
-    if (callStatus === CallStatus.FINISHED) router.push('/')
+    
+    if (callStatus === CallStatus.FINISHED){
+      if(type == 'generate'){
+        router.push('/')
+      }
+      else{
+        // handleGenerateFeedback(messages)
+      }
+    } 
   }, [messages, callStatus, type, userId])
 
   const handleCall = async () => {
@@ -106,19 +131,31 @@ function AgentLayout({ userName, userId, type }) {
     console.log('User Email:', createdBy);
    
     setCallStatus(CallStatus.CONNECTING)
-    const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
-      variableValues: {
-        username: user?.fullName,
-        createdBy: user?.primaryEmailAddress?.emailAddress,
-        topic1: courseTitle[0]?.courseTitle,
-        topic2: courseTitle[1]?.courseTitle,
-        topic3: courseTitle[2]?.courseTitle
-      },
-    });
-    
-    console.log('VAPI Response:', response);
-
-  }
+    if(type == 'generate'){
+      
+      const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
+        variableValues: {
+          username: user?.fullName,
+          createdBy: user?.primaryEmailAddress?.emailAddress,
+          topic1: courseTitle[0]?.courseTitle,
+          topic2: courseTitle[1]?.courseTitle,
+          topic3: courseTitle[2]?.courseTitle
+        },
+      });
+    } else {
+   
+      await vapi.start(teachMeAssistant,{
+        variableValues:{
+          firstQuestion: questions,
+          topic: topic
+        }
+      })
+      setTimeout(() => {
+        vapi.stop()
+        console.log("Teach Me Mode ended after 1.5 minutes.");
+      }, 180000);
+    };
+    }
 
 
   const handleDisconnect = async () => {
@@ -151,13 +188,18 @@ function AgentLayout({ userName, userId, type }) {
               <div className='absolute inset-0 bg-white/10'></div>
               <div className='avatar z-10 transform transition-all duration-300 hover:scale-105'>
                 <div className='p-3 bg-white bg-opacity-70 rounded-full border border-blue-200 shadow-md'>
-                  <Image
+                  {avatar=='boy'?<Image
                     src='/image-generate.jpg'
                     alt="vapi"
                     width={150}
                     height={130}
                     className='object-cover rounded-full'
-                  />
+                  />: <Image
+                  src='/thumbnail.png'
+                  alt="vapi"
+                  width={150}
+                  height={130}
+                  className='object-cover rounded-full'/>}
                 </div>
               </div>
 

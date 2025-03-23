@@ -96,7 +96,7 @@ function CourseCardItem({ course, index, mode, loading }) {
                   ? '/teach-me/' + course?.courseId
                   : mode=='exam'&&course?.questionCount<5
                   ? '/exam/' + course?.courseId
-                  : '/exam/'+course?.courseId
+                  : '/exam/'+course?.courseId+'/feedback'
               }
               className="block w-full"
             >

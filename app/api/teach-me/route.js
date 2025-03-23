@@ -14,3 +14,14 @@ export async function POST(req) {
     } catch(err){ return NextResponse.json({error: err})}
 }
 
+export async function GET(req){
+    const reqUrl = req.url
+    const {searchParams} = new URL(reqUrl)
+    const courseId = searchParams?.get('courseId')
+
+    const dbRes = await db.select().from(TEACH_ME_QUESTIONS_TABLE)
+    .where(eq(TEACH_ME_QUESTIONS_TABLE.courseId, courseId))
+
+    return NextResponse.json({result: dbRes[0]})
+}
+

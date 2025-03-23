@@ -1,7 +1,7 @@
 import { GenerateTeachQuestions } from "@/configs/AiModel";
 import { db } from "@/configs/db";
 import { TEACH_ME_QUESTIONS_TABLE } from "@/configs/schema";
-import { v4 as uuidv4 } from "uuid";
+
 import moment from "moment";
 import { NextResponse } from "next/server";
 
@@ -69,7 +69,7 @@ return NextResponse.json({ success: false, error: "Failed to parse AI response",
         courseId: uuidv4(),
         question: aiResult,
         createdAt: moment().format("DD-MM-yyyy"),
-        difficultyLevel: difficultyLevel,
+       
         status: "Ready",
         createdBy: createdBy || 'unknown', // initially inserting with a placeholder
         topic: topic,

@@ -64,7 +64,7 @@ function CourseCardItem({ course, index, mode, loading }) {
             </div>
           ):(
             <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
-              {course?.question?.courseSummary || "Learn and master new concepts"}
+              {course?.question?.courseSummary || "In this mode, you will be tasked to teach a topic towards an AI agent and your goal is to break down ideas into easy understanding points"}
             </p>
           )
         }

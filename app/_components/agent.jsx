@@ -108,8 +108,8 @@ function AgentLayout({ userName, userId, type }) {
     setCallStatus(CallStatus.CONNECTING)
     const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
       variableValues: {
-        username: username,
-        createdBy: createdBy,
+        username: user?.fullName,
+        createdBy: user?.primaryEmailAddress?.emailAddress,
         topic1: courseTitle[0]?.courseTitle,
         topic2: courseTitle[1]?.courseTitle,
         topic3: courseTitle[2]?.courseTitle

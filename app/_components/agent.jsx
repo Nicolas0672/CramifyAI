@@ -101,17 +101,24 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
     }
   }, [])
 
-  // const handleGenerateFeedback=async(messages: SavedMessage[])=>{
-  //   const {sucess, id} = {
-
-  //   }
-  //   if(sucess && id){
-  //     router.push(`/teach-me/${courseId}/feedback`)
-  //   }
-  //   else{
-  //     router.push('/')
-  //   }
-  // }
+  const handleGenerateFeedback = async (messages) => {
+    try {
+      const res = await axios.post('/api/generate-teach-feedback', {
+        courseId: courseId,
+        createdBy: userId,
+        transcript: messages,
+        title: courseTitle[0]
+      });
+  
+     
+        router.push(`/teach-me/${res.data.courseId}/feedback`);
+    
+    } catch (error) {
+      console.error("Error generating feedback:", error);
+      router.push('/');
+    }
+  };
+  
 
   useEffect(() => {
     
@@ -120,7 +127,7 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
         router.push('/')
       }
       else{
-        // handleGenerateFeedback(messages)
+        handleGenerateFeedback(messages)
       }
     } 
   }, [messages, callStatus, type, userId])

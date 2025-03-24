@@ -92,8 +92,10 @@ function CourseCardItem({ course, index, mode, loading }) {
                   ? '/course/' + course?.studyMaterialId
                   : mode === 'practice'
                   ? '/quiz/' + course?.courseId
-                  : mode === 'teach Me' 
+                  : mode === 'teach Me'&&course?.progress < 100 
                   ? '/teach-me/' + course?.courseId
+                  : mode === 'teach Me'&&course?.progress == 100 
+                  ? '/teach-me/' + course?.courseId + '/feedback'
                   : mode=='exam'&&course?.questionCount<5
                   ? '/exam/' + course?.courseId
                   : '/exam/'+course?.courseId+'/feedback'
@@ -104,7 +106,7 @@ function CourseCardItem({ course, index, mode, loading }) {
                 variant="outline"
                 className="cursor-pointer w-full text-xs sm:text-sm bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:text-blue-800 py-1.5 sm:py-2 px-2 sm:px-3 h-auto min-h-[2rem]"
               >
-                {mode === 'study' ? 'View' : mode === 'practice' ? 'Practice' : mode == 'teach Me' ? 'Teach Me' : mode == 'exam'&&course?.questionCount>=5 ? 'View Exam' : 'Take Exam'}
+                {mode === 'study' ? 'View' : mode === 'practice' ? 'Practice' : mode=='teach Me'&&course?.progress < 100 ? 'Teach Me' : mode=='teach Me'&&course?.progress == 100? 'View Feedback' :  mode == 'exam'&&course?.questionCount>=5 ? 'View Exam' : 'Take Exam'}
               </Button>
             </Link>
           </div>

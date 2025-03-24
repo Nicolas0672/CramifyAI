@@ -247,5 +247,35 @@ export const GenerateQuizAiModel = model.startChat({
         },
       ],
     });
+
+    export const GenereateTeachFeedback = model.startChat({
+      generationConfig,
+      history: [
+        {
+          role: "user",
+          parts: [
+            {text: "You are an AI tutor evaluating a learning session. Below is a transcript of a student explaining a topic to an AI assistant. Provide feedback on their explanation based on clarity, accuracy, depth, and confidence. Also, suggest two areas for improvement.\n\nTranscript:\n\"\"\"\nYou are an AI feedback generator. Analyze the following transcript of a TeachMe Mode session and provide structured feedback in JSON format.\n\nTranscript:\n{{formattedTranscript}}\n\nReturn the feedback in this JSON format:\n{\n  \"summary\": \"A brief summary of how the session went.\",\n  \"strengths\": [\"List of things the user did well\"],\n  \"improvements\": [\"List of areas for improvement\"],\n  \"overallScore\": \"A score out of 10 based on the quality of explanations\"\n}\n\n\"\"\"\n**Please return in JSON FORMAT\n### Feedback:\n- **Clarity:** (Was the explanation easy to understand?)\n- **Accuracy:** (Did they provide correct information?)\n- **Depth:** (Did they cover the topic in enough detail?)\n- **Confidence:** (Did they sound sure of their answer?)\n- **Suggestions for improvement:** (Give two actionable tips to help them improve.)\n`"},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {text: "Okay, I'm ready to analyze the transcript and provide feedback in JSON format. I'll focus on clarity, accuracy, depth, confidence, and provide two actionable suggestions for improvement. I need the transcript to complete the evaluation.\n"},
+          ],
+        },
+        {
+          role: "user",
+          parts: [
+            {text: "- User: The Fibonacci sequence is a series of numbers where each number is the sum of the two previous ones, starting from 0 and 1.  \n- AI: That’s a great start! Can you explain how it's used in real life?  \n- User: Umm... I think it appears in nature, like in the way leaves grow on a plant?  \n- AI: Yes! It’s seen in nature, like in the arrangement of petals. Can you describe how we calculate the 5th Fibonacci number?  \n- User: Oh, I think it’s... 0, 1, 1, 2, 3... So the 5th one is 5?  \n- AI: Almost! The 5th Fibonacci number is actually 3. Keep going, you’re doing great!  \n"},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {text: "```json\n{\n  \"summary\": \"The user provided a basic definition of the Fibonacci sequence and attempted to apply it. While they showed initial understanding, they struggled with applying the definition correctly to calculate a specific Fibonacci number.\",\n  \"strengths\": [\n    \"Successfully defined the Fibonacci sequence in its basic form.\",\n    \"Recognized the sequence's connection to patterns in nature.\",\n    \"Attempted to apply the definition to calculate the 5th Fibonacci number.\"\n  ],\n  \"improvements\": [\n    \"Practice calculating Fibonacci numbers to improve accuracy. Take the time to write out the sequence step-by-step to avoid errors.\",\n    \"Provide more specific examples of the Fibonacci sequence in nature. Instead of just saying it appears in leaves, mention specific examples like the spiral arrangement of seeds in a sunflower or the branching of trees, and try to explain *why* it appears there (optimization of space/resources).\"\n  ],\n  \"overallScore\": \"6\"\n}\n```\n"},
+          ],
+        },
+      ],
+    });
   
    

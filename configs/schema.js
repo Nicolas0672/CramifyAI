@@ -113,3 +113,11 @@ export const TEACH_ME_QUESTIONS_TABLE = pgTable('TeachQuestion',{
     topic: varchar().notNull(),
     progress: integer().default(0)
 })
+
+export const TEACH_ME_FEEDBACK_TABLE = pgTable('TeachFeedback',{
+    id: serial().primaryKey(),
+    courseId: varchar().notNull(),
+    aiFeedback: json(),
+    createdBy: varchar().notNull(),
+    topic: varchar().notNull()
+})

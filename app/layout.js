@@ -7,7 +7,7 @@ import Provider from "./provider";
 import SideBar from "./dashboard/_components/SideBar";
 import { SidebarProvider } from "./SidebarContext";
 import FloatingStudyElements from "./FloatingStudyElemens";
-import { headers } from "next/headers"; // Import headers
+import { headers } from "next/headers";
 
 export const metadata = {
   title: "CramifyAI",
@@ -17,23 +17,16 @@ export const metadata = {
 const outfit = Outfit({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
+  // Get the current URL path from the header set by middleware
   const headersList = headers();
-  const host = headersList.get("host"); // Get domain (e.g., localhost:3000 or mysite.com)
-  const referer = headersList.get("referer") || ""; // Get referrer URL
+  const pathname = headersList.get("x-pathname") || "/";
   
-  let pathname = "/";
-  try {
-    pathname = new URL(referer, `http://${host}`).pathname; // Extract the path dynamically
-  } catch (error) {
-    console.error("Invalid referer URL:", error);
-  }
-
   // List of authentication routes where sidebar should be hidden
   const authRoutes = ["/sign-in", "/sign-up"];
-
+  
   // Check if the current path is an auth page
-  const isAuthPage = authRoutes.includes(pathname);
-
+  const isAuthPage = authRoutes.some(route => pathname.startsWith(route));
+  
   return (
     <ClerkProvider>
       <StudyProvider>
@@ -51,7 +44,7 @@ export default function RootLayout({ children }) {
                       <SideBar />
                     </div>
                   )}
-
+                  
                   {/* Adjust main content layout */}
                   <div className={`mt-0 flex-1 p-6 ${!isAuthPage ? "ml-3" : ""}`}>
                     {children}

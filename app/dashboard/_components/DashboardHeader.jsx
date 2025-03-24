@@ -8,7 +8,7 @@ function DashboardHeader() {
     <div className=''>
     
       {/* User Profile Button */}
-      
+      <UserButton/>
     </div>
   );
 }

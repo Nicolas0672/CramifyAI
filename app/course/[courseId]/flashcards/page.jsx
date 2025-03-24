@@ -25,6 +25,7 @@ function ViewFlashCards() {
   const router = useRouter()
   const [showComplete, setShowComplete] = useState(true)
   const [loading, setLoading] = useState(false)
+  const [flashcardData, setFlashcardData] = useState()
 
   useEffect(() => {
     GetFlashCards()
@@ -73,6 +74,10 @@ function ViewFlashCards() {
         courseId: courseId,
         studyType: 'Flashcard'
       })
+      setFlashcardData(result.data)
+      console.log(result.data)
+
+
       
       // Pass the data directly to avoid any string manipulation that could break LaTeX
       // The FlashcardItem component will handle fixing the slash issues
@@ -92,8 +97,8 @@ function ViewFlashCards() {
   }
 
   useEffect(()=>{
-    setShowComplete(!flashCards[0]?.isDone)
-   console.log(flashCards.isDone?'1':'2')
+    setShowComplete(!flashcardData?.isDone)
+   console.log(flashcardData?.isDone?'1':'2')
   },[flashCards])
 
   return (

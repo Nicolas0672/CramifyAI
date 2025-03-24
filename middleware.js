@@ -7,7 +7,9 @@ const isProtectedRoute = createRouteMatcher([
   '/create(.*)', 
   '/course(.*)',
   '/quiz(.*)',
-  '/exam(.*)'
+  '/exam(.*)',
+  '/teach-me(.*)',
+  '/create-teach-me(.*)'
 ]);
 
 // Middleware function with route path tracking

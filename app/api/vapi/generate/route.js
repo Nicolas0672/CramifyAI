@@ -24,6 +24,8 @@ export async function POST(req) {
     The questions are going to be read by a voice assistant so do not use '/' or any other special characters which might break the voice assistant.
     Return the questions formatted like this: ["Question 1", "Question 2", "Question 3"]`;
 
+   
+    
     // Call AI to generate questions
     const aiResp = await GenerateTeachQuestions.sendMessage(prompt);
     const aiText =  aiResp.response.text(); // Ensure we await this
@@ -39,7 +41,17 @@ const cleanedText = aiText
 .replace(/\\"/g, '"') // Replace escaped quotes
 .trim();
 
-let aiResult;
+ const prompt2 = `Generate a courseTitle that fits the concept of ${courseLayout} and ${topic}`
+    const aiCourseTitle = await GenerateTeachQuestions.sendMessage(prompt2)
+    const aiTitleText = aiCourseTitle.response.text()
+    const cleanedTitle = aiTitleText.replace(/^```(?:json)?\n?/, "") // Remove leading code block markers with or without json
+    .replace(/```$/, "") // Remove trailing code block markers
+    .replace(/\\n/g, " ") // Replace escaped newlines
+    .replace(/\\"/g, '"') // Replace escaped quotes
+    .trim();
+
+    let aiResult;
+    let aiTitleResult;
 try {
 // Try direct parsing first
 aiResult = JSON.parse(cleanedText);
@@ -64,7 +76,7 @@ return NextResponse.json({ success: false, error: "Failed to parse AI response",
 }
     
    
-  
+    aiTitleResult = JSON.parse(cleanedTitle)
     const dbRes = await db.insert(TEACH_ME_QUESTIONS_TABLE).values({
         courseId: uuidv4(),
         question: aiResult,
@@ -72,13 +84,13 @@ return NextResponse.json({ success: false, error: "Failed to parse AI response",
        
         status: "Ready",
         createdBy: createdBy || 'unknown', // initially inserting with a placeholder
-        topic: topic,
+        topics: cleanedTitle,
     })
 
     
  
 
-    return NextResponse.json({ success: true, aiResp: aiResult }, { status: 200 });
+    return NextResponse.json({ success: true, aiResp: dbRes }, { status: 200 });
 
   } catch (err) {
     console.error("Server Error:", err);

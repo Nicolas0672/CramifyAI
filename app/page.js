@@ -21,7 +21,7 @@ export default function Home() {
   // Redirect to the sign-in page if not signed in
   useEffect(() => {
     if (!isSignedIn && !isLoading) {
-      router.push('/sign-in');
+      router.push('/home');
     }
   }, [isSignedIn, isLoading, router]);
 }

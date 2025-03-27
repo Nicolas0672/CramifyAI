@@ -74,6 +74,11 @@ function CourseList() {
                     
                     <div className="flex flex-wrap gap-2">
                         <div className='p-1 gap-3 bg-gray-50 rounded-lg shadow-sm flex gap-1'>
+                        <Button className={`cursor-pointer px-4 py-2 transition-all duration-300 ${mode === 'exam' ? 'shadow-md' : ''}`}
+                                onClick={() => setMode('teach Me')}
+                                variant={mode === 'teach Me' ? 'default' : 'outline'}
+                                >Teach</Button>
+                            
                             <Button 
                                 className={`cursor-pointer px-4 py-2 transition-all duration-300 ${mode === 'study' ? 'shadow-md' : ''}`}
                                 onClick={() => setMode('study')}
@@ -99,10 +104,7 @@ function CourseList() {
                         >
                             <RefreshCcw className='mr-1 h-4 w-4'/> Refresh
                         </Button> */}
-                        <Button className={`cursor-pointer px-4 py-2 transition-all duration-300 ${mode === 'exam' ? 'shadow-md' : ''}`}
-                                onClick={() => setMode('teach Me')}
-                                variant={mode === 'teach Me' ? 'default' : 'outline'}
-                                >Teach Me</Button>
+                        
                         </div>
                        
                     </div>

@@ -9,7 +9,7 @@ function CreateTeach() {
   return (
     <div className='mt-10'>
         
-        <h3>Teach Me Material Generation</h3>
+       
         <AgentLayout userName={user?.name} userId={user?.primaryEmailAddress?.emailAddress} type="generate" question='' courseId='' topic=''/>
     </div>
   )

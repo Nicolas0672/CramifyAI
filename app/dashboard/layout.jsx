@@ -1,26 +1,32 @@
-import React from 'react'
+"use client";
+import React, { useContext } from "react";
+import DashboardHeader from "./_components/DashboardHeader";
+import { SidebarContext } from "../SidebarContext";
 
-import DashboardHeader from './_components/DashboardHeader'
-import { SidebarProvider } from '../SidebarContext'
+function DashboardLayout({ children }) {
+  const { isSidebarExpanded } = useContext(SidebarContext);
 
-function DashboardLayout({children}) {
   return (
-    
-   <div>
-      <div className='md:w-64 hidden md:block fixed'>
-        
+    <div className="flex">
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 left-0 h-full  text-white transition-all duration-300 ${
+          isSidebarExpanded ? "w-64" : "w-16"
+        }`}
+      >
+        <DashboardHeader />
       </div>
-      <div className='md:ml-60'>
-        
-        <div className='p-10'>
+
+      {/* Main Content */}
+      <div
+        className={`flex-1 transition-all duration-300 p-10 ${
+          isSidebarExpanded ? "ml-64" : "ml-16"
+        }`}
+      >
         {children}
       </div>
-      </div>
-      
-   </div>
-  
-  )
-  
+    </div>
+  );
 }
 
-export default DashboardLayout
+export default DashboardLayout;

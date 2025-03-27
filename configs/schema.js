@@ -110,7 +110,7 @@ export const TEACH_ME_QUESTIONS_TABLE = pgTable('TeachQuestion',{
     createdBy: varchar().notNull(),
     createdAt: varchar(),
     status: varchar().default('Generating'),   
-    topic: varchar().notNull(),
+    topics: json(),
     progress: integer().default(0)
 })
 

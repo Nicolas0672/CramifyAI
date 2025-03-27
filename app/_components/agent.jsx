@@ -1,6 +1,6 @@
 "use client"
 import { Button } from '@/components/ui/button';
-import { teachMeAssistant } from '@/lib/teachMeAssistant';
+import { teachMeAssistant, vapi2 } from '@/lib/teachMeAssistant';
 import { cn } from '@/lib/utils';
 import { vapi } from '@/lib/vapi.sdk';
 import { useUser } from '@clerk/nextjs';
@@ -8,6 +8,7 @@ import axios from 'axios';
 import Image from 'next/image'
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast';
 
 
 
@@ -44,6 +45,7 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
       courseTitle: course.aiResponse.courseTitle
     }))
     setCourseTitle(courseTitle)
+    console.log(courseTitle)
   }
   useEffect(() => {
     GetCourseTitle()
@@ -57,10 +59,13 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
   }, [courseTitle])
 
   useEffect(() => {
+    const currentVapi = type === 'generate' ? vapi : vapi2;
+
     const onCallStart = () => setCallStatus(CallStatus.ACTIVE)
     const onCallEnd = () => setCallStatus(CallStatus.FINISHED)
 
     const onMessage = (message) => {
+      // Check if the message is a final transcript for both VAPI instances
       if (message.type === 'transcript' && message.transcriptType === 'final') {
         // Set who is speaking based on the role
         if (message.role === 'user') {
@@ -83,34 +88,38 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
     const onSpeechEnd = () => setIsSpeaking(false)
 
     const onError = (err) => console.log('error', err)
-    vapi.on('call=start', onCallStart)
-    vapi.on('call-end', onCallEnd)
-    vapi.on('message', onMessage)
-    vapi.on('speech-start', onSpeechStart)
-    vapi.on('speech-end', onSpeechEnd)
-    vapi.on('error', onError)
+    
+    // Use the appropriate VAPI instance for event listeners
+    currentVapi.on('call=start', onCallStart)
+    currentVapi.on('call-end', onCallEnd)
+    currentVapi.on('message', onMessage)
+    currentVapi.on('speech-start', onSpeechStart)
+    currentVapi.on('speech-end', onSpeechEnd)
+    currentVapi.on('error', onError)
 
     return () => {
-
-      vapi.off('call=start', onCallStart)
-      vapi.off('call-end', onCallEnd)
-      vapi.off('message', onMessage)
-      vapi.off('speech-start', onSpeechStart)
-      vapi.off('speech-end', onSpeechEnd)
-      vapi.off('error', onError)
+      // Remove listeners for the specific VAPI instance
+      currentVapi.off('call=start', onCallStart)
+      currentVapi.off('call-end', onCallEnd)
+      currentVapi.off('message', onMessage)
+      currentVapi.off('speech-start', onSpeechStart)
+      currentVapi.off('speech-end', onSpeechEnd)
+      currentVapi.off('error', onError)
     }
-  }, [])
+  }, [type])  
 
   const handleGenerateFeedback = async (messages) => {
+    console.log('Full Messages Array:', messages);
     try {
       const res = await axios.post('/api/generate-teach-feedback', {
         courseId: courseId,
         createdBy: userId,
         transcript: messages,
-        title: courseTitle[0]
+        title: topic
       });
+      toast('Your feedback has been fully generated')
   
-     
+      console.log(res.data)
         router.push(`/teach-me/${res.data.courseId}/feedback`);
     
     } catch (error) {
@@ -127,6 +136,7 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
         router.push('/')
       }
       else{
+        toast('Your feedback is being generated...')
         handleGenerateFeedback(messages)
       }
     } 
@@ -136,11 +146,12 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
     const createdBy = user?.primaryEmailAddress?.emailAddress;
     const username = user?.fullName
     console.log('User Email:', createdBy);
-   
+    toast('Call has started')
     setCallStatus(CallStatus.CONNECTING)
     if(type == 'generate'){
       
       const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
+        
         variableValues: {
           username: user?.fullName,
           createdBy: user?.primaryEmailAddress?.emailAddress,
@@ -151,24 +162,24 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
       });
     } else {
    
-      await vapi.start(teachMeAssistant,{
+      await vapi2.start(teachMeAssistant,{
         variableValues:{
           firstQuestion: questions,
           topic: topic
         }
       })
-      setTimeout(() => {
-        vapi.stop()
-        console.log("Teach Me Mode ended after 1.5 minutes.");
-      }, 180000);
+      
     };
     }
 
 
-  const handleDisconnect = async () => {
-    setCallStatus(CallStatus.FINISHED)
-    vapi.stop()
-  }
+    const handleDisconnect = async () => {
+      
+      setCallStatus(CallStatus.FINISHED)
+      
+      // Stop the appropriate VAPI instance based on the type
+      type === 'generate' ? vapi.stop() : vapi2.stop()
+    }
 
   const latestMessage = messages[messages.length - 1]?.content
   const isCallInactiveOrFinished = callStatus == CallStatus.INACTIVE || callStatus == CallStatus.FINISHED
@@ -267,16 +278,29 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
           </div>
 
 
-          <div className='mt-8 mb-6 mx-auto max-w-3xl bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-indigo-100 overflow-hidden'>
-            <div className='p-5 bg-gradient-to-r from-blue-50 to-purple-50'>
-              <h3 className='text-center text-indigo-600 font-medium mb-3'>Conversation</h3>
-              <div className='transcript-content bg-white/70 p-4 rounded-xl'>
-                <p key={latestMessage} className={cn('transition-opacity duration-500 opacity-0 text-gray-700 font-normal', 'animate-in opacity-100')}>
-                  {latestMessage}
-                </p>
-              </div>
-            </div>
-          </div>
+          
+    <div className='mt-8 mb-6 mx-auto max-w-3xl bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-indigo-100 overflow-hidden'>
+      <div className='p-5 bg-gradient-to-r from-blue-50 to-purple-50'>
+        <h3 className='text-center text-indigo-600 font-medium mb-3'>Conversation</h3>
+        <div className='transcript-content bg-white/70 p-4 rounded-xl'>
+          <p 
+            key={latestMessage}
+            className="
+              text-gray-700 
+              transition-all 
+              duration-300 
+              ease-in-out
+              opacity-100
+              transform 
+              translate-y-0
+            "
+          >
+            {latestMessage}
+          </p>
+        </div>
+      </div>
+    </div>
+ 
 
 
           {/* Call control buttons */}

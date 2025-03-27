@@ -63,7 +63,7 @@ function TeachIntroCard({course}) {
               {/* Course Summary */}
               <motion.div variants={itemVariants} className="mb-5">
                 <p className="text-gray-600 leading-relaxed">
-                Welcome to TeachMe Mode in Cramify! You'll be asked a series of questions, and your goal is to break down complex ideas into simple, easy-to-understand explanations. If you're unsure about an answer, no worries—our AI is here to guide you and simplify the concepts for you!
+                Welcome to TeachMe Mode in CramSmart! You'll be asked a series of questions, and your goal is to break down complex ideas into simple, easy-to-understand explanations. If you're unsure about an answer, no worries—our AI is here to guide you and simplify the concepts for you!
                 </p>
               </motion.div>
       

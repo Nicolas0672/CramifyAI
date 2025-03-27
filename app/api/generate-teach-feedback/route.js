@@ -48,6 +48,7 @@ export async function POST(req) {
             return NextResponse.json({'error updating db': err})
         }
         try{
+            
             const dbRes = await db.insert(TEACH_ME_FEEDBACK_TABLE).values({
                 courseId: courseId,
                 createdBy: createdBy,

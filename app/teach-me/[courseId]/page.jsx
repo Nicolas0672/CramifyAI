@@ -36,8 +36,8 @@ function ViewTeachMe() {
               userName={user?.name} 
               userId={user?.primaryEmailAddress?.emailAddress} 
               type="teach-me" 
-              questions={teachDetails?.question} 
-              topic={teachDetails?.topic?.courseTitle} 
+              questions={teachDetails?.question || ''} 
+              topic={teachDetails?.topics?.courseTitle || ''} 
               courseId={teachDetails?.courseId}
             />
           </div>

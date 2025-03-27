@@ -29,13 +29,21 @@ export async function POST (req){
                 .join(' || ')
             return NextResponse.json({courseLayout: combinedCourseLayout, firstItem: firstItem})
     } else {
-        const dbResult = await db.select().from(TEACH_ME_QUESTIONS_TABLE)
-        .where(and(eq(TEACH_ME_QUESTIONS_TABLE.createdBy, createdBy),
-        eq(TEACH_ME_QUESTIONS_TABLE.topic, selectedTopic)
-         ))
+        const dbResult = await db
+        .select()
+        .from(TEACH_ME_QUESTIONS_TABLE)
+        .where(
+            and(
+                eq(TEACH_ME_QUESTIONS_TABLE.createdBy, createdBy),
+                sql`${TEACH_ME_QUESTIONS_TABLE.topics} ->> 'courseTitle' = ${selectedTopic}`
+            )
+        );
+    
          const courseId = dbResult[0].courseId
          const combinedCourseLayout = await db.select().from(TEACH_ME_FEEDBACK_TABLE)
          .where(eq(TEACH_ME_FEEDBACK_TABLE?.courseId, courseId))
+
+         
 
          return NextResponse.json({courseLayout: combinedCourseLayout[0].aiFeedback, firstItem: dbResult[0]})
     }

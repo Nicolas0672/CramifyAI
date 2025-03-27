@@ -141,63 +141,77 @@ function SideBar() {
     const GenerateSelectedTopic = async () => {
         setLoading(true)
         toast('Your content is generating')
-        const res = await axios.post('/api/fetch-courseTopicId',{
+        const res = await axios.post('/api/fetch-courseTopicId', {
             createdBy: user?.primaryEmailAddress?.emailAddress,
             selectOption: selectOption,
             selectedTopic: selectedTopic
         })
 
         const firstItem = res.data.firstItem;
-        const combinedCourseLayout= res.data.courseLayout
+        const combinedCourseLayout = res.data.courseLayout
         console.log(combinedCourseLayout)
-      
-            
-            if (selectOption == 'Practice') {
-                const payLoad = {
-                    courseId: firstItem?.studyMaterialId,
-                    topic: firstItem?.aiResponse?.courseTitle,
-                    courseType: firstItem?.aiResponse?.courseType,
-                    courseLayout: combinedCourseLayout,
-                    difficultyLevel: firstItem?.aiResponse?.difficultyLevel,
-                    createdBy: user?.primaryEmailAddress?.emailAddress
-                }
-                console.log("paylod", payLoad)
-                const res = await axios.post('/api/generate-practice-questions', payLoad)
-                console.log("data is generated", res.data)
-            } else if (selectOption=='Exam'){
-                const payLoad = {
-                    courseId: firstItem?.studyMaterialId,
-                    topic: firstItem?.aiResponse?.courseTitle,
-                    courseType: firstItem?.aiResponse?.courseType,
-                    courseLayout: combinedCourseLayout,
-                    difficultyLevel: firstItem?.aiResponse?.difficultyLevel,
-                    createdBy: user?.primaryEmailAddress?.emailAddress,
-                    exam_time: 30
-                }
-                const res = await axios.post('/api/generate-exam', payLoad)
-                console.log('exam is generating', res.data)
-            } else {
-                const payLoad = {
-                    courseId: firstItem?.courseId,
-                    topic: firstItem?.topic,
-                    courseType: 'Study',
-                    courseLayout: combinedCourseLayout,
-                    difficultyLevel: 'Easy',
-                    createdBy: user?.primaryEmailAddress?.emailAddress
-                }
-                const res = await axios.post('/api/generate-course-outline', payLoad)
-                console.log('study content generating', res.data)
-            }
-            setLoading(false)
-            toast("Your content is generated")
-    
-            router.replace('/dashboard')
-    } 
-            // const { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy } = await req.json();
 
-        
-  
-    
+
+        if (selectOption == 'Practice') {
+            const payLoad = {
+                courseId: firstItem?.studyMaterialId,
+                topic: firstItem?.aiResponse?.courseTitle,
+                courseType: firstItem?.aiResponse?.courseType,
+                courseLayout: combinedCourseLayout,
+                difficultyLevel: firstItem?.aiResponse?.difficultyLevel,
+                createdBy: user?.primaryEmailAddress?.emailAddress
+            }
+            console.log("paylod", payLoad)
+            const res = await axios.post('/api/generate-practice-questions', payLoad)
+            console.log("data is generated", res.data)
+        } else if (selectOption == 'Exam') {
+            const payLoad = {
+                courseId: firstItem?.studyMaterialId,
+                topic: firstItem?.aiResponse?.courseTitle,
+                courseType: firstItem?.aiResponse?.courseType,
+                courseLayout: combinedCourseLayout,
+                difficultyLevel: firstItem?.aiResponse?.difficultyLevel,
+                createdBy: user?.primaryEmailAddress?.emailAddress,
+                exam_time: 30
+            }
+            const res = await axios.post('/api/generate-exam', payLoad)
+            console.log('exam is generating', res.data)
+        } else {
+            console.log(combinedCourseLayout?.strengths)
+            const summary = combinedCourseLayout?.summary;
+            const strengths = combinedCourseLayout?.strengths?.join(', ');
+            const improvements = combinedCourseLayout?.improvements?.join(', ');
+
+            // Combine all into one string
+            const combinedText = `
+                Summary: ${summary}
+
+                Strengths: ${strengths}
+
+                Improvements: ${improvements}
+            `;
+            console.log(combinedText)
+            const payLoad = {
+                courseId: firstItem?.courseId,
+                topic: firstItem?.topic,
+                courseType: 'Study',
+                courseLayout: combinedText,
+                difficultyLevel: 'Easy',
+                createdBy: user?.primaryEmailAddress?.emailAddress
+            }
+            const res = await axios.post('/api/generate-course-outline', payLoad)
+            console.log('study content generating', res.data)
+        }
+        setLoading(false)
+        toast("Your content is generated")
+
+        router.replace('/dashboard')
+    }
+    // const { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy } = await req.json();
+
+
+
+
 
     // courseId, topic, courseType, courseLayout, difficultyLevel, createdBy, exam_time
 

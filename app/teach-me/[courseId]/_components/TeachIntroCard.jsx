@@ -56,7 +56,7 @@ function TeachIntroCard({course}) {
               {/* Course Title */}
               <motion.div variants={itemVariants} className="mb-3">
                 <h2 className="font-bold text-2xl bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">
-                  {course?.topic || "Interactive Course Session"}
+                  {course?.topics?.courseTitle || "Interactive Course Session"}
                 </h2>
               </motion.div>
       

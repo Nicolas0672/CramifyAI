@@ -32,7 +32,7 @@ function CourseCardItem({ course, index, mode, loading }) {
       
       {/* Title Section */}
       <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-800 line-clamp-2 min-h-[2.5rem]">
-        {course?.aiResponse?.courseTitle || course?.aiResponse?.quizTitle || course?.currQuestionAiResp?.courseTitle || course?.topic}
+        {course?.aiResponse?.courseTitle || course?.aiResponse?.quizTitle || course?.currQuestionAiResp?.courseTitle || course?.topics?.courseTitle}
 
       </h3>
 

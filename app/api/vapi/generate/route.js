@@ -1,9 +1,10 @@
 import { GenerateTeachQuestions } from "@/configs/AiModel";
 import { db } from "@/configs/db";
-import { TEACH_ME_QUESTIONS_TABLE } from "@/configs/schema";
+import { TEACH_ME_QUESTIONS_TABLE, USER_TABLE } from "@/configs/schema";
 import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
 
 export async function GET() {
   return NextResponse.json({ success: true }, { status: 200 });
@@ -41,7 +42,7 @@ const cleanedText = aiText
 .replace(/\\"/g, '"') // Replace escaped quotes
 .trim();
 
- const prompt2 = `Generate a courseTitle that fits the concept of ${courseLayout} and ${topic}`
+ const prompt2 = `Generate one courseTitle that fits the concept of ${courseLayout} and ${topic} and a summary of what will what users will gain from engaging in a conversation about this course.`
     const aiCourseTitle = await GenerateTeachQuestions.sendMessage(prompt2)
     const aiTitleText = aiCourseTitle.response.text()
     const cleanedTitle = aiTitleText.replace(/^```(?:json)?\n?/, "") // Remove leading code block markers with or without json
@@ -86,6 +87,10 @@ return NextResponse.json({ success: false, error: "Failed to parse AI response",
         createdBy: createdBy || 'unknown', // initially inserting with a placeholder
         topics: cleanedTitle,
     })
+
+    const updateNewUser = await db.update(USER_TABLE).set({
+      isNewMember: false
+    }).where(eq(USER_TABLE.email, createdBy))
 
     
  

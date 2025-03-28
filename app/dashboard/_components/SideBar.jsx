@@ -35,7 +35,7 @@ function SideBar() {
     const path = usePathname();
     const [openDialogue, setOpenDialogue] = useState(false);
     const [selectedTopic, setSelectedTopic] = useState(null);
-    const { isSidebarExpanded, setIsSidebarExpanded } = useContext(SidebarContext) // State for sidebar expansion
+    const { isSidebarExpanded, setIsSidebarExpanded, isSidebarVisible } = useContext(SidebarContext) // State for sidebar expansion
     const [loading, setLoading] = useState()
     const MenuList = [
         {
@@ -226,7 +226,9 @@ function SideBar() {
     return (
         <>
 
-            {!isSidebarExpanded && <div
+            {isSidebarVisible && (
+                <> 
+                {!isSidebarExpanded&& <div
                 className={`fixed top-4 mr-5 z-50 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md cursor-pointer transition-all hover:bg-blue-50 hover:scale-110 ${isSidebarExpanded ? 'ml-64' : 'ml-4'}`}
                 onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
             >
@@ -432,6 +434,8 @@ function SideBar() {
                     </DialogContent>
                 </Dialog>
             </div>
+            </>
+            )}
         </>
     );
 }

@@ -18,6 +18,7 @@ export default function Home() {
     }
   }, [isSignedIn, router]);
 
+  
   // Redirect to the sign-in page if not signed in
   useEffect(() => {
     if (!isSignedIn && !isLoading) {

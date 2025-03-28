@@ -20,13 +20,13 @@ export default function RootLayout({ children }) {
   // Get the current URL path from the header set by middleware
   const headersList = headers();
   const pathname = headersList.get("x-pathname") || "/";
-  
+
   // List of authentication routes where sidebar should be hidden
-  const authRoutes = ["/sign-in", "/sign-up"];
-  
+  const authRoutes = ["/sign-in", "/sign-up", "/home"];
+
   // Check if the current path is an auth page
   const isAuthPage = authRoutes.some(route => pathname.startsWith(route));
-  
+
   return (
     <ClerkProvider>
       <StudyProvider>
@@ -44,7 +44,7 @@ export default function RootLayout({ children }) {
                       <SideBar />
                     </div>
                   )}
-                  
+
                   {/* Adjust main content layout */}
                   <div className={`mt-0 flex-1 p-6 ${!isAuthPage ? "ml-3" : ""}`}>
                     {children}

@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 
 
 
-function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
+function AgentLayout({ userName, userId, type, courseId, topic, questions, isNewMember }) {
   const CallStatus = {
     INACTIVE: "INACTIVE",
     CONNECTING: "CONNECTING",
@@ -45,7 +45,7 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
       courseTitle: course.aiResponse.courseTitle
     }))
     setCourseTitle(courseTitle)
-    console.log(courseTitle)
+   
   }
   useEffect(() => {
     GetCourseTitle()
@@ -54,9 +54,7 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
     } else { setAvatar('girl')}
   }, [user])
 
-  useEffect(() => {
-    console.log(courseTitle[0], courseTitle[1], courseTitle[2]);
-  }, [courseTitle])
+
 
   useEffect(() => {
     const currentVapi = type === 'generate' ? vapi : vapi2;
@@ -127,6 +125,8 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
       router.push('/');
     }
   };
+
+
   
 
   useEffect(() => {
@@ -145,21 +145,33 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions }) {
   const handleCall = async () => {
     const createdBy = user?.primaryEmailAddress?.emailAddress;
     const username = user?.fullName
-    console.log('User Email:', createdBy);
+  
     toast('Call has started')
     setCallStatus(CallStatus.CONNECTING)
     if(type == 'generate'){
-      
+      if(isNewMember){
       const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
         
         variableValues: {
           username: user?.fullName,
           createdBy: user?.primaryEmailAddress?.emailAddress,
-          topic1: courseTitle[0]?.courseTitle,
-          topic2: courseTitle[1]?.courseTitle,
-          topic3: courseTitle[2]?.courseTitle
+          topic1: courseTitle[0]?.courseTitle || 'Math',
+          topic2: courseTitle[1]?.courseTitle || 'Science',
+          topic3: courseTitle[2]?.courseTitle || 'History'
         },
-      });
+      })} else {
+        const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID2, {
+        
+          variableValues: {
+            username: user?.fullName,
+            createdBy: user?.primaryEmailAddress?.emailAddress,
+            topic1: courseTitle[0]?.courseTitle,
+            topic2: courseTitle[1]?.courseTitle,
+            topic3: courseTitle[2]?.courseTitle
+          },
+        })
+      };
+      
     } else {
    
       await vapi2.start(teachMeAssistant,{

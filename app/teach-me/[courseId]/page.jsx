@@ -33,6 +33,7 @@ function ViewTeachMe() {
           {/* Agent Layout - Chat interface */}
           <div className="mt-4 w-full">
             <AgentLayout 
+              isNewMember={false}
               userName={user?.name} 
               userId={user?.primaryEmailAddress?.emailAddress} 
               type="teach-me" 

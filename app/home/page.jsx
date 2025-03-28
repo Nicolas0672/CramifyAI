@@ -13,9 +13,10 @@ import {
     FaChevronUp
 } from 'react-icons/fa';
 import FloatingStudyElements from '../FloatingStudyElemens';
-import { useRouter } from 'next/navigation';
+
 import Typed from 'typed.js';
 import { Book, Home, Shield, Users } from 'lucide-react';
+import Link from 'next/link';
 const AIVisual = () => {
     return (
       <svg 
@@ -126,7 +127,7 @@ const CramifyHomePage = () => {
     const [activeMode, setActiveMode] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeFaq, setActiveFaq] = useState(null);
-  const router = useRouter();
+
   const el = useRef(null);
 
   
@@ -271,12 +272,14 @@ const CramifyHomePage = () => {
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 transition-all duration-300 group-hover:w-full"></span>
           </a>
         ))}
+         <Link href={'/sign-up'}>
         <button 
-          onClick={() => router.push('/sign-up')} 
+          
           className="cursor-pointer bg-gradient-to-br from-purple-600 to-blue-600 text-white px-7 py-2.5 rounded-xl text-sm font-bold hover:shadow-lg hover:scale-105 transition-all transform"
         >
           Start Learning
         </button>
+        </Link>
       </nav>
 
           {/* Mobile Menu Toggle */}
@@ -311,12 +314,14 @@ const CramifyHomePage = () => {
                   {link.label}
                 </a>
               ))}
+               <Link href={'/sign-up'}>
               <button 
-                onClick={() => router.push('/sign-up')} 
+              
                 className="cursor-pointer bg-gradient-to-br from-purple-600 to-blue-600 text-white px-8 py-3 rounded-xl text-sm font-bold hover:shadow-lg hover:scale-105 transition-all transform"
               >
                 Start Learning
               </button>
+              </Link>
             </nav>
           </div>
         </motion.div>
@@ -373,12 +378,14 @@ const CramifyHomePage = () => {
         transition={{ duration: 0.7, delay: 0.7 }}
         className="relative z-10"
       >
+        <Link href={'/sign-up'}>
         <button 
-          onClick={() => router.push('/sign-up')} 
+         
           className="cursor-pointer bg-gradient-to-br from-purple-600 to-blue-600 text-white px-10 py-4 rounded-xl text-lg font-bold hover:shadow-lg hover:scale-105 transition-all transform"
         >
           Start Your Learning Journey
         </button>
+        </Link>
       </motion.div>
     </motion.section>
 
@@ -608,6 +615,7 @@ const CramifyHomePage = () => {
           <p className="text-xl max-w-2xl mx-auto mb-10 text-white/80">
             Join thousands of students who have transformed their study approach with CramSmart's intelligent learning companion.
           </p>
+          <Link href={'/sign-up'}>
           <button
             className="group relative inline-flex items-center justify-center 
             px-12 py-4 
@@ -621,11 +629,13 @@ const CramifyHomePage = () => {
             active:scale-95 
             shadow-2xl 
             hover:shadow-purple-500/50 cursor-pointer"
-            onClick={router.push('/sign-up')}
+          
           >
+            
             <span className="absolute inset-0 bg-purple-100 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
             <span className="relative z-10">Get Started for Free</span>
           </button>
+          </Link>
         </div>
       </section>
       

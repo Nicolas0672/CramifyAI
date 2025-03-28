@@ -25,12 +25,29 @@ function PracticeContentCard({quizTypeContent, item, refreshData, practiceCourse
 
     })
 
+    checkStatus(result.data.id)
     
-    toast('Content is generated');
-    await refreshData();
+  }
+
+  const checkStatus = async(recordId)=>{
+    console.log('Check status')
+    let attemps = 0;
+    const maxAttempts = 10
+
+    while(attemps < maxAttempts){
+      const res = await axios.get(`/api/get-check-status?id=${recordId}`)
+     
+      if(res.data.status == 'Ready'){
+        setLoading(false)
+        await refreshData();
+        toast('Your content is ready to view');
+        break;
+      }
+      await new Promise((res)=> setTimeout(res, 2000))
+      attemps++
+    }
     
-    setLoading(false);
-    
+    setLoading(false)
   }
 
   const isReady = quizTypeContent?.[item.type]?.status == 'Ready';

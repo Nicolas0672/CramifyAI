@@ -87,7 +87,7 @@ Please output in the following JSON structure:
 
 
             const dbResult = await db.insert(AI_TEXT_RESPONSE_TABLE).values({
-                studyMaterialId: courseId,
+                courseId: courseId,
                 aiResponse: aiResult,
                 createdBy: createdBy,
                 createdAt: moment().format("DD-MM-yyyy")

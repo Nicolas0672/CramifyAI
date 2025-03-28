@@ -33,6 +33,6 @@ If it's a **math question**, format the question using LaTeX syntax and return i
         }
     })
 
-    return NextResponse.json(result[0].id)
+    return NextResponse.json({id: result[0].id})
 
 }

@@ -22,7 +22,7 @@ export const STUDY_MATERIAL_TABLE=pgTable('studyMaterial',{
 
 export const AI_TEXT_RESPONSE_TABLE=pgTable('aiTextResp',{
     id:serial().primaryKey(),
-    studyMaterialId: varchar().notNull(),
+    courseId: varchar().notNull(),
     aiResponse: json(),
     status:varchar().default('Generating'),
     createdAt: varchar('createdAt'),

@@ -17,10 +17,10 @@ export async function POST(req){
 export async function GET(req) {
     const reqUrl = req.url;
     const {searchParams} = new URL(reqUrl)
-    const studyMaterialId = searchParams?.get('courseId');
+    const courseId = searchParams?.get('courseId');
 
     const course= await db.select().from(AI_TEXT_RESPONSE_TABLE)
-    .where(eq(AI_TEXT_RESPONSE_TABLE.studyMaterialId, studyMaterialId))
+    .where(eq(AI_TEXT_RESPONSE_TABLE.courseId, courseId))
 
     return NextResponse.json({result:course[0]})
 }

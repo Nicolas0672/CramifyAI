@@ -18,14 +18,14 @@ export async function POST(req) {
             }).where(eq(FLASHCARD_CONTENT.courseId, courseId))
         }
         const session = await db.select().from(AI_TEXT_RESPONSE_TABLE)
-            .where(eq(AI_TEXT_RESPONSE_TABLE.studyMaterialId, courseId))
+            .where(eq(AI_TEXT_RESPONSE_TABLE.courseId, courseId))
 
         if (!session) return NextResponse.json({ resp: 'session not found' })
 
         const newCount = parseInt((session[0].progress || 0) + 50)
         await db.update(AI_TEXT_RESPONSE_TABLE).set({
             progress: newCount
-        }).where(eq(AI_TEXT_RESPONSE_TABLE.studyMaterialId, courseId))
+        }).where(eq(AI_TEXT_RESPONSE_TABLE.courseId, courseId))
 
         return NextResponse.json({ resp: 'sucess' })
     }

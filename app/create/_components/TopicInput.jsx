@@ -63,7 +63,7 @@ function TopicInput({ setFileName ,setTopic, setDifficultyLevel, setComment, han
             </div>
     
             {/* PDF Upload Option */}
-            <div className="mb-6">
+            {/* <div className="mb-6">
                 <h2 className="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2">
                     <FileText size={20} className="text-blue-500" /> Do you have a PDF to upload?
                 </h2>
@@ -83,7 +83,7 @@ function TopicInput({ setFileName ,setTopic, setDifficultyLevel, setComment, han
                         No
                     </Button>
                 </div>
-            </div>
+            </div> */}
     
             {/* PDF Upload or Textarea */}
             {hasPdf ? (

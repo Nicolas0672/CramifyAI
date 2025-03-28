@@ -11,7 +11,28 @@ import toast from 'react-hot-toast';
 function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
   const [loading, setLoading] = useState(false);
 
+  const checkStatus = async(recordId)=>{
+    console.log('Check status')
+    let attemps = 0;
+    const maxAttempts = 10
 
+    while(attemps < maxAttempts){
+      const res = await axios.get(`/api/get-check-status?id=${recordId}`)
+     
+      if(res.data.status == 'Ready'){
+        setLoading(false)
+        await refreshData();
+        toast('Your content is ready to view');
+        break;
+      }
+      await new Promise((res)=> setTimeout(res, 2000))
+      attemps++
+    }
+    
+    setLoading(false)
+  }
+
+ 
  
   const GenerateContent = async () => {
     toast('Generating content');
@@ -27,19 +48,17 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
     .join(' || ')
   
     const result = await axios.post('/api/generate-content', {
-      courseId: course?.studyMaterialId,
+      courseId: course?.courseId,
       type: item.name,
       chapters: combinedCourseLayout,
       
     });
     console.log('generating flashcards', result);
-    setLoading(false);
-    await refreshData();
-    toast('Your content is ready to view');
+    checkStatus(result.data.id)
   };
 
   return (
-    <Link href={'/course/' + course?.studyMaterialId + item.path}>
+    <Link href={'/course/' + course?.courseId + item.path}>
       <motion.div
         className={`relative mt-3 border border-gray-200 shadow-lg p-6 rounded-xl
           flex flex-col items-center backdrop-blur-sm

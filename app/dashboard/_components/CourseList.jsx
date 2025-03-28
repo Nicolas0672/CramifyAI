@@ -14,6 +14,7 @@ function CourseList() {
     const [mode, setMode] = useState('study')  // NEW - Switch between Study & Practice
     const [examList, setExamList] = useState([])
     const [teachMeList, setTeachMeList] = useState([])
+    const [status, setStatus] = useState()
     
     useEffect(() => {
         user && getCourseList();
@@ -25,15 +26,28 @@ function CourseList() {
     
     const getCourseList = async () => {
         setLoading(true);
+        let attempt = 0;
+        const maxAttempt = 10;
+        while(attempt < maxAttempt){
+            
         const result = await axios.post('/api/courses', { createdBy: user?.primaryEmailAddress.emailAddress });
         setCourseList(result.data.result);
+        await new Promise((res)=> setTimeout(res,5000))
+        attempt++
+        }
         setLoading(false);
     }
     
     const getQuizList = async () => {
         setLoading(true);
+        let attempt = 0;
+        const maxAttempt = 10
+        while(attempt < maxAttempt){
         const result = await axios.post('/api/quizzes', { createdBy: user?.primaryEmailAddress.emailAddress });
         setQuizList(result.data.result);
+        await new Promise((res)=> setTimeout(res,5000))
+        attempt++
+        }
         setLoading(false);
     }
 
@@ -117,7 +131,7 @@ function CourseList() {
                     mode === 'study' ? (
                         courseList.length > 0 ? (
                             courseList.map((course, index) => (
-                                <CourseCardItem course={course} key={index} mode={mode} loading={loading} />
+                                <CourseCardItem course={course} key={index} mode={mode} loading={loading} setCourses={setCourseList}/>
                             ))
                         ) : (
                             <div className="col-span-full py-8 text-center text-gray-500">
@@ -127,7 +141,7 @@ function CourseList() {
                     ) : mode === 'practice' ? (
                         quizList.length > 0 ? (
                             quizList.map((quiz, index) => (
-                                <CourseCardItem course={quiz} key={index} mode={mode} loading={loading} />
+                                <CourseCardItem course={quiz} key={index} mode={mode} loading={loading} setCourses={setQuizList}/>
                             ))
                         ) : (
                             <div className="col-span-full py-8 text-center text-gray-500">
@@ -137,7 +151,7 @@ function CourseList() {
                     ) : mode == 'exam' ? (
                         examList.length > 0 ? (
                             examList.map((exam, index) => (
-                                <CourseCardItem course={exam} key={index} mode={mode} loading={loading} />
+                                <CourseCardItem course={exam} key={index} mode={mode} loading={loading} setCourses={setExamList}/>
                             ))
                         ) : (
                             <div className="col-span-full py-8 text-center text-gray-500">
@@ -147,7 +161,7 @@ function CourseList() {
                     ) : (
                         teachMeList.length > 0 ? (
                             teachMeList.map((teach, index) => (
-                                <CourseCardItem course={teach} key={index} mode={mode} loading={loading} />
+                                <CourseCardItem course={teach} key={index} mode={mode} loading={loading} setCourses={setTeachMeList}/>
                             ))
                         ) : (
                             <div className="col-span-full py-8 text-center text-gray-500">

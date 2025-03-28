@@ -109,7 +109,7 @@ export const GenerateNotes=inngest.createFunction(
 
         await db.insert(CHAPTER_NOTE_TABLE).values({
           chapterId: index,
-          courseId: course?.studyMaterialId,
+          courseId: course?.courseId,
           notes:aiResp,
         })
         index = index + 1
@@ -120,7 +120,7 @@ export const GenerateNotes=inngest.createFunction(
     const updateCourseStatus= await step.run('Update Course Status to Ready', async() =>{
       const result = await db.update(AI_TEXT_RESPONSE_TABLE).set({
         status:'Ready'
-      }).where(eq(AI_TEXT_RESPONSE_TABLE?.studyMaterialId, course?.studyMaterialId))
+      }).where(eq(AI_TEXT_RESPONSE_TABLE?.courseId, course?.courseId))
 
       return 'Success'
     })

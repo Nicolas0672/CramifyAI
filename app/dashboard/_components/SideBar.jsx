@@ -154,7 +154,7 @@ function SideBar() {
 
         if (selectOption == 'Practice') {
             const payLoad = {
-                courseId: firstItem?.studyMaterialId,
+                courseId: firstItem?.courseId,
                 topic: firstItem?.aiResponse?.courseTitle,
                 courseType: firstItem?.aiResponse?.courseType,
                 courseLayout: combinedCourseLayout,
@@ -166,7 +166,7 @@ function SideBar() {
             console.log("data is generated", res.data)
         } else if (selectOption == 'Exam') {
             const payLoad = {
-                courseId: firstItem?.studyMaterialId,
+                courseId: firstItem?.courseId,
                 topic: firstItem?.aiResponse?.courseTitle,
                 courseType: firstItem?.aiResponse?.courseType,
                 courseLayout: combinedCourseLayout,

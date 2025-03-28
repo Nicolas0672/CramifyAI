@@ -12,7 +12,7 @@ export async function POST(req) {
             `- ${sentence.role}: ${sentence.content}\n`
         ).join('');
 
-        const prompt = `You are an AI tutor evaluating a learning session. Below is a transcript of a student explaining a topic to an AI assistant. Provide feedback on their explanation based on clarity, accuracy, depth, and confidence. Also, suggest two areas for improvement.
+        const prompt = `You are an AI tutor evaluating a learning session. Below is a transcript of a student explaining a topic to an AI assistant. Provide feedback on their explanation based on , accuracy, depth,. Also, suggest two areas for improvement.
 
                         Transcript:
                         """
@@ -21,12 +21,12 @@ export async function POST(req) {
                         **Please return in JSON FORMAT and DO NOT OTHER CATEGORIES BESIDES THE ONE PROVIDED. ENSURE THAT IT IS ABLE TO PARSE AS JSON. DO NOT ADD ANYTHING THAT WILL BREAK THE PARSE
                         
                         ### Feedback:
-                        - courseTitle of the transcript
-                        - **Clarity:** (Was the explanation easy to understand?)
-                        - **Accuracy:** (Did they provide correct information?)
-                        - **Depth:** (Did they cover the topic in enough detail?)
-                        - **Confidence:** (Did they sound sure of their answer?)
-                        - **Suggestions for improvement:** (Give two actionable tips to help them improve.)
+                        
+                        - **Summary:** (Did they provide correct information?)
+                        - **Strength:** (Did they cover the topic in enough detail?)
+                       
+                        - **Improvements:** (Give two actionable tips to help them improve.)
+                        - Overall rating out of 10. Ensure that the rating is lighthearted
                         `
         const aiResp = await GenereateTeachFeedback.sendMessage(prompt)
         const aiText = aiResp.response.text()

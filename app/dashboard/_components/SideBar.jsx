@@ -37,6 +37,7 @@ function SideBar() {
     const [selectedTopic, setSelectedTopic] = useState(null);
     const { isSidebarExpanded, setIsSidebarExpanded, isSidebarVisible } = useContext(SidebarContext) // State for sidebar expansion
     const [loading, setLoading] = useState()
+    const [tip, setTip] = useState()
     const MenuList = [
         {
             name: 'Dashboard',
@@ -95,14 +96,13 @@ function SideBar() {
         }
     };
 
-    useEffect(() => {
-        console.log(selectOption)
-    }, [selectOption])
+
 
     const handleProceed = () => {
         if (selectOption === 'Practice' || selectOption === 'Exam' || selectOption == 'Study') {
             setConfirmSelection(true);
         } else {
+            toast('Redirecting...')
             router.push('/create-teach-me')
             setOpenDialogue(false);
         }
@@ -209,13 +209,21 @@ function SideBar() {
     }
     // const { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy } = await req.json();
 
-
-
+    useEffect(()=>{
+        GetStudyTip()
+    }, [user])
 
 
     // courseId, topic, courseType, courseLayout, difficultyLevel, createdBy, exam_time
 
-
+    const GetStudyTip=async()=>{
+        const res = await axios.post('/api/generate-ai-tips',{
+            createdBy: user?.primaryEmailAddress?.emailAddress
+        })
+        setTip(res.data.res.motivationTips)
+        console.log(res.data.res.motivationTips)
+      
+    }
 
     useEffect(() => {
         if (isLoaded && user) {
@@ -297,7 +305,7 @@ function SideBar() {
                             <Brain className="w-5 h-5 text-indigo-500 mr-2" />
                             <span className="text-sm font-medium text-indigo-700">AI Study Tip</span>
                         </div>
-                        <p className="text-xs text-indigo-600 italic">Try studying in 25-minute sessions with 5-minute breaks for optimal retention!</p>
+                        <p className="text-xs text-indigo-600 italic">{tip}</p>
                     </div>}
 
                     {/* Credits Section */}

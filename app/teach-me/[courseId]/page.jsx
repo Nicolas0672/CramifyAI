@@ -16,6 +16,7 @@ function ViewTeachMe() {
         GetTeachMeDetails()
     },[courseId])
     const GetTeachMeDetails = async()=>{
+      console.log(courseId)
         const res = await axios.get('/api/teach-me?courseId='+courseId)
         console.log(res.data)
         setTeachDetails(res.data.result)

@@ -1,10 +1,15 @@
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Star, Brain, Zap } from 'lucide-react';
+import {  useLearningMode } from '@/app/LearningModeContext';
+import LearningProgressStepper from '@/app/LearningProgressStepper';
+import { useCourse } from '@/app/CourseIdProvider';
 
 function PracticeIntroCard({course}) {
+  const {currentModes, setMode} = useLearningMode()
+  const{setCourse} = useCourse()
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -15,6 +20,11 @@ function PracticeIntroCard({course}) {
       }
     }
   };
+
+  useEffect(()=>{
+    setMode('practice')
+    setCourse(course)
+  },[course])
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -29,6 +39,7 @@ function PracticeIntroCard({course}) {
       variants={containerVariants}
       whileHover={{ scale: 1.01 }}
     >
+      <LearningProgressStepper currentMode={currentModes}/>
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -mr-20 -mt-20 blur-xl"></div>
       <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full -ml-16 -mb-16 blur-xl"></div>

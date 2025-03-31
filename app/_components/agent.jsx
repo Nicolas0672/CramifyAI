@@ -34,6 +34,11 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
   const [callStatus, setCallStatus] = useState(CallStatus.INACTIVE);
 
   const [messages, setMessages] = useState([]);
+  
+  // Timer state for vapi2 - starting from 5 minutes (300 seconds)
+  const TIMER_START = 300; // 5 minutes in seconds
+  const [timer, setTimer] = useState(TIMER_START);
+  const [isTimerActive, setIsTimerActive] = useState(false);
 
   const GetCourseTitle = async () => {
     const res = await axios.post('/api/courses', {
@@ -54,13 +59,53 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
     } else { setAvatar('girl')}
   }, [user])
 
+  // Timer effect for vapi2 - countdown from 5 minutes
+  useEffect(() => {
+    let interval = null;
+    
+    if (isTimerActive && type !== 'generate') {
+      interval = setInterval(() => {
+        setTimer(seconds => {
+          if (seconds <= 1) {
+            // Timer finished
+            clearInterval(interval);
+            setIsTimerActive(false);
+            handleDisconnect(); // Auto disconnect when timer reaches 0
+            return 0;
+          }
+          return seconds - 1;
+        });
+      }, 1000);
+    } else if (!isTimerActive) {
+      clearInterval(interval);
+    }
+    
+    return () => clearInterval(interval);
+  }, [isTimerActive, type]);
 
+  // Format time for display
+  const formatTime = (totalSeconds) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     const currentVapi = type === 'generate' ? vapi : vapi2;
 
-    const onCallStart = () => setCallStatus(CallStatus.ACTIVE)
-    const onCallEnd = () => setCallStatus(CallStatus.FINISHED)
+    const onCallStart = () => {
+      setCallStatus(CallStatus.ACTIVE);
+      // Start timer only for vapi2
+      if (type !== 'generate') {
+        setIsTimerActive(true);
+      }
+    }
+    
+    const onCallEnd = () => {
+      setCallStatus(CallStatus.FINISHED);
+      // Stop timer
+      setIsTimerActive(false);
+    }
 
     const onMessage = (message) => {
       // Check if the message is a final transcript for both VAPI instances
@@ -115,7 +160,7 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
         transcript: messages,
         title: topic
       });
-      toast('Your feedback has been fully generated')
+      toast('Redirecting...')
   
       console.log(res.data)
         router.push(`/teach-me/${res.data.courseId}/feedback`);
@@ -148,6 +193,13 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
   
     toast('Call has started')
     setCallStatus(CallStatus.CONNECTING)
+    
+    // Reset timer when starting vapi2 call
+    if (type !== 'generate') {
+      setTimer(TIMER_START);
+      setIsTimerActive(true);
+    }
+    
     if(type == 'generate'){
       if(isNewMember){
       const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
@@ -188,6 +240,7 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
     const handleDisconnect = async () => {
       
       setCallStatus(CallStatus.FINISHED)
+      setIsTimerActive(false);
       
       // Stop the appropriate VAPI instance based on the type
       type === 'generate' ? vapi.stop() : vapi2.stop()
@@ -242,7 +295,7 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
 
               {/* Teacher label */}
               <div className='absolute top-4 left-4 bg-white/60 px-3 py-1 rounded text-sm text-blue-600 font-medium'>
-                Teacher
+                {type === 'generate' ? 'Elliot' : 'Hannah'}
               </div>
 
               {/* Connection status indicator */}
@@ -252,6 +305,18 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
                   {isSpeaking ? 'Speaking' : 'Connected'}
                 </div>
               </div>
+              
+              {/* Timer for vapi2 */}
+              {type !== 'generate' && (callStatus === CallStatus.CONNECTING || callStatus === CallStatus.ACTIVE) && (
+                <div className={`absolute top-4 right-4 bg-white/80 px-3 py-1 rounded-full text-sm font-medium ${timer <= 60 ? 'text-red-600' : 'text-blue-600'}`}>
+                  <span className='flex items-center'>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                    </svg>
+                    {formatTime(timer)}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Student video */}
@@ -276,7 +341,7 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
 
               {/* Student label */}
               <div className='absolute top-4 left-4 bg-white/60 px-3 py-1 rounded text-sm text-purple-600 font-medium'>
-                Student
+                {user?.fullName}
               </div>
 
               {/* Muted/Speaking indicator */}

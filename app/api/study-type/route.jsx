@@ -1,5 +1,5 @@
 import { db } from "@/configs/db"
-import { CHAPTER_NOTE_TABLE, EXAM_SESSION_TABLE, FILL_BLANK_TABLE, FLASHCARD_CONTENT, PRACTICE_QUIZ_TABLE } from "@/configs/schema"
+import { AI_TEXT_RESPONSE_TABLE, CHAPTER_NOTE_TABLE, EXAM_SESSION_TABLE, FILL_BLANK_TABLE, FLASHCARD_CONTENT, PRACTICE_QUIZ_TABLE } from "@/configs/schema"
 import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
@@ -63,5 +63,11 @@ export async function POST(req) {
         .where(eq(EXAM_SESSION_TABLE?.courseId, courseId))
 
         return NextResponse.json(examSheet[0])
+    }
+    else if(studyType == 'study'){
+        const studySheet = await db.select().from(AI_TEXT_RESPONSE_TABLE)
+        .where(eq(AI_TEXT_RESPONSE_TABLE?.courseId, courseId))
+
+        return NextResponse.json(studySheet[0])
     }
 }

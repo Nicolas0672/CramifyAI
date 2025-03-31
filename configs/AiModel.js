@@ -277,5 +277,35 @@ export const GenerateQuizAiModel = model.startChat({
         },
       ],
     });
+
+    export const GenerateStudyTip = model.startChat({
+      generationConfig,
+      history: [
+        {
+          role: "user",
+          parts: [
+            {text: "generate a study tip in json\n"},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {text: "```json\n{\n  \"studyTip\": \"Use the Feynman Technique: Explain the concept you're learning in simple terms, as if you were teaching it to someone with no prior knowledge. Identify gaps in your understanding and revisit the source material. Repeat the process until you can explain the concept clearly and concisely. This helps solidify your understanding and identify areas where you need more focus.\",\n  \"category\": \"Active Learning\",\n  \"tags\": [\"understanding\", \"explanation\", \"simplification\", \"teaching\", \"review\", \"feynman\", \"active recall\"],\n  \"difficulty\": \"Medium\",\n  \"timeInvestment\": \"Variable (depending on concept complexity)\",\n  \"effectiveness\": \"High\"\n}\n```"},
+          ],
+        },
+        {
+          role: "user",
+          parts: [
+            {text: "generate a single line of tip for studying in json"},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {text: "```json\n{ \"tip\": \"Break down large tasks into smaller, manageable chunks to avoid feeling overwhelmed.\" }\n```\n"},
+          ],
+        },
+      ],
+    });
   
    

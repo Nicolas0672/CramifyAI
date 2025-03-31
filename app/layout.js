@@ -8,6 +8,8 @@ import SideBar from "./dashboard/_components/SideBar";
 import { SidebarProvider } from "./SidebarContext";
 import FloatingStudyElements from "./FloatingStudyElemens";
 import { headers } from "next/headers";
+import { LearningModeProvider } from "./LearningModeContext";
+import { CourseProvider } from "./CourseIdProvider";
 
 export const metadata = {
   title: "CramifyAI",
@@ -30,8 +32,11 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <StudyProvider>
+      <CourseProvider>
         <html lang="en">
           <body className={outfit.className}>
+            <LearningModeProvider>
+              
             <FloatingStudyElements />
             <Toaster position="bottom-right" reverseOrder={false} />
             <Provider>
@@ -52,8 +57,11 @@ export default function RootLayout({ children }) {
                 </div>
               </SidebarProvider>
             </Provider>
+            
+            </LearningModeProvider>
           </body>
         </html>
+        </CourseProvider>
       </StudyProvider>
     </ClerkProvider>
   );

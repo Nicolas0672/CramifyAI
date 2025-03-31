@@ -15,6 +15,8 @@ export async function POST(req) {
         // Generate course layout using AI
         const prompt = `
 Generate a high-quality study guide for the course. The topic is "${topic}", the course type is "${courseType}", the difficulty level is "${difficultyLevel}", and the course layout is "${courseLayout}".
+**IF COURSELAYOUT IS RECEIVED AS A JSON WHICH CONTAINS INFO ABOUT A USER CONVERSATION SUMMARY, STRENGTH, IMPROVEMENTS AND RATING, USE THIS TO GENERATE CONTENT 
+TO HELP ACCOMODATE WEAKPOINTS
 
 1. **Introduction**: Provide a clear and engaging introduction to the course topic "${topic}". Explain why this topic is important, its relevance, and what learners can expect to gain from studying it.
 

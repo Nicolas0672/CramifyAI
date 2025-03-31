@@ -22,11 +22,20 @@ export async function POST(req) {
                         
                         ### Feedback:
                         
-                        - **Summary:** (Did they provide correct information?)
+                        - **Summary:** (What the conversation was about)
                         - **Strength:** (Did they cover the topic in enough detail?)
-                       
+                       - Weakness (What can user improve on in terms of study materials)
                         - **Improvements:** (Give two actionable tips to help them improve.)
                         - Overall rating out of 10. Ensure that the rating is lighthearted
+                        **PLEASE OUTPUT IN THIS JSON FORMAT**
+                        {
+                            "summary": "<AI-generated summary here>",
+                            "strengths": ["<AI-generated strength 1>", "<AI-generated strength 2>", "..."],
+                            "weaknesses": ["<AI-generated weakness 1>", "<AI-generated weakness 2>", "..."],
+                            "improvements": ["<AI-generated improvement 1>", "<AI-generated improvement 2>", "..."],
+                            "overallScore": "<AI-generated score>"
+                        }
+                        
                         `
         const aiResp = await GenereateTeachFeedback.sendMessage(prompt)
         const aiText = aiResp.response.text()

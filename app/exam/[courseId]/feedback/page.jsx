@@ -3,15 +3,24 @@ import axios from 'axios'
 import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import FeedbackDetails from '../_components/FeedbackDetails'
+import LearningProgressStepper from '@/app/LearningProgressStepper'
+import { useLearningMode } from '@/app/LearningModeContext'
+import { useCourse } from '@/app/CourseIdProvider'
+import confetti from 'canvas-confetti'
 
 
 function ViewExamFeedback() {
   const {courseId} = useParams()
   const [feedbackDetails, setFeedbackDetails] = useState([])
   const router = useRouter()
+  const {currentModes, setMode} = useLearningMode()
+    const{setCourse} = useCourse()
+
+    
 
   useEffect(()=>{
     GetFeedbackData()
+    setMode('exam')
   }, [courseId])
 
   const GetFeedbackData = async()=>{
@@ -19,6 +28,21 @@ function ViewExamFeedback() {
     setFeedbackDetails(res.data.result)
     console.log(res.data.result)
   }
+
+  function triggerConfetti() {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  }
+
+  useEffect(()=>{
+    setCourse(feedbackDetails[0])
+    triggerConfetti()
+  },[feedbackDetails])
+
+  
  
   
  
@@ -29,6 +53,7 @@ function ViewExamFeedback() {
 
 return (
   <div className="max-w-4xl mx-auto px-6 py-8 bg-gradient-to-b from-indigo-50 to-white min-h-screen rounded-2xl">
+          <LearningProgressStepper currentMode={currentModes} />
     <div className="mb-8 text-center">
       <div className="inline-block p-2 bg-indigo-100 rounded-full mb-4">
         <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

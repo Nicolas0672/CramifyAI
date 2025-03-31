@@ -3,6 +3,10 @@ import axios from 'axios'
 import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { useLearningMode } from '@/app/LearningModeContext'
+import LearningProgressStepper from '@/app/LearningProgressStepper'
+import { useCourse } from '@/app/CourseIdProvider'
+import confetti from 'canvas-confetti'
 
 function ViewTeachFeedback() {
   const router = useRouter()
@@ -10,12 +14,23 @@ function ViewTeachFeedback() {
   const [teachFeedback, setTeachFeedback] = useState()
   const [newTopic, setNewTopic] = useState("")
   const [loading, setLoading] = useState(true)
+  const {currentModes, setMode} = useLearningMode()
+  const {setCourse} = useCourse()
   
   useEffect(() => {
     if (courseId) {
       GetTeachFeedback()
+     
     }
   }, [courseId])
+
+  function triggerConfetti() {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  }
   
   const GetTeachFeedback = async () => {
     setLoading(true)
@@ -26,6 +41,7 @@ function ViewTeachFeedback() {
       console.error("Failed to fetch learning feedback:", error)
     } finally {
       setLoading(false)
+      triggerConfetti()
     }
   }
   
@@ -39,6 +55,8 @@ function ViewTeachFeedback() {
   
   useEffect(() => {
     processTopic()
+    setCourse(teachFeedback)
+    setMode('teach')
   }, [teachFeedback])
 
   // Helper function to determine score color
@@ -74,6 +92,7 @@ function ViewTeachFeedback() {
       transition={{ duration: 0.5 }}
       className="max-w-4xl mx-auto px-6 py-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 min-h-screen rounded-3xl shadow-md"
     >
+      <LearningProgressStepper currentMode={currentModes}/>
       <div className="mb-8 text-center">
         <motion.div 
           initial={{ scale: 0, rotate: 0 }}
@@ -147,7 +166,7 @@ function ViewTeachFeedback() {
           )}
           
           {/* Strengths Section */}
-          {teachFeedback.aiFeedback.strengths && (
+          {teachFeedback?.aiFeedback?.strengths && (
             <motion.div 
               whileHover={{ y: -5 }}
               className="bg-white p-6 rounded-3xl shadow-md border-2 border-green-100"

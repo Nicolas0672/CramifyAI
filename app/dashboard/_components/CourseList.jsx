@@ -79,7 +79,7 @@ function CourseList() {
     
     return (
         <div className='mt-5 px-2'>
-            <UserButton/>
+          
             <div className='mb-8 pb-4 border-b border-gray-100'>
                 <h2 className='font-bold text-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
                     <span className='text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800 pb-1'>

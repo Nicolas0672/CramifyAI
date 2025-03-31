@@ -20,7 +20,7 @@ export async function GET(req){
     const courseId = searchParams?.get('courseId')
 
     const dbRes = await db.select().from(TEACH_ME_QUESTIONS_TABLE)
-    .where(eq(TEACH_ME_QUESTIONS_TABLE.courseId, courseId))
+    .where(eq(TEACH_ME_QUESTIONS_TABLE?.courseId, courseId))
 
     return NextResponse.json({result: dbRes[0]})
 }

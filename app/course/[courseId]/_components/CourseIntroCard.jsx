@@ -1,13 +1,18 @@
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion'; // For animations
 import {  BookOpen, Star, Brain, Zap } from 'lucide-react'; // Fun icons
+import LearningProgressStepper from '@/app/LearningProgressStepper';
+import { useLearningMode } from '@/app/LearningModeContext';
+import { useCourse } from '@/app/CourseIdProvider';
 
 
 
 function CourseIntroCard({ course }) {
-
+  const {setCourse} = useCourse()
+  const {currentModes, setMode} = useLearningMode()
+  
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
@@ -17,6 +22,16 @@ function CourseIntroCard({ course }) {
       }
     }
   };
+
+  useEffect(()=>{
+    setMode('study')
+    setCourse(course)
+   
+  },[course])
+
+
+
+  
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -31,6 +46,7 @@ function CourseIntroCard({ course }) {
       variants={containerVariants}
       whileHover={{ scale: 1.01 }}
     >
+      <LearningProgressStepper currentMode={currentModes} />
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -mr-20 -mt-20 blur-xl"></div>
       <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full -ml-16 -mb-16 blur-xl"></div>
@@ -53,15 +69,17 @@ function CourseIntroCard({ course }) {
             <Star className="w-3 h-3 text-white" />
           </div>
         </motion.div>
-  
+      
         {/* Course Details */}
         <div className='flex-1'>
+        
           {/* Course Title */}
           <motion.div variants={itemVariants} className="mb-3">
             <h2 className='font-bold text-2xl bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent'>
               {course?.aiResponse?.courseTitle || "Interactive Course Session"}
             </h2>
           </motion.div>
+         
   
           {/* Course Summary */}
           <motion.div variants={itemVariants} className="mb-5">

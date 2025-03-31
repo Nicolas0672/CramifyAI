@@ -1,6 +1,6 @@
 import { GenerateTeachQuestions } from "@/configs/AiModel";
 import { db } from "@/configs/db";
-import { TEACH_ME_QUESTIONS_TABLE, USER_TABLE } from "@/configs/schema";
+import { STUDY_MATERIAL_TABLE, TEACH_ME_QUESTIONS_TABLE, USER_TABLE } from "@/configs/schema";
 import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import { NextResponse } from "next/server";
@@ -12,7 +12,7 @@ export async function GET() {
 
 export async function POST(req) {
   try {
-    const { difficultyLevel, amount, courseLayout, topic, createdBy} = await req.json();
+    const { courseId ,difficultyLevel, amount, courseLayout, topic, createdBy} = await req.json();
 
     if (!difficultyLevel || !amount || !courseLayout || !topic ) {
       return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 });
@@ -42,7 +42,12 @@ const cleanedText = aiText
 .replace(/\\"/g, '"') // Replace escaped quotes
 .trim();
 
- const prompt2 = `Generate one courseTitle that fits the concept of ${courseLayout} and ${topic} and a summary of what will what users will gain from engaging in a conversation about this course.`
+ const prompt2 = `Generate one courseTitle that fits the concept of ${courseLayout} and ${topic} and a summary of what will what users will gain from engaging in a conversation about this course.
+    PLEASE OUTPUT IN THIS FORMAT: 
+    {
+      "summary" : "**CONTENT HERE**"
+    }
+ `
     const aiCourseTitle = await GenerateTeachQuestions.sendMessage(prompt2)
     const aiTitleText = aiCourseTitle.response.text()
     const cleanedTitle = aiTitleText.replace(/^```(?:json)?\n?/, "") // Remove leading code block markers with or without json
@@ -76,10 +81,11 @@ console.error("Error parsing AI response:", error, "Raw text:", cleanedText);
 return NextResponse.json({ success: false, error: "Failed to parse AI response", rawResponse: cleanedText }, { status: 500 });
 }
     
+    const id = uuidv4()
    
     aiTitleResult = JSON.parse(cleanedTitle)
     const dbRes = await db.insert(TEACH_ME_QUESTIONS_TABLE).values({
-        courseId: uuidv4(),
+        courseId: courseId.length > 3 ? courseId : id,
         question: aiResult,
         createdAt: moment().format("DD-MM-yyyy"),
        
@@ -91,6 +97,16 @@ return NextResponse.json({ success: false, error: "Failed to parse AI response",
     const updateNewUser = await db.update(USER_TABLE).set({
       isNewMember: false
     }).where(eq(USER_TABLE.email, createdBy))
+
+    const resp = await db.insert(STUDY_MATERIAL_TABLE).values({
+                    courseId: courseId.length > 3 ? courseId : id,
+                    courseType: 'Teach',
+                    topic: topic,
+                    difficultyLevel: difficultyLevel,
+                    courseLayout: courseLayout,
+                    createdBy: createdBy,
+                    storageId: null,  // Save only if provided
+                })
 
     
  

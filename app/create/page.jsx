@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SelectOption from './_components/SelectOption'
 import { Button } from '@/components/ui/button'
 import TopicInput from './_components/TopicInput'
@@ -26,6 +26,7 @@ function Create() {
     const [hasPdf, setHasPdf] = useState(false)
     const { selectedStudyType } = useStudy()
     const router = useRouter()
+    const [data, setData] = useState({})
     const AddFileEntry = useMutation(api.fileStorage.AddFileEntryToDb)
     const GetFileUrl=useMutation(api.fileStorage.getFileUrl)
     const [fileName, setFileName] = useState()
@@ -60,48 +61,48 @@ function Create() {
             toast.error("Please provide either a PDF file or text.");
             return;
         }
-        //setLoading(true);
+        setLoading(true);
 
-        if (hasPdf) {
+        // if (hasPdf) {
 
-            const postUrl = await generateUploadUrl();
+        //     const postUrl = await generateUploadUrl();
 
-            const fileData = new FormData()
-            fileData.append("file", pdfFile)
+        //     const fileData = new FormData()
+        //     fileData.append("file", pdfFile)
            
-            console.log("Upload URL:", postUrl);
+        //     console.log("Upload URL:", postUrl);
 
-            const result = await fetch(postUrl, {
-                method: "POST",
-                headers:{"Content-Type": pdfFile?.type},
-                body: pdfFile,
-            });
-            const { storageId } = await result.json();
-            const fileUrl = await GetFileUrl({storageId: storageId})
+        //     const result = await fetch(postUrl, {
+        //         method: "POST",
+        //         headers:{"Content-Type": pdfFile?.type},
+        //         body: pdfFile,
+        //     });
+        //     const { storageId } = await result.json();
+        //     const fileUrl = await GetFileUrl({storageId: storageId})
 
-            // Maybe considering using this fileId as courseId
-            const fileId= uuidv4()
-            const res = await AddFileEntry({
-                fileId: fileId,
-                storageId: storageId,
-                fileName: fileName??'Untitled File',
-                fileUrl: fileUrl,
-                createdBy:  user?.primaryEmailAddress?.emailAddress
-            })
+        //     // Maybe considering using this fileId as courseId
+        //     const fileId= uuidv4()
+        //     const res = await AddFileEntry({
+        //         fileId: fileId,
+        //         storageId: storageId,
+        //         fileName: fileName??'Untitled File',
+        //         fileUrl: fileUrl,
+        //         createdBy:  user?.primaryEmailAddress?.emailAddress
+        //     })
 
-            console.log(res)
+        //     console.log(res)
 
-            const resp = await db.insert(STUDY_MATERIAL_TABLE).values({
-                courseId: uuidv4(),
-                courseType: formData.studyType,
-                topic: formData.topic,
-                difficultyLevel: formData.difficultyLevel,
-                courseLayout: '',
-                createdBy: user?.primaryEmailAddress?.emailAddress,
-                storageId: storageId  // Save only if provided
-            }).returning()
+        //     const resp = await db.insert(STUDY_MATERIAL_TABLE).values({
+        //         courseId: uuidv4(),
+        //         courseType: formData.studyType,
+        //         topic: formData.topic,
+        //         difficultyLevel: formData.difficultyLevel,
+        //         courseLayout: '',
+        //         createdBy: user?.primaryEmailAddress?.emailAddress,
+        //         storageId: storageId  // Save only if provided
+        //     }).returning()
 
-            console.log('storageId',storageId)
+        //     console.log('storageId',storageId)
 
             // if (resp) {
             //     GenerateCourseOutline()
@@ -112,55 +113,41 @@ function Create() {
             //     // Handle the failure case (e.g., show an error message)
             // }
 
-        }
-        else {
-            const resp = await db.insert(STUDY_MATERIAL_TABLE).values({
-                courseId: uuidv4(),
+        // }
+        // else {
+            // MAKE AN API TO INSERT DATA
+            const resp = await axios.post('/api/insert-new-study',{
                 courseType: formData.studyType,
                 topic: formData.topic,
                 difficultyLevel: formData.difficultyLevel,
                 courseLayout: formData.comment,
                 createdBy: user?.primaryEmailAddress?.emailAddress,
-                storageId: null,  // Save only if provided
             })
-
-            if (resp) {
-                GenerateCourseOutline()
-                console.log('Insert successful', resp);
-                // Optionally show a success message to the user
-            } else {
-                console.log('Insert failed');
-                // Handle the failure case (e.g., show an error message)
-            }
-        }
-       
+            const res = resp.data
+            setData(res)      
     }
+    useEffect(()=>{
+        console.log(data)
+        console.log(data?.courseType)
+        GenerateCourseOutline()
+    },[data])
 
     const GenerateCourseOutline = async () => {
         setLoading(true);
         try {
-            // Fetch data from the database
-            const resData = await db
-                .select()
-                .from(STUDY_MATERIAL_TABLE)
-                .where(eq(STUDY_MATERIAL_TABLE.createdBy, user?.primaryEmailAddress?.emailAddress))
-                .orderBy(desc(STUDY_MATERIAL_TABLE.id))
-                .limit(1);
-    
-            const firstItem = resData[0];
 
-            if(firstItem.courseType == 'Study'){
-                if (!hasPdf) {
+            if(data?.courseType == 'Study'){
+               
                     console.log("res is going thru");
         
                     // Prepare the payload
                     const payload = {
-                        courseId: firstItem.courseId,
-                        courseType: firstItem.courseType,
-                        topic: firstItem.topic,
-                        difficultyLevel: firstItem.difficultyLevel,
-                        courseLayout: firstItem.courseLayout,
-                        createdBy: firstItem.createdBy,
+                        courseId: data?.courseId,
+                        courseType: data?.courseType,
+                        topic: data?.topic,
+                        difficultyLevel: data?.difficultyLevel,
+                        courseLayout: data?.courseLayout,
+                        createdBy: data?.createdBy,
                     };
                     console.log("Request Payload:", payload);
         
@@ -168,34 +155,37 @@ function Create() {
                     const res = await axios.post('/api/generate-course-outline', payload);
                     console.log("Response from API:", res.data);
                     toast("Your course content is generating...")
-                }
+                    router.replace('/dashboard')
+                
             }
-            else if(firstItem.courseType == 'Practice'){
+            else if(data?.courseType == 'Practice'){
                 const practicePayload = {
-                    courseId: firstItem.courseId,
-                    courseType: firstItem.courseType,
-                    topic: firstItem.topic,
-                    difficultyLevel: firstItem.difficultyLevel,
-                    createdBy: firstItem.createdBy,
-                    courseLayout: firstItem.courseLayout
+                    courseId: data?.courseId,
+                    courseType: data?.courseType,
+                    topic: data?.topic,
+                    difficultyLevel: data?.difficultyLevel,
+                    createdBy: data?.createdBy,
+                    courseLayout: data?.courseLayout
                 };
         
                 const res = await axios.post('/api/generate-practice-questions', practicePayload);
                 console.log("Response from API:", res.data);
                 toast("Your practice questions are generating...");
+                router.replace('/dashboard')
             }
-            else if(firstItem.courseType == 'Exam'){
+            else if(data?.courseType == 'Exam'){
                 const examPayload = {
-                    courseId: firstItem.courseId,
-                    courseLayout: firstItem.courseLayout,
-                    topic: firstItem.topic,
-                    difficultyLevel: firstItem.difficultyLevel,
-                    createdBy: firstItem.createdBy,
+                    courseId: data?.courseId,
+                    courseLayout: data?.courseLayout,
+                    topic: data?.topic,
+                    difficultyLevel: data?.difficultyLevel,
+                    createdBy: data?.createdBy,
                     exam_time: 30
                 }
                 const res = await axios.post('/api/generate-exam',examPayload)
                 console.log("Response from API:", res.data);
                 toast("Your exam is generating...");
+                router.replace('/dashboard')
             }
     
            
@@ -203,7 +193,7 @@ function Create() {
             console.error("Error in GenerateCourseOutline:", error);
         }
         setLoading(false)
-        router.replace('/dashboard')
+       
     };
 
 

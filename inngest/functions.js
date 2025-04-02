@@ -3,6 +3,7 @@ import { inngest } from "./client";
 import { AI_TEXT_RESPONSE_TABLE, CHAPTER_NOTE_TABLE, FILL_BLANK_TABLE, FLASHCARD_CONTENT, USER_TABLE } from "@/configs/schema";
 import { eq } from "drizzle-orm";
 import { GenerateFillBlank, GenerateFlashCardAI, generateNotesAIModel } from "@/configs/AiModel";
+import moment from "moment";
 
 export const helloWorld = inngest.createFunction(
   { id: "hello-world" },
@@ -22,10 +23,17 @@ export const CreateNewUser = inngest.createFunction(
       const result = await db.select().from(USER_TABLE)
         .where(eq(USER_TABLE.email, user?.primaryEmailAddress?.emailAddress))
 
+        const currentDate = new Date();
+      const nextMonthDate = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
+
+    // Format nextMonthDate to the database format, for example: '2025-05-01T00:00:00Z'
+    
       if (result?.length == 0) {
         const userResp = await db.insert(USER_TABLE).values({
           name: user?.fullName,
           email: user?.primaryEmailAddress?.emailAddress,
+          nextCreditReset: sql`${nextMonthDate.toISOString()}::timestamp`,
+          createdAt: moment().format("DD-MM-yyyy")
         }).returning({ id: USER_TABLE.id })
         return userResp;
       }
@@ -71,6 +79,7 @@ export const GenerateNotes=inngest.createFunction(
              \\frac{dy}{dx} = \\cos(u) \\cdot \\frac{du}{dx} = \\cos(x^2) \\cdot 2x
              \\]
              \`\`\`
+             ** PLEASE ONLY USE CODING EXAMPLE IF RELATED TO CODING OTHERWISE DO NOT OUTPUT AS CODE FORMAT AS IT WILL BREAK MATHJAX RENDER**
            - Wrap ALL code snippets in <pre><code> tags for proper formatting. For example:
              \`\`\`html
              <pre class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto">
@@ -82,6 +91,8 @@ export const GenerateNotes=inngest.createFunction(
                </code>
              </pre>
              \`\`\`
+               ** PLEASE ONLY USE CODING EXAMPLE IF RELATED TO CODING OTHERWISE DO NOT OUTPUT AS CODE FORMAT AS IT WILL BREAK MATHJAX RENDER**
+             
            - Add inline styles or Tailwind CSS classes for better visual appeal (e.g., use classes like "text-lg", "font-bold", "bg-gray-100", "p-4", "rounded-lg", etc.).
            - Structure the content into sections with clear headings and subheadings.
            - Use spacing and dividers (<hr>) to separate sections for better readability.

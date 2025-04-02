@@ -32,7 +32,7 @@ function PracticeContentCard({quizTypeContent, item, refreshData, practiceCourse
   const checkStatus = async(recordId)=>{
     console.log('Check status')
     let attemps = 0;
-    const maxAttempts = 10
+    const maxAttempts = 20
 
     while(attemps < maxAttempts){
       const res = await axios.get(`/api/get-check-status?id=${recordId}`)

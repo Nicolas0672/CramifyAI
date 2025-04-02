@@ -20,7 +20,7 @@ function DashboardLayout({ children }) {
       {/* Main Content */}
       <div
         className={`flex-1 transition-all duration-300 p-10 ${
-          isSidebarExpanded ? "ml-64" : ""
+          isSidebarExpanded ? "ml-64" : "ml-0"
         }`}
       >
         {children}

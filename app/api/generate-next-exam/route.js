@@ -34,15 +34,45 @@ Your response MUST be a **100% valid, parseable JSON object** with the **exact**
     }
 }
 
-CRITICAL FORMATTING RULES:
-1. **Return ONLY valid JSON**—NO markdown, backticks, extra text, or commentary.
-2. Use **double quotes** for all strings and property names.
-3. **Escape special characters** within strings properly (especially quotes and backslashes).
-4. If using LaTeX, use **double backslashes** for proper formatting (e.g., "$\\\\alpha$").
-5. **No newlines inside string values**—keep everything on one line.
-6. **No trailing commas** in arrays or objects.
-7. **No comments** of any kind.
-8. The output **must be 100% valid JSON**—if not, reformat and retry.
+CRITICAL FORMATTING RULES FOR JSON OUTPUT:
+
+1. **OUTPUT FORMAT**: Return ONLY valid, parseable JSON—NO markdown formatting, code blocks, backticks, explanatory text, or commentary before or after the JSON.
+
+2. **STRING FORMATTING**:
+   - Use double quotes (") for ALL strings and property names
+   - NEVER use single quotes (') anywhere in the JSON
+   - Escape all special characters within strings: \" for quotes, \\ for backslashes, \n for newlines
+
+3. **MATHEMATICAL NOTATION**:
+   Use double backslashes (\\) for LaTeX commands (e.g., \\alpha for α, \\frac{x}{y} for fractions).
+
+Avoid using triple backslashes (\\\\) unless required by JavaScript string escaping rules. Only use \\ inside LaTeX expressions.
+
+Ensure LaTeX commands are written correctly and don't have extra spaces or escapes (e.g., use \\frac{x}{y}, not \\ frac{x}{y}).
+
+Test expressions to verify they render correctly with MathJax.
+   
+4. **STRUCTURAL INTEGRITY**:
+   - NO line breaks within string values
+   - NO trailing commas after the last element in arrays or objects
+   - Ensure all arrays and objects are properly closed with matching brackets/braces
+   - Ensure all property names are quoted
+
+5. **VALIDATION REQUIREMENTS**:
+   - Check that the output passes JSON.parse() without errors
+   - Verify LaTeX expressions are properly escaped for MathJax compatibility
+   - Double-check the entire structure before finalizing response
+
+6. **ABSOLUTELY NO**:
+   - Comments (// or /**/)
+   - Undefined values
+   - NaN or Infinity literals (use strings instead)
+   - Extra text outside the JSON structure
+   - Explanations of the JSON structure
+
+7. **OUTPUT VERIFICATION**:
+   - After generating JSON, mentally parse it to confirm validity
+   - If any question about validity arises, rewrite the problematic section
 
 Return only the JSON object. Any response that does not meet these criteria must be corrected automatically before returning.
 `;

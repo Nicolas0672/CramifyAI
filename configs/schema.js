@@ -1,12 +1,32 @@
-import { boolean, integer, json, text, timestamp } from "drizzle-orm/gel-core";
-import { date, pgTable, serial, time, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, json, text } from "drizzle-orm/gel-core";
+import { date, pgTable, serial, time, timestamp, varchar } from "drizzle-orm/pg-core";
 
 export const USER_TABLE=pgTable('users',{
     id:serial().primaryKey(),
     name:varchar().notNull(),
     email:varchar().notNull(),
     isMember:boolean().default(false),
-    isNewMember: boolean().default(true)
+    isNewMember: boolean().default(true),
+    totalCredits: integer().default(0),
+    newFreeCredits: integer().default(10),
+    newPurchasedCredit: integer().default(0),
+    remainingCredits: integer().default(10),
+    totalCreditSize: integer().default(10),
+    lastCreditReset: timestamp("lastCreditReset").defaultNow(),
+    nextCreditReset: timestamp("nextCreditReset"),
+    createdAt: varchar()
+
+})
+
+export const PAYMENT_USER_TABLE=pgTable('PaymentTable',{
+    id: serial().primaryKey(),
+    createdBy: varchar().notNull(),
+    transactionId: varchar().notNull(),
+    amountPaid: integer().notNull(),
+    status: varchar().default('pending'),
+    creditAmount: integer().notNull(),
+    createdAt: timestamp("createdAt").defaultNow(),
+    customerId: varchar(), 
 })
 
 export const STUDY_MATERIAL_TABLE=pgTable('studyMaterial',{
@@ -121,4 +141,12 @@ export const TEACH_ME_FEEDBACK_TABLE = pgTable('TeachFeedback',{
     aiFeedback: json(),
     createdBy: varchar().notNull(),
     topic: varchar().notNull()
+})
+
+export const PROGRESS_CREDITS_COMPLETED_TABLE = pgTable('CreditsProgress',{
+    id: serial().primaryKey(),
+    courseId: varchar().notNull(),
+    createdBy: varchar().notNull(),
+    creditsClaimed: boolean().default(false),
+    
 })

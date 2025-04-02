@@ -50,6 +50,23 @@ export async function POST(req) {
         question: aiRes.question,
         status: 'Ready'
     }).returning({ resp: EXAM_SESSION_TABLE });
+
+    const creditTable = await db.insert(PROGRESS_CREDITS_COMPLETED_TABLE).values({
+      createdBy: createdBy,
+      courseId: courseId
+    })
+
+    const userInfo= await db.select().from(USER_TABLE).where(eq(USER_TABLE?.email, createdBy))
+    const newTotal = 1 + userInfo[0]?.totalCredits
+
+   const remainingCredits = (userInfo[0]?.newFreeCredits + userInfo[0]?.newPurchasedCredit) - 1
+                 const newFreeCredits = userInfo[0]?.newFreeCredits - 1 
+             
+                 const updateCredits = await db.update(USER_TABLE).set({
+                   totalCredits: newTotal,
+                   newFreeCredits: newFreeCredits < 0 ? 0 : newFreeCredits,
+                   remainingCredits: remainingCredits < 0 ? 0 : remainingCredits
+                 }).where(eq(USER_TABLE?.email, createdBy))
     
          return NextResponse.json({ result: dbResult[0] });
     

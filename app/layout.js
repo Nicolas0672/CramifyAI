@@ -51,7 +51,7 @@ export default function RootLayout({ children }) {
                   )}
 
                   {/* Adjust main content layout */}
-                  <div className={`mt-0 flex-1 p-6 ${!isAuthPage ? "ml-3" : ""}`}>
+                  <div className={`mt-0 flex-1 p-6 ${!isAuthPage ? "" : ""}`}>
                     {children}
                   </div>
                 </div>

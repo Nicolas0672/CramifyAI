@@ -17,6 +17,7 @@ import FloatingStudyElements from '../FloatingStudyElemens';
 import Typed from 'typed.js';
 import { Book, Home, Shield, Users } from 'lucide-react';
 import Link from 'next/link';
+import { useSidebar } from '../SidebarContext';
 const AIVisual = () => {
     return (
       <svg 
@@ -127,6 +128,7 @@ const CramifyHomePage = () => {
     const [activeMode, setActiveMode] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeFaq, setActiveFaq] = useState(null);
+  const{setIsSidebarVisible} = useSidebar()
 
   const el = useRef(null);
 

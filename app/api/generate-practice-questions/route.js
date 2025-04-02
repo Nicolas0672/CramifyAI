@@ -1,6 +1,7 @@
 import { GenerateQuizAiModel } from "@/configs/AiModel";
 import { db } from "@/configs/db";
-import { PRACTICE_QUIZ_TABLE } from "@/configs/schema";
+import { PRACTICE_QUIZ_TABLE, PROGRESS_CREDITS_COMPLETED_TABLE, USER_TABLE } from "@/configs/schema";
+import { eq } from "drizzle-orm";
 import moment from "moment";
 import { NextResponse } from "next/server";
 
@@ -52,6 +53,23 @@ export async function POST (req) {
         topic: topic,
         difficultyLevel: difficultyLevel
     }).returning({ resp: PRACTICE_QUIZ_TABLE });
+
+    const creditTable = await db.insert(PROGRESS_CREDITS_COMPLETED_TABLE).values({
+      createdBy: createdBy,
+      courseId: courseId
+    })
+
+    const userInfo= await db.select().from(USER_TABLE).where(eq(USER_TABLE?.email, createdBy))
+    const newTotal = 1 + userInfo[0]?.totalCredits
+
+    const remainingCredits = (userInfo[0]?.newFreeCredits + userInfo[0]?.newPurchasedCredit) - 1
+              const newFreeCredits = userInfo[0]?.newFreeCredits - 1 
+          
+              const updateCredits = await db.update(USER_TABLE).set({
+                totalCredits: newTotal,
+                newFreeCredits: newFreeCredits < 0 ? 0 : newFreeCredits,
+                remainingCredits: remainingCredits < 0 ? 0 : remainingCredits
+              }).where(eq(USER_TABLE?.email, createdBy))
 
      return NextResponse.json({ result: dbResult[0] });
 }

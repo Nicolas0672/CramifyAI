@@ -1,6 +1,6 @@
 import { GenerateTeachQuestions } from "@/configs/AiModel";
 import { db } from "@/configs/db";
-import { STUDY_MATERIAL_TABLE, TEACH_ME_QUESTIONS_TABLE, USER_TABLE } from "@/configs/schema";
+import { PROGRESS_CREDITS_COMPLETED_TABLE, STUDY_MATERIAL_TABLE, TEACH_ME_QUESTIONS_TABLE, USER_TABLE } from "@/configs/schema";
 import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import { NextResponse } from "next/server";
@@ -107,6 +107,25 @@ return NextResponse.json({ success: false, error: "Failed to parse AI response",
                     createdBy: createdBy,
                     storageId: null,  // Save only if provided
                 })
+
+    const creditTable = await db.insert(PROGRESS_CREDITS_COMPLETED_TABLE).values({
+      createdBy: createdBy,
+      courseId: courseId.length > 3 ? courseId : id
+    })
+
+    const userInfo= await db.select().from(USER_TABLE).where(eq(USER_TABLE?.email, createdBy))
+    const newTotal = 2 + userInfo[0]?.totalCredits
+
+    
+    const remainingCredits = (userInfo[0]?.newFreeCredits + userInfo[0]?.newPurchasedCredit) - 2
+    const newFreeCredits = userInfo[0]?.newFreeCredits - 2 
+
+    const updateCredits = await db.update(USER_TABLE).set({
+      totalCredits: newTotal,
+      newFreeCredits: newFreeCredits < 0 ? 0 : newFreeCredits,
+      remainingCredits: remainingCredits < 0 ? 0 : remainingCredits
+    }).where(eq(USER_TABLE?.email, createdBy))
+
 
     
  

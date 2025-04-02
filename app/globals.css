@@ -131,44 +131,75 @@
 /* global.css */
 
 /* Consistent spacing for headings */
+/* Enhanced notes styling with better code and math support */
 .notes-content {
-  /* Add max-width and overflow handling for the container */
+  /* Improve mobile display */
   max-width: 100%;
   overflow-wrap: break-word;
   word-wrap: break-word;
+  padding: 0 0.5rem;
+  margin: 0 auto;
 }
 
+/* Responsive heading sizes */
 .notes-content h1 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: bold;
   margin-top: 1.5rem;
   margin-bottom: 1rem;
 }
 
+@media (min-width: 640px) {
+  .notes-content h1 {
+    font-size: 2rem;
+  }
+}
+
 .notes-content h2 {
-  font-size: 1.75rem;
+  font-size: 1.35rem;
   font-weight: bold;
   margin-top: 1.25rem;
   margin-bottom: 1rem;
 }
 
+@media (min-width: 640px) {
+  .notes-content h2 {
+    font-size: 1.75rem;
+  }
+}
+
 .notes-content h3 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: bold;
   margin-top: 1rem;
   margin-bottom: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .notes-content h3 {
+    font-size: 1.5rem;
+  }
 }
 
 /* Consistent spacing for paragraphs */
 .notes-content p {
   margin-bottom: 1rem;
   line-height: 1.6;
+  text-align: left;
 }
 
 /* Consistent spacing for lists */
 .notes-content ul, .notes-content ol {
   margin-bottom: 1rem;
-  margin-left: 1.5rem;
+  margin-left: 1rem;
+  padding-left: 1rem;
+  text-align: left;
+}
+
+@media (min-width: 640px) {
+  .notes-content ul, .notes-content ol {
+    margin-left: 1.5rem;
+  }
 }
 
 .notes-content ul {
@@ -183,20 +214,57 @@
 .notes-content pre {
   background-color: #2d2d2d;
   color: #f8f8f2;
-  padding: 1rem;
+  padding: 0.75rem;
   border-radius: 0.5rem;
   overflow-x: auto;
-  margin-bottom: 1.5rem;
+  margin: 1rem 0 1.5rem 0;
   max-width: 100%;
   white-space: pre-wrap;
+  font-size: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  .notes-content pre {
+    padding: 1rem;
+    font-size: 0.95rem;
+  }
 }
 
 .notes-content code {
   font-family: 'Courier New', monospace;
   background-color: #2d2d2d;
   color: #f8f8f2;
-  padding: 0.2rem 0.4rem;
+  padding: 0.15rem 0.3rem;
   border-radius: 0.25rem;
+  font-size: 0.85rem;
+  word-break: break-word;
+}
+
+@media (min-width: 640px) {
+  .notes-content code {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Specialized math display */
+.notes-content .MathJax {
+  overflow-x: auto !important;
+  max-width: 100% !important;
+  margin: 1.5rem 0 !important;
+  padding: 0.5rem 0 !important;
+}
+
+/* MathJax specific styling to avoid overflow */
+.MathJax_Display {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  max-width: 100% !important;
+}
+
+/* Adjust line breaks inside math expressions */
+.notes-content .MathJax_SVG_Display {
+  margin: 1.5rem 0 !important;
 }
 
 /* Additional spacing for other elements */
@@ -206,6 +274,7 @@
   border-left: 4px solid #3b82f6;
   background-color: #f3f4f6;
   font-style: italic;
+  text-align: left;
 }
 
 .notes-content hr {
@@ -214,35 +283,52 @@
   border-top: 1px solid #e5e7eb;
 }
 
-/* Additional styles for equations and math content */
-.notes-content .math-container {
-  overflow-x: auto;
-  padding: 0.5rem 0;
-  margin-top: 8rem;
-  margin-bottom: 8rem;
-}
-
-/* Table styling */
+/* Table styling with horizontal scroll on mobile */
 .notes-content table {
   border-collapse: collapse;
-  width: 100%;
+  width: 100%; 
   margin-bottom: 1rem;
   overflow-x: auto;
   display: block;
+  white-space: nowrap;
 }
 
-.notes-content table td, .notes-content table th {
+@media (min-width: 768px) {
+  .notes-content table {
+    white-space: normal;
+  }
+}
+
+.notes-content table td, 
+.notes-content table th {
   border: 1px solid #ddd;
-  padding: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  .notes-content table td, 
+  .notes-content table th {
+    padding: 0.5rem;
+    font-size: 1rem;
+  }
 }
 
 /* Images */
 .notes-content img {
   max-width: 100%;
   height: auto;
-  margin: 1rem 0;
+  margin: 1rem auto;
+  display: block;
 }
 
+/* Fix for BR tags that might be rendered from \n */
+.notes-content br {
+  display: block;
+  margin: 0.5rem 0;
+  content: "";
+}
 /* Add these to your globals.css file or tailwind.config.js */
 
 @keyframes float {

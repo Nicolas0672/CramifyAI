@@ -11,10 +11,11 @@ import toast from 'react-hot-toast';
 function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
   const [loading, setLoading] = useState(false);
 
+
   const checkStatus = async(recordId)=>{
     console.log('Check status')
     let attemps = 0;
-    const maxAttempts = 10
+    const maxAttempts = 20
 
     while(attemps < maxAttempts){
       const res = await axios.get(`/api/get-check-status?id=${recordId}`)

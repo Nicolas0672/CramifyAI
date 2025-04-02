@@ -7,6 +7,7 @@ import LearningProgressStepper from '@/app/LearningProgressStepper'
 import { useLearningMode } from '@/app/LearningModeContext'
 import { useCourse } from '@/app/CourseIdProvider'
 import confetti from 'canvas-confetti'
+import { MathJaxContext } from 'better-react-mathjax';
 
 
 function ViewExamFeedback() {
@@ -17,7 +18,7 @@ function ViewExamFeedback() {
     const{setCourse} = useCourse()
 
     
-
+  
   useEffect(()=>{
     GetFeedbackData()
     setMode('exam')
@@ -41,6 +42,8 @@ function ViewExamFeedback() {
     setCourse(feedbackDetails[0])
     triggerConfetti()
   },[feedbackDetails])
+
+  
 
   
  
@@ -74,11 +77,22 @@ return (
     
     <div className="space-y-6">
       {feedbackDetails.map((feedback, index) => (
+         <MathJaxContext config={{
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true
+          },
+          options: {
+            enableMenu: false
+          }
+        }}>
         <FeedbackDetails 
           key={index} 
           feedback={feedback} 
           index={index} 
         />
+        </MathJaxContext>
       ))}
     </div>
     

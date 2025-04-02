@@ -38,6 +38,8 @@ function SideBar() {
     const { isSidebarExpanded, setIsSidebarExpanded, isSidebarVisible } = useContext(SidebarContext) // State for sidebar expansion
     const [loading, setLoading] = useState()
     const [tip, setTip] = useState()
+    const [credit, setCredit] = useState({})
+    const [totalCredit, setTotalCredit] = useState()
     const MenuList = [
         {
             name: 'Dashboard',
@@ -137,6 +139,37 @@ function SideBar() {
 
     };
 
+    const GetCredits=async()=>{
+        const res = await axios.post('/api/check-new-member',{
+            createdBy: user?.primaryEmailAddress?.emailAddress
+        })
+        setCredit(res.data.res)
+        console.log(res.data.res)
+        if(res != null){
+            let newFreeCredit = res.data.res?.newFreeCredits || 0
+            let newPurchases = res.data.res?.newPurchasedCredit || 0
+            const newTotal = res.data.res?.remainingCredits
+          
+            setTotalCredit(newTotal)
+            console.log(newTotal)
+        }
+    }
+
+    const CheckFreeReset = async () => {
+        const currentDate = new Date();
+        // Compare the timestamps
+        if (currentDate.getTime() >= new Date(credit?.nextCreditReset).getTime()) {
+            const res = await axios.post('/api/update-credit', {
+                createdBy: user?.primaryEmailAddress?.emailAddress,
+                lastCreditReset: credit?.nextCreditReset
+            });
+        }
+    };
+    
+    useEffect(()=>{
+        credit&&CheckFreeReset()
+    },[user, credit])
+
 
     const GenerateSelectedTopic = async () => {
         setLoading(true)
@@ -202,6 +235,7 @@ function SideBar() {
             const res = await axios.post('/api/generate-course-outline', payLoad)
             console.log('study content generating', res.data)
         }
+        GetCredits()
         setLoading(false)
         toast("Your content is generated")
 
@@ -211,7 +245,10 @@ function SideBar() {
 
     useEffect(()=>{
         GetStudyTip()
+        user&&GetCredits()
     }, [user])
+
+  
 
 
     // courseId, topic, courseType, courseLayout, difficultyLevel, createdBy, exam_time
@@ -233,96 +270,124 @@ function SideBar() {
 
     return (
         <>
-
             {isSidebarVisible && (
-                <> 
-                {!isSidebarExpanded&& <div
-                className={`fixed top-4 mr-5 z-50 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md cursor-pointer transition-all hover:bg-blue-50 hover:scale-110 ${isSidebarExpanded ? 'ml-64' : 'ml-4'}`}
-                onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
-            >
-                <Menu className="w-6 h-6 text-indigo-600" />
-            </div>}
-
-            {/* Sidebar */}
-            <div
-                className={`fixed h-screen shadow-xl p-5 bg-gradient-to-br from-white via-blue-50 to-indigo-50 border-r border-blue-100/50 ${isSidebarExpanded ? 'w-64' : 'w-0 overflow-hidden'} transition-all duration-300 ease-in-out`}
-            >
-
-                {/* Logo with glowing effect */}
-                <div className='flex gap-2 items-center'>
-                    {/* Logo with subtle animation */}
-                    <div className="relative">
-                        <div className="absolute -inset-1 bg-indigo-400 rounded-full blur-md opacity-50 animate-pulse"></div>
-                        <Image src={'/logo.svg'} color='black' alt='logo' width={40} height={40} className="relative drop-shadow-lg" />
-                    </div>
-
-                    {/* Title */}
-                    {isSidebarExpanded && <h2 className='font-bold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 tracking-tight'>CramSmart</h2>}
-
-                    {/* Hamburger Menu */}
+                <>
+                    {/* Sidebar with hamburger menu that stays fixed */}
                     <div
-                        className='p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg cursor-pointer transition-all hover:bg-indigo-50 hover:rotate-180 '
-                        onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+                        className={`fixed h-screen transition-all duration-300 ease-in-out ${
+                            isSidebarExpanded ? 'w-64' : 'w-16'
+                        }`}
                     >
-                        <Menu className="w-6 h-6 text-indigo-600" />
-                    </div>
-                </div>
-
-                {/* Create New Button */}
-                {isSidebarExpanded && <div className='mt-10'>
-                    <Button
-                        className='w-full cursor-pointer bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 hover:from-blue-600 hover:via-indigo-600 hover:to-purple-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
-                        onClick={() => setOpenDialogue(true)}
-                    >
-                        <Sparkles className="w-4 h-4 mr-2" /> Create New
-                    </Button>
-                </div>}
-
-                {/* Menu List */}
-                {isSidebarExpanded && <div className='mt-8 space-y-2'>
-                    {MenuList.map((menu, index) => (
-                        <Link href={menu.path} key={index}>
+                        {/* Header with logo and hamburger that's always visible */}
+                        <div className={`flex gap-2 items-center p-4 ${
+                        isSidebarExpanded ? 'bg-gradient-to-br from-white via-blue-50 to-indigo-50' : 'bg-transparent'
+                    }`}>
+                        {/* Logo with subtle animation */}
+                        <div className="relative">
+                            <div className="absolute -inset-1 bg-indigo-400 rounded-full blur-md opacity-50 animate-pulse"></div>
+                            <Image src={'/logo.svg'} color='black' alt='logo' width={40} height={40} className="relative drop-shadow-lg" />
+                        </div>
+    
+                            {/* Title - only visible when expanded */}
+                            {isSidebarExpanded && <h2 className='font-bold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 tracking-tight'>CramSmart</h2>}
+    
+                            {/* Hamburger Menu - always visible */}
                             <div
-                                className={`flex gap-4 items-center p-3.5 rounded-xl cursor-pointer transition-all duration-300
-                    ${path === menu.path
-                                        ? 'bg-gradient-to-r from-indigo-100/80 to-blue-50 text-indigo-600 shadow-md border-l-4 border-indigo-500'
-                                        : 'text-gray-700 hover:bg-white/70 hover:shadow-sm border-l-4 border-transparent'}`}
+                                className='ml-auto p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg cursor-pointer transition-all hover:bg-indigo-50 hover:rotate-180'
+                                onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
                             >
-                                <div className={`p-2 rounded-lg ${path === menu.path ? 'bg-white/90 shadow-sm' : 'bg-gray-100/70'}`}>
-                                    <menu.icon className={`w-5 h-5 ${path === menu.path ? 'text-indigo-600' : 'text-gray-600'}`} />
+                                <Menu className="w-6 h-6 text-indigo-600" />
+                            </div>
+                        </div>
+    
+                        {/* Sidebar content - conditionally rendered based on expanded state */}
+                        {isSidebarExpanded && (
+                            <div className="h-[calc(100vh-68px)] overflow-y-auto p-4 bg-gradient-to-br from-white via-blue-50 to-indigo-50 border-r border-blue-100/50 shadow-xl">
+                                {/* Create New Button */}
+                                <div className='mt-4'>
+                                    {totalCredit > 0 ? <Button
+                                        className='w-full cursor-pointer bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 hover:from-blue-600 hover:via-indigo-600 hover:to-purple-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
+                                        onClick={() => setOpenDialogue(true)}
+                                    >
+                                        <Sparkles className="w-4 h-4 mr-2" /> Create New
+                                    </Button> : 
+                                    <Button
+                                        className='w-full cursor-pointer bg-gradient-to-r from-gray-500 via-gray-600 to-gray-700 hover:from-gray-600 hover:via-gray-700 hover:to-gray-800 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
+                                        onClick={() => toast('You have run out of credits')}
+                                    >
+                                        <Sparkles className="w-4 h-4 mr-2" /> Credits Required
+                                    </Button>
+                                    }
                                 </div>
-                                <h2 className={`text-md font-medium transition-all ${path === menu.path ? 'font-semibold' : ''}`}>
-                                    {menu.name}
-                                </h2>
+    
+                                {/* Menu List */}
+                                <div className='mt-8 space-y-2'>
+                                    {MenuList.map((menu, index) => (
+                                        <Link href={menu.path} key={index}>
+                                            <div
+                                                className={`flex gap-4 items-center p-3.5 rounded-xl cursor-pointer transition-all duration-300
+                                                    ${path === menu.path
+                                                    ? 'bg-gradient-to-r from-indigo-100/80 to-blue-50 text-indigo-600 shadow-md border-l-4 border-indigo-500'
+                                                    : 'text-gray-700 hover:bg-white/70 hover:shadow-sm border-l-4 border-transparent'}`}
+                                            >
+                                                <div className={`p-2 rounded-lg ${path === menu.path ? 'bg-white/90 shadow-sm' : 'bg-gray-100/70'}`}>
+                                                    <menu.icon className={`w-5 h-5 ${path === menu.path ? 'text-indigo-600' : 'text-gray-600'}`} />
+                                                </div>
+                                                <h2 className={`text-md font-medium transition-all ${path === menu.path ? 'font-semibold' : ''}`}>
+                                                    {menu.name}
+                                                </h2>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                                
+                                {/* AI Tips/Suggestion */}
+                                <div className="mt-6 bg-indigo-50/80 backdrop-blur-sm p-4 rounded-xl border border-indigo-100/50 shadow-sm hover:shadow-md transition-all">
+                                    <div className="flex items-center mb-2">
+                                        <Brain className="w-5 h-5 text-indigo-500 mr-2" />
+                                        <span className="text-sm font-medium text-indigo-700">Motivation Tip</span>
+                                    </div>
+                                    <p className="text-xs text-indigo-600 italic">{tip}</p>
+                                </div>
+    
+                                {/* Credits Section */}
+                                <div className="relative mt-6 mb-4">
+                                    <div className="w-full border p-4 bg-gradient-to-r from-blue-50/80 to-purple-50/80 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <h2 className="text-md text-gray-800 font-medium"> Remaining Credits: </h2>
+                                            <span className="text-indigo-600 font-bold">
+                                            {totalCredit}
+                                            </span>
+                                        </div>
+    
+                                        {/* Progress Bar */}
+                                        <div className="relative h-3 w-full bg-blue-100/60 rounded-full overflow-hidden">
+                                            <div
+                                                className="absolute h-full bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 transition-all"
+                                                style={{ width: `${Math.min((credit?.totalCredits / credit?.totalCreditSize) * 100, 100)}%` }}
+                                            />
+                                            {/* Divider to show free credit limit */}
+                                            <div className="absolute left-[50%] h-full w-0.5 bg-gray-400/50"></div>
+                                        </div>
+    
+                                        <h2 className="text-xs mt-1 text-gray-500">Includes 10 Free Per Month</h2>
+    
+                                        {/* Next Reset Date */}
+                                        <div className="mt-3 text-sm text-gray-600">
+                                            <p>Next Reset: {credit?.nextCreditReset ? new Date(credit?.nextCreditReset).toLocaleDateString() : 'Not set'}</p>
+                                        </div>
+    
+                                        <Link
+                                            href={'/dashboard/upgrade'}
+                                            className="flex items-center justify-center mt-3 text-white text-sm bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 p-2 rounded-md hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 transition-all shadow-sm hover:shadow-md"
+                                        >
+                                            <Sparkles className="w-4 h-4 mr-1" /> Upgrade for More
+                                        </Link>
+                                    </div>
+                                </div>
                             </div>
-                        </Link>
-                    ))}
-                </div>}
-                <div className='mt-auto'>
-                    {/* AI Tips/Suggestion */}
-                    {isSidebarExpanded && <div className="mt-6 bg-indigo-50/80 backdrop-blur-sm p-4 rounded-xl border border-indigo-100/50 shadow-sm hover:shadow-md transition-all">
-                        <div className="flex items-center mb-2">
-                            <Brain className="w-5 h-5 text-indigo-500 mr-2" />
-                            <span className="text-sm font-medium text-indigo-700">AI Study Tip</span>
-                        </div>
-                        <p className="text-xs text-indigo-600 italic">{tip}</p>
-                    </div>}
-
-                    {/* Credits Section */}
-                    {isSidebarExpanded && <div className="relative mt-6 mb-4">
-                        <div className="w-full border p-4 bg-gradient-to-r from-blue-50/80 to-purple-50/80 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all">
-                            <div className="flex items-center justify-between mb-2">
-                                <h2 className="text-md text-gray-800 font-medium">Study Credits:</h2>
-                                <span className="text-indigo-600 font-bold">30%</span>
-                            </div>
-                            <Progress value={30} className="h-3 bg-blue-100/60 rounded-full overflow-hidden" indicatorClassName="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
-                            <h2 className="text-sm text-gray-600 mt-2">3 out of 10 Credits Used</h2>
-                            <Link href={'/dashboard/upgrade'} className="flex items-center justify-center mt-3 text-white text-sm bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 p-2 rounded-md hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 transition-all shadow-sm hover:shadow-md">
-                                <Sparkles className="w-4 h-4 mr-1" /> Upgrade for More
-                            </Link>
-                        </div>
-                    </div>}
-                </div>
+                        )}
+                    </div>
 
                 {/* Dialog for Study Material Selection */}
                 <Dialog open={openDialogue} onOpenChange={setOpenDialogue}>
@@ -333,13 +398,13 @@ function SideBar() {
                             </DialogTitle>
                             <DialogDescription className='text-center text-gray-600'>
                                 {selectOption === 'Study'
-                                    ? "Create your own personalized study guide and flashcards"
+                                    ? "Create your own personalized study guide and flashcards (1 credit)"
                                     : selectOption === 'Exam'
-                                        ? "Challenge yourself with a realistic, timed exam"
+                                        ? "Challenge yourself with a dynamic, timed exam (1 credit)"
                                         : selectOption === 'Practice'
-                                            ? "Sharpen your memory with AI-generated quizzes"
+                                            ? "Sharpen your memory with AI-generated quizzes (1 credit)"
                                             : selectOption === 'Teach' ?
-                                                'Teach an AI' : ''}
+                                                'Learn with AI (2 credits)' : ''}
                             </DialogDescription>
 
                             {/* Study Material Options */}
@@ -441,7 +506,7 @@ function SideBar() {
                         </DialogHeader>
                     </DialogContent>
                 </Dialog>
-            </div>
+           
             </>
             )}
         </>

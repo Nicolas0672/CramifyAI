@@ -1,7 +1,8 @@
 import { courseOutline } from "@/configs/AiModel";
 import { db } from "@/configs/db";
-import { AI_TEXT_RESPONSE_TABLE } from "@/configs/schema";
+import { AI_TEXT_RESPONSE_TABLE, PROGRESS_CREDITS_COMPLETED_TABLE, USER_TABLE } from "@/configs/schema";
 import { inngest } from "@/inngest/client";
+import { eq } from "drizzle-orm";
 import moment from "moment/moment";
 import { NextResponse } from "next/server";
 
@@ -36,6 +37,8 @@ TO HELP ACCOMODATE WEAKPOINTS
 5. DO NOT INCLUDE ANYTHING IN THE CONTENT THAT WILL RUIN A JSON PARSE** ENSURE THAT THE CONTENT GENERATED CAN PARSE THROUGH AS A JSON**
 Please output in the following JSON structure:
 6. **INCLUDE EMOJI ICON FOR EACH CHAPTER**
+
+7. PLEASE OUTPUT IN VALID JSON FORMAT
 
 {
   "courseTitle": "Course Title Here",
@@ -98,12 +101,31 @@ Please output in the following JSON structure:
 
             // Triggering INGEST FUNCTION
 
+           
+
             const result = await inngest.send({
                 name:'notes.generate',
                 data:{
                     course: dbResult[0].resp
                 }
             })
+
+            const creditTable = await db.insert(PROGRESS_CREDITS_COMPLETED_TABLE).values({
+                createdBy: createdBy,
+                courseId: courseId
+              })
+          
+              const userInfo= await db.select().from(USER_TABLE).where(eq(USER_TABLE?.email, createdBy))
+              const newTotal = 1 + userInfo[0]?.totalCredits
+
+              const remainingCredits = (userInfo[0]?.newFreeCredits + userInfo[0]?.newPurchasedCredit) - 1
+              const newFreeCredits = userInfo[0]?.newFreeCredits - 1 
+          
+              const updateCredits = await db.update(USER_TABLE).set({
+                totalCredits: newTotal,
+                newFreeCredits: newFreeCredits < 0 ? 0 : newFreeCredits,
+                remainingCredits: remainingCredits < 0 ? 0 : remainingCredits
+              }).where(eq(USER_TABLE?.email, createdBy))
 
 
             return NextResponse.json({ result: dbResult[0] });

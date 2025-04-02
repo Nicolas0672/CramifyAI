@@ -1,10 +1,40 @@
 import React from 'react';
+import { MathJax } from 'better-react-mathjax';
 
 function FeedbackDetails({ feedback, index }) {
+  // No need for MathJax loading or typesetting effects as better-react-mathjax handles this
+
   const getRatingColor = (rating) => {
     if (rating >= 8) return 'bg-green-100 text-green-800 border-green-300';
     if (rating >= 5) return 'bg-yellow-100 text-yellow-800 border-yellow-300';
     return 'bg-red-100 text-red-800 border-red-300';
+  };
+
+  // Function to fix common LaTeX syntax errors
+  const formatMathContent = (content) => {
+    if (!content) return '';
+    
+    // Fix common LaTeX syntax errors
+    let formattedContent = content
+      // Fix backslash-space issues (like "\ rac" to "\frac")
+      .replace(/\\ rac{/g, "\\frac{")
+      .replace(/\\ rac/g, "\\frac")
+      
+      // Fix incorrect fraction command
+      .replace(/\\rac{/g, "\\frac{")
+      .replace(/\\rac(\S+)(\S+)/g, "\\frac{$1}{$2}")
+      .replace(/\\rac(\s+)(\S+)(\s+)(\S+)/g, "\\frac{$2}{$4}")
+      
+      // Add missing braces to fractions
+      .replace(/\\frac(\d+)(\d+)/g, "\\frac{$1}{$2}")
+      .replace(/\\frac(\d+)([a-zA-Z]+)(\d+)/g, "\\frac{$1$2}{$3}")
+      .replace(/\\frac([a-zA-Z]+)(\d+)/g, "\\frac{$1}{$2}")
+      
+      // Fix potentially missing $ delimiters around math
+      .replace(/([^$])(\\frac|\\sqrt|\\sum|\\prod|\\int)/g, "$1$$$2")
+      .replace(/(\\frac|\\sqrt|\\sum|\\prod|\\int)([^$])/g, "$1$$2");
+    
+    return formattedContent;
   };
 
   return (
@@ -19,13 +49,15 @@ function FeedbackDetails({ feedback, index }) {
         </div>
         <div className="flex-grow">
           <h3 className="text-lg font-semibold text-gray-800">Question {index + 1}</h3>
-          <p className="text-sm text-gray-600">{feedback.question}</p>
+          <MathJax>
+            <div className="text-sm text-gray-600 math-content" dangerouslySetInnerHTML={{ __html: formatMathContent(feedback.question) }} />
+          </MathJax>
         </div>
         <div className={`ml-4 px-3 py-1 rounded-full border ${getRatingColor(feedback.aiResponse.feedback.rating)}`}>
           <span className="font-semibold">{feedback.aiResponse.feedback.rating}/10</span>
         </div>
       </div>
-
+      
       <div className="ml-12">
         {/* User's Answer Section */}
         <div className="mb-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
@@ -35,9 +67,11 @@ function FeedbackDetails({ feedback, index }) {
             </svg>
             <h4 className="text-sm font-semibold text-purple-800">Your Answer</h4>
           </div>
-          <p className="text-sm text-gray-700">{feedback.userAns}</p>
+          <MathJax>
+            <div className="text-sm text-gray-700 math-content" dangerouslySetInnerHTML={{ __html: formatMathContent(feedback.userAns) }} />
+          </MathJax>
         </div>
-
+        
         {/* AI Feedback Section */}
         <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
           <div className="flex items-center mb-1">
@@ -46,16 +80,13 @@ function FeedbackDetails({ feedback, index }) {
             </svg>
             <h4 className="text-sm font-semibold text-blue-800">AI Feedback</h4>
           </div>
-          <p className="text-sm text-gray-700">{feedback.aiResponse.feedback.explanation}</p>
+          <MathJax>
+            <div className="text-sm text-gray-700 math-content" dangerouslySetInnerHTML={{ __html: formatMathContent(feedback.aiResponse.feedback.explanation) }} />
+          </MathJax>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-         
-          
-          
-           
-            
         
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {/* Additional content can go here */}
         </div>
       </div>
     </div>

@@ -130,9 +130,8 @@ function CourseCardItem({ course, index, mode, status, setCourses }) {
                       ? '/teach-me/' + course?.courseId
                       : mode === 'teach Me' && course?.progress == 100
                         ? '/teach-me/' + course?.courseId + '/feedback'
-                        : mode == 'exam' && course?.questionCount < 5
-                          ? '/exam/' + course?.courseId
-                          : '/exam/' + course?.courseId + '/feedback'
+                        :  mode === 'exam' && course?.questionCount >= 5 || course?.exam_time == 0 ? '/exam/' + course?.courseId + '/feedback'
+                          : '/exam/' + course?.courseId
               }
               className="block w-full"
             >
@@ -149,7 +148,7 @@ function CourseCardItem({ course, index, mode, status, setCourses }) {
                     mode === 'practice' ? 'Practice' :
                       mode === 'teach Me' && course?.progress < 100 ? 'Teach Me' :
                         mode === 'teach Me' && course?.progress === 100 ? 'View Feedback' :
-                          mode === 'exam' && course?.questionCount >= 5 ? 'View Exam' :
+                          mode === 'exam' && course?.questionCount >= 5 || course?.exam_time == 0 ? 'View Exam' :
                             'Take Exam'
                 )}
 

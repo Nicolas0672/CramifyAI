@@ -122,17 +122,28 @@ function ExamStart() {
 
       setTimeLeft(remaining);
 
-      if (remaining === 0) clearInterval(interval); // Stop timer when time is up
+      if (remaining === 0) {
+        updateExamTime()
+        toast('Time is up!')
+        clearInterval(interval);
+        router.push(`/exam/${courseId}/feedback`)
+       } // Stop timer when time is up
     }, 1000);
 
     return () => clearInterval(interval);
   }, [startTime, course.exam_time]);
 
-
+  const updateExamTime=async()=>{
+    const res = await axios.post('/api/update-exam-time',{
+      createdBy: course?.createdBy,
+      courseId: course?.courseId
+    })
+    console.log(res)
+  }
   // Handle answer submission
   const handleSubmit = async () => {
     if (questionCount >= 5) return;
-
+    toast('Deciding your next quesiton...')
     setLoading(true);
 
     // Debugging: Log the values before sending request
@@ -277,8 +288,12 @@ function ExamStart() {
           <div className="flex justify-between">
             {questionCount <= 5 && <Button onClick={() => handleSave()} className={`cursor-pointer bg-gradient-to-r from-blue-400 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}>Save Answer</Button>}
             {questionCount >= 4 ? (
-              <Button onClick={() => {
+              <Button 
+              disabled={loading}
+              onClick={() => {
+                
                 handleSubmit();  // First, execute handleSubmit()
+                toast('Redirecting to feedback...')
                 router.push(`/exam/${courseId}/feedback`);  // Then, navigate
               }} className="cursor-poiner z-20 bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center">
                 <CheckCircle className="w-5 h-5 mr-2" />

@@ -36,6 +36,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
  
  
   const GenerateContent = async () => {
+    
     toast('Generating content');
     setLoading(true);
     const chapters = course?.aiResponse?.chapters

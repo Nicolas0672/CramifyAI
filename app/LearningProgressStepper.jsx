@@ -190,13 +190,23 @@ const LearningProgressStepper = ({ currentMode }) => {
 
     if (generatedModes[mode.id]) {
       if (mode.id === 'teach') {
-        router.push('/teach-me/' + course?.courseId + '/feedback');
+        if(course?.progress >= 100){
+          router.push('/teach-me/' + course?.courseId + '/feedback');
+        } else {
+          router.push('/teach-me/' + course?.courseId);
+        }
+       
       } else if (mode.id === 'practice') {
         router.push('/quiz/' + course?.courseId);
       } else if (mode.id === 'study') {
         router.push('/course/' + course?.courseId);
       } else if (mode.id === 'exam') {
-        router.push('/exam/' + course?.courseId + '/feedback');
+        if(course?.questionCount >= 5){
+          router.push('/exam/' + course?.courseId + '/feedback');
+        } else {
+          router.push('/exam/' + course?.courseId)
+        }
+        
       }
     } else {
       // Pass lastMode directly instead of relying on prevMode from state

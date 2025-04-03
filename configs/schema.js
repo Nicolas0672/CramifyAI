@@ -14,7 +14,7 @@ export const USER_TABLE=pgTable('users',{
     totalCreditSize: integer().default(10),
     lastCreditReset: timestamp("lastCreditReset").defaultNow(),
     nextCreditReset: timestamp("nextCreditReset"),
-    createdAt: varchar()
+    createdAt: varchar(),
 
 })
 

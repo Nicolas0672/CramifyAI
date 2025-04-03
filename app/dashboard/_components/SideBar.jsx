@@ -104,9 +104,14 @@ function SideBar() {
         if (selectOption === 'Practice' || selectOption === 'Exam' || selectOption == 'Study') {
             setConfirmSelection(true);
         } else {
-            toast('Redirecting...')
+            if(credit?.remainingCredits - 2 >= 0){
+                toast('Redirecting...')
             router.push('/create-teach-me')
             setOpenDialogue(false);
+            } else {
+                toast('Insufficient Credit')
+            }
+            
         }
     };
 
@@ -144,14 +149,14 @@ function SideBar() {
             createdBy: user?.primaryEmailAddress?.emailAddress
         })
         setCredit(res.data.res)
-        console.log(res.data.res)
+    
         if(res != null){
             let newFreeCredit = res.data.res?.newFreeCredits || 0
             let newPurchases = res.data.res?.newPurchasedCredit || 0
             const newTotal = res.data.res?.remainingCredits
           
             setTotalCredit(newTotal)
-            console.log(newTotal)
+           
         }
     }
 

@@ -119,6 +119,9 @@ export const EXAM_RESPONSE_TABLE = pgTable('Exam-Response',{
     status: varchar().default('Generating'),
     createdBy: varchar().notNull(),
     question: text(),
+    
+    questionCount: boolean().default(false),
+    questionCounts: integer().default(0)
 
 })
 

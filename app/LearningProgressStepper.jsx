@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useCourse } from './CourseIdProvider';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast'; // Make sure this import is added
+import { useUser } from '@clerk/nextjs';
 
 const LearningProgressStepper = ({ currentMode }) => {
   const { setMode, currentModes } = useLearningMode();
@@ -18,6 +19,7 @@ const LearningProgressStepper = ({ currentMode }) => {
   const [loading, setLoading] = useState(false);
   const [loadingMode, setLoadingMode] = useState(null); // Track which mode is loading
   const [prevMode, setPrevMode] = useState();
+  const [userDetails, setUserDetails] = useState()
   const modes = [
     { id: 'teach', label: 'Teach' },
     { id: 'study', label: 'Study' },
@@ -25,10 +27,28 @@ const LearningProgressStepper = ({ currentMode }) => {
     { id: 'exam', label: 'Exam' }
   ];
   const router = useRouter();
-
+  const {user} = useUser()
   useEffect(() => {
     CheckExist();
   }, [course?.courseId]);
+
+  useEffect(()=>{
+    user&&GetUserDetails()
+   
+  },[user])
+
+  const GetUserDetails=async()=>{
+    const res = await axios.post('/api/check-new-member',{
+      createdBy: user?.primaryEmailAddress?.emailAddress
+    })
+    setUserDetails(res.data.res)
+ 
+
+  }
+
+
+
+
 
   const CheckExist = async () => {
     console.log(course?.courseId);
@@ -36,7 +56,7 @@ const LearningProgressStepper = ({ currentMode }) => {
       courseId: course?.courseId
     });
     setGeneratedModes(res.data);
-    console.log(res.data);
+   
   };
 
   useEffect(() => {
@@ -44,87 +64,159 @@ const LearningProgressStepper = ({ currentMode }) => {
   }, [course]);
 
   const GenerateStudyContent = async (mode, lastMode) => {
-    setLoading(true);
-    setLoadingMode(mode); // Set which mode is currently loading
-    toast('Content is generating...');
-    const summary = await GetModeDetails(lastMode);
-    const topic = await GetModeTopics(lastMode)
-    console.log(summary);
-    console.log(mode);
-
-    if (!summary) {
-      alert("No content available to generate.");
-      setLoading(false);
-      setLoadingMode(null); // Reset loading mode
-      return;
-    }
-
-    let payload;
+   
 
     if (mode === 'teach') {
-      payload = {
-        courseId: course?.courseId,
-        difficultyLevel: 'Easy',
-        amount: 1,
-        courseLayout: summary,
-        topic: topic,
-        createdBy: course?.createdBy
-      };
-      console.log("Teach Payload: ", payload);
-
-      const res = await axios.post('/api/vapi/generate', payload);
-      console.log(res.data);
-
-      router.push('/teach-me/' + course?.courseId);
+      if(userDetails?.remainingCredits - 2  >= 0){
+        setLoading(true);
+        setLoadingMode(mode); // Set which mode is currently loading
+        toast('Content is generating...');
+        const summary = await GetModeDetails(lastMode);
+        const topic = await GetModeTopics(lastMode)
+        console.log(summary);
+        console.log(mode);
+    
+        if (!summary) {
+          alert("No content available to generate.");
+          setLoading(false);
+          setLoadingMode(null); // Reset loading mode
+          return;
+        }
+    
+        let payload;
+        payload = {
+          courseId: course?.courseId,
+          difficultyLevel: 'Easy',
+          amount: 1,
+          courseLayout: summary,
+          topic: topic,
+          createdBy: course?.createdBy
+        };
+        console.log("Teach Payload: ", payload);
+  
+        const res = await axios.post('/api/vapi/generate', payload);
+        console.log(res.data);
+        toast('Redirecting...')
+        router.push('/teach-me/' + course?.courseId);
+      } else {
+        toast('Insufficient Credit')
+      }
+     
 
     } else if (mode === 'study') {
-      payload = {
-        courseId: course?.courseId,
-        topic: topic,
-        courseType: 'Study',
-        courseLayout: summary,
-        difficultyLevel: 'Easy',
-        createdBy: course?.createdBy
-      };
-      console.log("Study Payload: ", payload);
-
-      const res = await axios.post('/api/generate-course-outline', payload);
-      console.log(res.data);
-      router.push('/course/' + course?.courseId);
+      if(userDetails?.remainingCredits - 1 >= 0){
+        setLoading(true);
+        setLoadingMode(mode); // Set which mode is currently loading
+        toast('Content is generating...');
+        const summary = await GetModeDetails(lastMode);
+        const topic = await GetModeTopics(lastMode)
+        console.log(summary);
+        console.log(mode);
+    
+        if (!summary) {
+          alert("No content available to generate.");
+          setLoading(false);
+          setLoadingMode(null); // Reset loading mode
+          return;
+        }
+    
+        let payload;
+        payload = {
+          courseId: course?.courseId,
+          topic: topic,
+          courseType: 'Study',
+          courseLayout: summary,
+          difficultyLevel: 'Easy',
+          createdBy: course?.createdBy
+        };
+        console.log("Study Payload: ", payload);
+  
+        const res = await axios.post('/api/generate-course-outline', payload);
+        console.log(res.data);
+        toast('Redirecting...')
+        router.push('/course/' + course?.courseId);
+      } else {
+        toast('Insufficient Credit')
+      }
+      
 
     } else if (mode === 'practice') {
-      payload = {
-        courseId: course?.courseId,
-        topic: topic,
-        courseType: 'practice',
-        courseLayout: summary,
-        difficultyLevel: 'Easy',
-        createdBy: course?.createdBy
-      };
-      console.log("Practice Payload: ", payload);
-
-      const res = await axios.post('/api/generate-practice-questions', payload);
-      console.log(res.data);
-      router.push('/quiz/' + course?.courseId);
+      if(userDetails?.remainingCredits - 1 >= 0){
+        setLoading(true);
+        setLoadingMode(mode); // Set which mode is currently loading
+        toast('Content is generating...');
+        const summary = await GetModeDetails(lastMode);
+        const topic = await GetModeTopics(lastMode)
+        console.log(summary);
+        console.log(mode);
+    
+        if (!summary) {
+          alert("No content available to generate.");
+          setLoading(false);
+          setLoadingMode(null); // Reset loading mode
+          return;
+        }
+    
+        let payload;
+        payload = {
+          courseId: course?.courseId,
+          topic: topic,
+          courseType: 'practice',
+          courseLayout: summary,
+          difficultyLevel: 'Easy',
+          createdBy: course?.createdBy
+        };
+        console.log("Practice Payload: ", payload);
+  
+        const res = await axios.post('/api/generate-practice-questions', payload);
+        console.log(res.data);
+        toast('Redirecting...')
+        router.push('/quiz/' + course?.courseId);
+      } else {
+        toast('Insufficient Credit')
+      }
+  
 
     } else if (mode === 'exam') {
-      payload = {
-        courseId: course?.courseId,
-        topic: topic,
-        courseType: 'exam',
-        courseLayout: summary,
-        difficultyLevel: 'Easy',
-        createdBy: course?.createdBy,
-        exam_time: 30
-      };
-      console.log("Exam Payload: ", payload);
-
-      const res = await axios.post('/api/generate-exam', payload);
-      console.log(res.data);
-      router.push('/exam/' + course?.courseId);
+      if(userDetails?.remainingCredits - 1 >= 0){
+        setLoading(true);
+        setLoadingMode(mode); // Set which mode is currently loading
+        toast('Content is generating...');
+        const summary = await GetModeDetails(lastMode);
+        const topic = await GetModeTopics(lastMode)
+        console.log(summary);
+        console.log(mode);
+    
+        if (!summary) {
+          alert("No content available to generate.");
+          setLoading(false);
+          setLoadingMode(null); // Reset loading mode
+          return;
+        }
+    
+        let payload;
+        payload = {
+          courseId: course?.courseId,
+          topic: topic,
+          courseType: 'exam',
+          courseLayout: summary,
+          difficultyLevel: 'Easy',
+          createdBy: course?.createdBy,
+          exam_time: 30
+        };
+        console.log("Exam Payload: ", payload);
+  
+        const res = await axios.post('/api/generate-exam', payload);
+        console.log(res.data);
+        toast('Redirecting...')
+        router.push('/exam/' + course?.courseId);
+      } else {
+        toast('Insufficient Credit')
+      }
+    
     }
    
-    toast('Redirecting...')
+    
     setLoading(false);
     setLoadingMode(null); // Reset loading mode
   };
@@ -201,7 +293,10 @@ const LearningProgressStepper = ({ currentMode }) => {
       } else if (mode.id === 'study') {
         router.push('/course/' + course?.courseId);
       } else if (mode.id === 'exam') {
-        if(course?.questionCount >= 5){
+        console.log(course?.questionCount)
+        console.log(course?.exam_time)
+        console.log(course)
+        if(course?.questionCounts >= 5 || course?.exam_time == 0){
           router.push('/exam/' + course?.courseId + '/feedback');
         } else {
           router.push('/exam/' + course?.courseId)

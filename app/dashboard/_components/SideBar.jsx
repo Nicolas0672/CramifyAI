@@ -245,8 +245,19 @@ function SideBar() {
 
     useEffect(()=>{
         GetStudyTip()
-        user&&GetCredits()
+        
     }, [user])
+
+    useEffect(() => {
+        if (!user) return;
+    
+        const interval = setInterval(() => {
+            GetCredits(); // Fetch the latest credits from the DB
+        }, 5000); // Runs every 5 seconds
+    
+        return () => clearInterval(interval); // Cleanup interval when component unmounts
+    }, [user]);
+    
 
   
 

@@ -204,46 +204,46 @@ function ViewFillBlank() {
         }
       }}
     >
-      <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-slate-50 to-gray-100 min-h-screen">
-        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-8 text-center">
+      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 bg-gradient-to-br from-slate-50 to-gray-100 min-h-screen">
+        <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6 sm:mb-8 text-center">
           Fill in the Blanks
         </h1>
         
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {fillData.map((item, index) => (
             <div 
               key={index}
-              className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300"
+              className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 w-full"
             >
-              <div className="flex items-center justify-between bg-gradient-to-r from-gray-50 to-slate-100 p-4 border-b border-gray-100">
-                <div className="flex items-center space-x-3">
-                  <div className="flex justify-center items-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-medium">
+              <div className="flex items-center justify-between bg-gradient-to-r from-gray-50 to-slate-100 p-3 sm:p-4 border-b border-gray-100">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="flex justify-center items-center w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-blue-100 text-blue-600 font-medium text-sm sm:text-base">
                     {index + 1}
                   </div>
-                  <h3 className="font-medium text-gray-700">Question {index + 1}</h3>
+                  <h3 className="font-medium text-gray-700 text-sm sm:text-base">Question {index + 1}</h3>
                 </div>
                 
                 <div className="flex space-x-2">
                   <button 
                     onClick={() => checkAnswer(index)}
-                    className="px-4 py-1.5 text-sm rounded-md bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium transition-all duration-300 shadow-sm hover:shadow"
+                    className="px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm rounded-md bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium transition-all duration-300 shadow-sm hover:shadow"
                   >
                     Check
                   </button>
                 </div>
               </div>
               
-              <div className="p-6">
-                <div className="text-lg text-gray-800 leading-relaxed">
+              <div className="p-4 sm:p-6">
+                <div className="text-base sm:text-lg text-gray-800 leading-relaxed">
                   {renderQuestion(item.question, index)}
                 </div>
               </div>
               
               {item.explanation && submitted[index] && (
-                <div className="p-4 bg-blue-50 border-t border-blue-100">
-                  <h4 className="text-sm font-medium text-blue-800 mb-1">Explanation:</h4>
+                <div className="p-3 sm:p-4 bg-blue-50 border-t border-blue-100">
+                  <h4 className="text-xs sm:text-sm font-medium text-blue-800 mb-1">Explanation:</h4>
                   <MathJax hideUntilTypeset="first">
-                    <p className="text-sm text-gray-700">{item.explanation}</p>
+                    <p className="text-xs sm:text-sm text-gray-700">{item.explanation}</p>
                   </MathJax>
                 </div>
               )}
@@ -252,10 +252,23 @@ function ViewFillBlank() {
         </div>
         <div className='flex justify-end'>
         
-        {showComplete?<Button disabled={loading} onClick={handleComplete}variant='outline' className='mt-6 cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300'>Mark as completed</Button>
-          :  
-          <Button onClick={()=>router.back()}variant='outline' className='mt-6 cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300'>Completed</Button>
-      }
+        {showComplete ? 
+          <Button 
+            disabled={loading} 
+            onClick={handleComplete} 
+            variant='outline' 
+            className='mt-6 cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300 text-sm sm:text-base py-2 px-3 sm:px-4'
+          >
+            Mark as completed
+          </Button> : 
+          <Button 
+            onClick={()=>router.back()} 
+            variant='outline' 
+            className='mt-6 cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300 text-sm sm:text-base py-2 px-3 sm:px-4'
+          >
+            Completed
+          </Button>
+        }
         </div>
       </div>
     </MathJaxContext>

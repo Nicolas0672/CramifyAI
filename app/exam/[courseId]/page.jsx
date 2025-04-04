@@ -63,72 +63,72 @@ function ViewExam() {
   if (!examIntro) return <div className="p-6 text-xl">No exam information available</div>
 
   return (
-    <div className="mt-20 max-w-5xl mx-auto p-8 relative">
+    <div className="mt-2 sm:mt-15 w-full max-w-5xl mx-auto px-4 sm:px-8 py-6 sm:py-8 relative">
       {/* Background decorative elements */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-10 right-10 w-16 h-16 border-4 border-blue-400/20 rounded-full animate-pulse"></div>
-        <div className="absolute top-20 left-10 w-24 h-24 border-4 border-purple-400/20 rounded-full animate-pulse"></div>
-        <div className="absolute bottom-20 left-40 w-32 h-3 bg-blue-400/20 rounded-full animate-pulse"></div>
-        <div className="absolute bottom-40 right-20 w-20 h-2 bg-purple-400/20 rounded-full animate-pulse"></div>
+        <div className="absolute top-10 right-10 w-8 sm:w-16 h-8 sm:h-16 border-2 sm:border-4 border-blue-400/20 rounded-full animate-pulse"></div>
+        <div className="absolute top-20 left-10 w-12 sm:w-24 h-12 sm:h-24 border-2 sm:border-4 border-purple-400/20 rounded-full animate-pulse"></div>
+        <div className="absolute bottom-20 left-10 sm:left-40 w-16 sm:w-32 h-2 sm:h-3 bg-blue-400/20 rounded-full animate-pulse"></div>
+        <div className="absolute bottom-40 right-10 sm:right-20 w-10 sm:w-20 h-1 sm:h-2 bg-purple-400/20 rounded-full animate-pulse"></div>
       </div>
       
       {/* Main content with hover effects */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-2xl border border-blue-400/30 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-1 relative z-10">
-        <h1 className="text-4xl font-bold mb-3">{examIntro.currQuestionAiResp.courseTitle}</h1>
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 sm:p-8 rounded-xl sm:rounded-2xl border border-blue-400/30 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-1 relative z-10 w-full">
+        <h1 className="text-2xl sm:text-4xl font-bold mb-2 sm:mb-3">{examIntro.currQuestionAiResp.courseTitle}</h1>
         
-        <div className="flex flex-wrap gap-4 mt-6">
-          <div className="bg-slate-800/80 backdrop-blur-sm px-5 py-3 rounded-xl text-base border-l-4 border-blue-400 hover:border-blue-300 transition-colors duration-300">
+        <div className="flex flex-wrap gap-2 sm:gap-4 mt-4 sm:mt-6">
+          <div className="bg-slate-800/80 backdrop-blur-sm px-3 sm:px-5 py-2 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base border-l-4 border-blue-400 hover:border-blue-300 transition-colors duration-300">
             <span className="opacity-70">Duration:</span> {examIntro.exam_time} minutes
           </div>
-          <div className="bg-slate-800/80 backdrop-blur-sm px-5 py-3 rounded-xl text-base border-l-4 border-purple-400 hover:border-purple-300 transition-colors duration-300">
+          <div className="bg-slate-800/80 backdrop-blur-sm px-3 sm:px-5 py-2 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base border-l-4 border-purple-400 hover:border-purple-300 transition-colors duration-300">
             <span className="opacity-70">Difficulty:</span> {examIntro.difficultyLevel}
           </div>
         </div>
       </div>
       
-      <div className="bg-white shadow-xl rounded-2xl p-8 mt-4 border border-slate-200 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 relative z-10">
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4 flex items-center group">
-            <span className="w-2 h-8 bg-blue-500 rounded-full mr-3 group-hover:h-10 transition-all duration-300"></span>
+      <div className="bg-white shadow-xl rounded-xl sm:rounded-2xl p-4 sm:p-8 mt-4 border border-slate-200 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 relative z-10 w-full">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center group">
+            <span className="w-1 sm:w-2 h-6 sm:h-8 bg-blue-500 rounded-full mr-2 sm:mr-3 group-hover:h-8 sm:group-hover:h-10 transition-all duration-300"></span>
             Course Summary
           </h2>
-          <p className="text-gray-700 text-lg leading-relaxed">{examIntro.currQuestionAiResp.courseSummary}</p>
+          <p className="text-gray-700 text-base sm:text-lg leading-relaxed">{examIntro.currQuestionAiResp.courseSummary}</p>
         </div>
         
-        <div className="mt-10">
-          <h2 className="text-2xl font-semibold mb-4 flex items-center group">
-            <span className="w-2 h-8 bg-purple-500 rounded-full mr-3 group-hover:h-10 transition-all duration-300"></span>
+        <div className="mt-6 sm:mt-10">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center group">
+            <span className="w-1 sm:w-2 h-6 sm:h-8 bg-purple-500 rounded-full mr-2 sm:mr-3 group-hover:h-8 sm:group-hover:h-10 transition-all duration-300"></span>
             Exam Instructions
           </h2>
-          <ul className="text-gray-700 space-y-3 text-lg">
+          <ul className="text-gray-700 space-y-2 sm:space-y-3 text-base sm:text-lg">
             <li className="flex items-start group">
-              <span className="inline-block w-2 h-2 bg-slate-400 rounded-full mt-3 mr-3 group-hover:bg-blue-400 transition-colors duration-300"></span>
+              <span className="inline-block w-1.5 sm:w-2 h-1.5 sm:h-2 bg-slate-400 rounded-full mt-2 sm:mt-3 mr-2 sm:mr-3 group-hover:bg-blue-400 transition-colors duration-300"></span>
               Read each question carefully before answering.
             </li>
             <li className="flex items-start group">
-              <span className="inline-block w-2 h-2 bg-slate-400 rounded-full mt-3 mr-3 group-hover:bg-purple-400 transition-colors duration-300"></span>
+              <span className="inline-block w-1.5 sm:w-2 h-1.5 sm:h-2 bg-slate-400 rounded-full mt-2 sm:mt-3 mr-2 sm:mr-3 group-hover:bg-purple-400 transition-colors duration-300"></span>
               You have {examIntro.exam_time} minutes to complete this exam.
             </li>
             <li className="flex items-start group">
-              <span className="inline-block w-2 h-2 bg-slate-400 rounded-full mt-3 mr-3 group-hover:bg-blue-400 transition-colors duration-300"></span>
+              <span className="inline-block w-1.5 sm:w-2 h-1.5 sm:h-2 bg-slate-400 rounded-full mt-2 sm:mt-3 mr-2 sm:mr-3 group-hover:bg-blue-400 transition-colors duration-300"></span>
               This exam will test your knowledge of {examIntro.currQuestionAiResp.courseTitle}.
             </li>
             <li className="flex items-start group">
-              <span className="inline-block w-2 h-2 bg-slate-400 rounded-full mt-3 mr-3 group-hover:bg-purple-400 transition-colors duration-300"></span>
+              <span className="inline-block w-1.5 sm:w-2 h-1.5 sm:h-2 bg-slate-400 rounded-full mt-2 sm:mt-3 mr-2 sm:mr-3 group-hover:bg-purple-400 transition-colors duration-300"></span>
               Once you begin, you cannot pause the timer.
             </li>
           </ul>
         </div>
         
-        <div className="mt-12 flex justify-center">
+        <div className="mt-8 sm:mt-12 flex justify-center">
           <button 
-            className={`cursor-pointer bg-slate-900 hover:bg-slate-800 text-white font-medium text-lg py-4 px-10 rounded-xl transition-all duration-300 transform hover:translate-y-[-4px] hover:shadow-lg shadow-blue-500/30 active:translate-y-0 relative overflow-hidden ${buttonLoading ? 'pointer-events-none' : ''}`}
+            className={`cursor-pointer bg-slate-900 hover:bg-slate-800 text-white font-medium text-base sm:text-lg py-3 sm:py-4 px-6 sm:px-10 rounded-lg sm:rounded-xl transition-all duration-300 transform hover:translate-y-[-4px] hover:shadow-lg shadow-blue-500/30 active:translate-y-0 relative overflow-hidden w-full sm:w-auto ${buttonLoading ? 'pointer-events-none' : ''}`}
             onClick={handleStartExam}
             disabled={buttonLoading}
           >
             {buttonLoading ? (
               <div className="flex items-center justify-center">
-                <div className="inline-block h-5 w-5 animate-spin rounded-full border-3 border-solid border-white border-r-transparent align-[-0.125em] mr-2"></div>
+                <div className="inline-block h-4 sm:h-5 w-4 sm:w-5 animate-spin rounded-full border-2 sm:border-3 border-solid border-white border-r-transparent align-[-0.125em] mr-2"></div>
                 <span>Starting...</span>
               </div>
             ) : (

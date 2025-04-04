@@ -1,5 +1,5 @@
 import { db } from "@/configs/db"
-import { AI_TEXT_RESPONSE_TABLE, CHAPTER_NOTE_TABLE, EXAM_RESPONSE_TABLE, FILL_BLANK_TABLE, FLASHCARD_CONTENT, PRACTICE_QUIZ_TABLE, STUDY_MATERIAL_TABLE, TEACH_ME_FEEDBACK_TABLE, TEACH_ME_QUESTIONS_TABLE } from "@/configs/schema"
+import { AI_TEXT_RESPONSE_TABLE, CHAPTER_NOTE_TABLE, EXAM_RESPONSE_TABLE, EXAM_SESSION_TABLE, FILL_BLANK_TABLE, FLASHCARD_CONTENT, PRACTICE_QUIZ_TABLE, STUDY_MATERIAL_TABLE, TEACH_ME_FEEDBACK_TABLE, TEACH_ME_QUESTIONS_TABLE } from "@/configs/schema"
 import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
@@ -15,7 +15,7 @@ export async function DELETE(req) {
             schemasToDeleteFrom = [PRACTICE_QUIZ_TABLE, FILL_BLANK_TABLE]
         } 
         else if (type == 'exam') {
-            schemasToDeleteFrom = [EXAM_RESPONSE_TABLE]
+            schemasToDeleteFrom = [EXAM_RESPONSE_TABLE, EXAM_SESSION_TABLE]
         }
         else if (type == 'teach Me') {
             schemasToDeleteFrom = [TEACH_ME_FEEDBACK_TABLE, TEACH_ME_QUESTIONS_TABLE]

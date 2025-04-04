@@ -46,10 +46,12 @@ export async function POST(req){
         const userDb = await db.select().from(USER_TABLE).where(eq(USER_TABLE.email, customerEmail))
         const oldPurchasedCredit = userDb[0].newPurchasedCredit
         const oldTotalCreditSize = userDb[0].totalCreditSize
+        const newRemainCredit = userDb[0].remainingCredits
         const res = await db.update(USER_TABLE).set({
             newPurchasedCredit: 20 + oldPurchasedCredit,
             totalCreditSize: 20 + oldTotalCreditSize,
-            isMember: true
+            isMember: true,
+            remainingCredits: newRemainCredit
         }).where(eq(USER_TABLE.email, customerEmail))
 
         const updatePaymentTable = await db.insert(PAYMENT_USER_TABLE).values({

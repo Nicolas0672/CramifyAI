@@ -10,9 +10,17 @@ import { NextResponse } from "next/server";
 export async function POST(req) {
     try {
         // Parse request body
-        const { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy } = await req.json();
-        console.log("Request Data:", { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy });
 
+        const { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy } = await req.json();
+        let amount 
+        console.log("Request Data:", { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy });
+        const userRes = await db.select().from(USER_TABLE).where(eq(USER_TABLE.email, createdBy))
+        if(userRes[0].isMember == true){
+          amount = 5
+        } else {
+          amount = 3
+        }
+        
         // Generate course layout using AI
         const prompt = `
 Generate a high-quality study guide for the course. The topic is "${topic}", the course type is "${courseType}", the difficulty level is "${difficultyLevel}", and the course layout is "${courseLayout}".
@@ -24,7 +32,7 @@ TO HELP ACCOMODATE WEAKPOINTS
 2. **Chapter Breakdown**: Break down the course into 3 chapters and 2 topics based on the provided course layout ("${courseLayout}" as a guide). For each chapter, provide:
    - **Chapter Title**: A descriptive and engaging title for the chapter.
    - **Chapter Summary**: A concise yet insightful summary of the chapter, outlining the key concepts and objectives.
-   - **Topic List**: 3 topics name that will be covered in this chapter. For each topic, provide:
+   - **Topic List**: ${amount} topics name that will be covered in this chapter. For each topic, provide:
      
 
 3. **Content Quality**: Ensure the content is:

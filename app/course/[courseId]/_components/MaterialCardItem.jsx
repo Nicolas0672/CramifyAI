@@ -90,8 +90,8 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
   function CardContent() {
     return (
       <motion.div
-        className={`relative mt-3 border border-gray-200 shadow-lg p-6 rounded-xl
-          flex flex-col items-center backdrop-blur-sm
+        className={`relative mt-3 border border-gray-200 shadow-lg p-4 sm:p-6 rounded-xl
+          flex flex-col items-center backdrop-blur-sm w-full
           ${studyTypeContent?.[item.type]?.length > 0 ? 'bg-gradient-to-br from-white/80 to-blue-50/50' : 'bg-gradient-to-br from-white/80 to-purple-50/50'}
           hover:shadow-xl transition-all duration-300 h-full overflow-hidden`}
         whileHover={{ scale: 1.03, boxShadow: '0px 10px 25px rgba(0, 0, 0, 0.1)' }}
@@ -123,7 +123,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
           </motion.div>
   
           {/* Icon */}
-          <motion.div className='relative w-16 h-16 mb-4' initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 100 }}>
+          <motion.div className='relative w-12 h-12 sm:w-16 sm:h-16 mb-4' initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 100 }}>
             <div className="absolute inset-0 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full blur-md"></div>
             <div className="relative w-full h-full bg-white rounded-full flex items-center justify-center p-2">
               <Image src={item.icon} alt={item.name} fill className='object-contain p-3' />
@@ -131,34 +131,34 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
           </motion.div>
   
           {/* Name & Description */}
-          <h2 className='font-semibold text-xl bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent mb-2'>
+          <h2 className='font-semibold text-lg sm:text-xl bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent mb-2 text-center'>
             {item.name}
           </h2>
-          <p className='text-gray-600 text-sm text-center mb-5 flex-1 max-w-[90%]'>
+          <p className='text-gray-600 text-sm text-center mb-5 flex-1 max-w-full px-1 sm:px-0 sm:max-w-[90%]'>
             {item.desc}
           </p>
   
           {/* Button */}
           <motion.div className="w-full mt-auto" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
             {studyTypeContent?.[item.type]?.length > 0 ? (
-              <Button className="cursor-pointer w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-0 hover:from-blue-600 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 py-5">
+              <Button className="cursor-pointer w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-0 hover:from-blue-600 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 py-4 sm:py-5">
                 <span>View</span>
                 <ArrowRight className="w-4 h-4" />
               </Button>
             ) : userDetails?.remainingCredits > 0 ? (
               <Button
-                className="cursor-pointer w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-0 hover:from-indigo-600 hover:to-purple-700 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 py-5"
+                className="cursor-pointer w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-0 hover:from-indigo-600 hover:to-purple-700 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 py-4 sm:py-5"
                 onClick={(e) => {
                   e.preventDefault();
                   GenerateContent();
                 }}
               >
-                {loading && <RefreshCcw className="animate-spin mr-1" />}
+                {loading && <RefreshCcw className="w-4 h-4 animate-spin" />}
                 <span>Generate</span>
                 <ArrowRight className="w-4 h-4" />
               </Button>
             ) : (
-              <Button className="cursor-not-allowed w-full bg-gray-300 text-gray-500 border-0 shadow-md transition-all duration-300 flex items-center justify-center gap-2 py-5" disabled>
+              <Button className="cursor-not-allowed w-full bg-gray-300 text-gray-500 border-0 shadow-md transition-all duration-300 flex items-center justify-center gap-2 py-4 sm:py-5" disabled>
                 <span>Credit Required</span>
               </Button>
             )}

@@ -15,6 +15,18 @@ Format the output as an array of objects with "front", "back", and "isMath" keys
 ** DO NOT INCLUDE CHAPTER NUMBER
 MAKE SURE IT'S IN JSON FORMAT
 If it's a **math question**, format the question using LaTeX syntax and return it as a **string** that can be rendered with MathJax.
+Each flashcard should have:
+- a 'front' field (question)
+- a 'back' field (answer)
+- an 'isMath' boolean (true if math-related, false otherwise)
+- a unique 'id' (UUID)
+
+Return the response as a JSON array, e.g.:
+[
+  { "id": "uuid1", "front": "What is the Chain Rule?", "back": "hi", "isMath": false },
+  { "id": "uuid2", "front": "What is Derivative?", "back": "A function's rate of change", "isMath": true }
+]
+
 `
 
 

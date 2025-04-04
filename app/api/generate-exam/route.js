@@ -1,6 +1,7 @@
 import { GenerateStartExam } from "@/configs/AiModel";
 import { db } from "@/configs/db";
-import { EXAM_SESSION_TABLE } from "@/configs/schema";
+import { EXAM_SESSION_TABLE, USER_TABLE } from "@/configs/schema";
+import { eq } from "drizzle-orm";
 import moment from "moment";
 import { NextResponse } from "next/server";
 

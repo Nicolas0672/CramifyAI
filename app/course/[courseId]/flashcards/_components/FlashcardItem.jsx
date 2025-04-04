@@ -77,7 +77,7 @@ function FlashcardItem({ flashcard, isFlipped, onClick, cardIndex, isMember, onE
         }
       }}
     >
-      <div className='w-full max-w-xs sm:max-w-sm md:max-w-md'>
+      <div className='w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto'>
         <ReactCardFlip isFlipped={isFlipped} flipDirection="vertical">
           {/* Front of the flashcard - Enhanced AI-themed styling */}
           <div
@@ -86,12 +86,12 @@ function FlashcardItem({ flashcard, isFlipped, onClick, cardIndex, isMember, onE
           >
             {/* Edit button for members */}
             {isMember && (
-              <button 
+              <button
                 onClick={(e) => handleEditClick(e, 'front')}
-                className="absolute top-2 right-2 p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-all z-20"
+                className="absolute top-2 right-2 p-2 bg-gray-100 bg-opacity-50 rounded-full hover:bg-opacity-70 transition-all z-20 text-lg"
                 aria-label="Edit question"
               >
-                <Pencil size={16} className="text-white" />
+                ✏️
               </button>
             )}
             

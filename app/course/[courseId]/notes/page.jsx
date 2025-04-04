@@ -74,27 +74,16 @@ function ViewNotes() {
   return (
     <MathJaxContext>
       <MathJax>
-        <div className="relative overflow-hidden p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 shadow-lg border-0">
+        <div className="relative overflow-hidden p-3 sm:p-6 rounded-2xl bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 shadow-lg border-0">
           {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -mr-20 -mt-20 blur-xl"></div>
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full -ml-16 -mb-16 blur-xl"></div>
-            
+          
           <div className="relative z-10">
-            {/* Navigation Buttons and Progress Bar */}
-            <div className='flex gap-2 sm:gap-5 items-center mb-6 flex-wrap sm:flex-nowrap'>
-              {stepCount !== 0 && (
-                <Button
-                  className='cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300'
-                  onClick={handlePrevious}
-                  variant='outline'
-                  size='sm'
-                >
-                  <ChevronLeft className="w-4 h-4 mr-1" />
-                  Previous
-                </Button>
-              )}
-                
-              <div className='flex-1 flex gap-1 sm:gap-2 min-w-0'>
+            {/* Navigation Buttons and Progress Bar - Adjusted for mobile */}
+            <div className='flex flex-col sm:flex-row gap-3 sm:gap-5 items-center mb-4 sm:mb-6'>
+              {/* Progress Bar - Full width on mobile */}
+              <div className='w-full order-2 sm:order-1 flex gap-1 sm:gap-2 sm:flex-1 min-w-0 my-2 sm:my-0'>
                 {notes?.map((item, index) => (
                   <div
                     key={index}
@@ -106,47 +95,69 @@ function ViewNotes() {
                   ></div>
                 ))}
               </div>
+              
+              {/* Navigation Buttons - Stacked on mobile */}
+              <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-2 order-1 sm:order-2">
+                <div className="flex justify-center sm:justify-start">
+                  {stepCount !== 0 && (
+                    <Button
+                      className='cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300 w-full sm:w-auto'
+                      onClick={handlePrevious}
+                      variant='outline'
+                      size='sm'
+                    >
+                      <ChevronLeft className="w-4 h-4 mr-1" />
+                      Previous
+                    </Button>
+                  )}
+                </div>
                 
-              <div className="mt-2 sm:mt-0">
-                {stepCount < notes.length - 1 ? (
-                  <Button
-                    className='cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300'
-                    onClick={handleNext}
-                    variant='outline'
-                    size='sm'
-                  >
-                    Next
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => router.back()}
-                    className='cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300'
-                    variant='outline'
-                    size='sm'
-                  >
-                    Go to Course Page
-                  </Button>
-                )}
+                <div className="flex justify-center sm:justify-start">
+                  {stepCount < notes.length - 1 ? (
+                    <Button
+                      className='cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300 w-full sm:w-auto'
+                      onClick={handleNext}
+                      variant='outline'
+                      size='sm'
+                    >
+                      Next
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => router.back()}
+                      className='cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300 w-full sm:w-auto'
+                      variant='outline'
+                      size='sm'
+                    >
+                      Go to Course Page
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
-              
-            {/* Notes Content */}
-            <div className='mt-6'>
+            
+            {/* Notes Content - Improved mobile formatting */}
+            <div className='mt-4 sm:mt-6'>
               <div
-                className='notes-content prose max-w-none space-y-4 text-base sm:text-lg bg-white/70 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-sm mx-auto'
-                style={{ overflowWrap: 'break-word', wordWrap: 'break-word', hyphens: 'auto' }}
+                className='notes-content prose max-w-none space-y-3 sm:space-y-4 text-base sm:text-lg bg-white/70 backdrop-blur-sm p-3 sm:p-6 rounded-xl shadow-sm mx-auto'
+                style={{ 
+                  overflowWrap: 'break-word', 
+                  wordWrap: 'break-word', 
+                  hyphens: 'auto',
+                  lineHeight: '1.6'
+                }}
                 dangerouslySetInnerHTML={{
                   __html: formatNotes(notes[stepCount]?.notes || '')
                 }}
               />
               {showComplete && stepCount == notes.length - 1 &&
-                <div className='flex justify-end'>
-                  <Button 
+                <div className='flex justify-center sm:justify-end mt-4'>
+                  <Button
                     disabled={loading}
                     onClick={() => handleComplete()}
-                    variant='outline' 
-                    className='mt-5 cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300'
+                    variant='outline'
+                    className='mt-3 sm:mt-5 cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300'
                   >
                     Mark as completed
                   </Button>
@@ -164,40 +175,49 @@ function ViewNotes() {
     if (!content) return '';
     
     let formatted = DOMPurify.sanitize(content)
-      // Fix Gemini's escaped code blocks with newlines
-      .replace(/\\n\s*\\n\s*/g, '<br>')
-      .replace(/\\n/g, '<br>')
-      
-      // Math expressions
-      .replace(/\$\$(.*?)\$\$/gs, (match, p1) => `$$${p1}$$`) // Block math
-      .replace(/\\\((.*?)\\\)/g, (match, p1) => `\\(${p1}\\)`) // Inline math
-      .replace(/\\\[(.*?)\\\]/g, (match, p1) => `\\[${p1}\\]`) // Display math
-      
-      // Handle code blocks with proper formatting
-      .replace(/```(\w*)\s*([\s\S]*?)```/g, (match, language, code) => {
-        // If it looks like math content in a code block, convert to math display
-        if (code.includes('\\frac') || code.includes('\\sin') || 
-            code.includes('\\cos') || code.includes('\\sum') ||
-            code.includes('\\int')) {
-          return `$$${code}$$`;
-        }
-        
-        // Otherwise format as code
-        return `<pre class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"><code class="font-mono text-sm">${code}</code></pre>`;
-      })
-      
-      // Handle Gemini's weird comment-based code blocks
-      .replace(/(\/\/\s*.*?)<br>(.*?Math\..*?)<br>/g, (match) => {
-        return `<pre class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"><code class="font-mono text-sm">${match}</code></pre>`;
-      })
-      
-      // Clean up HTML artifacts
-      .replace(/\{\s*"(html_content|content)"\s*:\s*"/g, '')
-      .replace(/"\s*\}/g, '')
-      .replace(/<\/?p>/g, '')
-      .replace(/\\\\/g, '\\');  // Fixes double backslashes
-      
-    return formatted;
+  // Fix Gemini's escaped newlines and replace them with <br> for line breaks
+  .replace(/\\n\s*\\n\s*/g, '<br>') 
+  .replace(/\\n/g, '<br>') 
+
+  // Replace escaped quotes with regular quotes
+  .replace(/\\"/g, '"')  
+  .replace(/\\"([^"]+)\\"/g, '"$1"')
+
+  // Handle math expressions
+  .replace(/\$\$(.*?)\$\$/gs, (match, p1) => `$$${p1}$$`) // Block math
+  .replace(/\\\((.*?)\\\)/g, (match, p1) => `\\(${p1}\\)`) // Inline math
+  .replace(/\\\[(.*?)\\\]/g, (match, p1) => `\\[${p1}\\]`) // Display math
+
+  // Handle code blocks with proper formatting
+  .replace(/```(\w*)\s*([\s\S]*?)```/g, (match, language, code) => {
+    // If it looks like math content in a code block, convert to math display
+    if (code.includes('\\frac') || code.includes('\\sin') || 
+        code.includes('\\cos') || code.includes('\\sum') ||
+        code.includes('\\int')) {
+      return `$$${code}$$`;
+    }
+
+    // Otherwise format as code block
+    return `<pre class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto">
+              <code class="font-mono text-sm">${code}</code>
+            </pre>`;
+  })
+  
+  // Handle Gemini's weird comment-based code blocks
+  .replace(/(\/\/\s*.*?)<br>(.*?Math\..*?)<br>/g, (match) => {
+    return `<pre class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto">
+              <code class="font-mono text-sm">${match}</code>
+            </pre>`;
+  })
+
+  // Clean up HTML artifacts (potentially from Gemini)
+  .replace(/\{\s*"(html_content|content)"\s*:\s*"/g, '') // Remove content artifact
+  .replace(/"\s*\}/g, '') // Remove closing brace artifact
+  .replace(/<\/?p>/g, '') // Remove paragraph tags (if any)
+  .replace(/\\\\/g, '\\');  // Fixes double backslashes
+
+return formatted;
+
   }
 }
 

@@ -31,13 +31,13 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
     }
 
   const checkStatus = async(recordId)=>{
-    console.log('Check status')
+    
     let attemps = 0;
-    const maxAttempts = 20
+    const maxAttempts = 40
 
     while(attemps < maxAttempts){
       const res = await axios.get(`/api/get-check-status?id=${recordId}`)
-     
+      console.log('Check status')
       if(res.data.status == 'Ready'){
         setLoading(false)
         await refreshData();

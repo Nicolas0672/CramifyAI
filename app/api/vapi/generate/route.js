@@ -98,8 +98,9 @@ return NextResponse.json({ success: false, error: "Failed to parse AI response",
       isNewMember: false
     }).where(eq(USER_TABLE.email, createdBy))
 
+    const finalCourseId = (typeof courseId === "string" && courseId.length > 3) ? courseId : id;
     const resp = await db.insert(STUDY_MATERIAL_TABLE).values({
-                    courseId: courseId.length > 3 ? courseId : id,
+                    courseId: finalCourseId,
                     courseType: 'Teach',
                     topic: topic,
                     difficultyLevel: difficultyLevel,
@@ -110,7 +111,7 @@ return NextResponse.json({ success: false, error: "Failed to parse AI response",
 
     const creditTable = await db.insert(PROGRESS_CREDITS_COMPLETED_TABLE).values({
       createdBy: createdBy,
-      courseId: courseId.length > 3 ? courseId : id
+      courseId: finalCourseId
     })
 
     const userInfo= await db.select().from(USER_TABLE).where(eq(USER_TABLE?.email, createdBy))

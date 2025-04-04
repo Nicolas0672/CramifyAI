@@ -34,9 +34,14 @@ export const CreateNewUser = inngest.createFunction(
           name: user?.fullName,
           email: user?.primaryEmailAddress?.emailAddress,
           nextCreditReset: sql`${nextMonthDate.toISOString()}::timestamp`,
-          createdAt: formattedDate
+          
         }).returning({ id: USER_TABLE.id })
+        await db.update(USER_TABLE).set({
+          createdAt: moment().format('MM-DD-YYYY')
+        }).where(eq(USER_TABLE.email, user?.primaryEmailAddress?.emailAddress))
+
         return userResp;
+       
       }
       return result
     })

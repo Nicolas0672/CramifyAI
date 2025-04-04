@@ -53,6 +53,7 @@ export async function POST(req) {
                 progress: 100
             }).where(eq(TEACH_ME_QUESTIONS_TABLE.courseId, courseId))
 
+
         }catch(err){
             return NextResponse.json({'error updating db': err})
         }
@@ -62,7 +63,8 @@ export async function POST(req) {
                 courseId: courseId,
                 createdBy: createdBy,
                 aiFeedback: aiResult,
-                topic: title
+                topic: title,
+                progress: 100
             })
             return NextResponse.json({sucess: true, courseId: courseId})
         } catch(err){return NextResponse.json({'error inserting' : err})}

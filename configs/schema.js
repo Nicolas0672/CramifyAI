@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { boolean, integer, json, text } from "drizzle-orm/gel-core";
 import { date, pgTable, serial, time, timestamp, varchar } from "drizzle-orm/pg-core";
 
@@ -13,7 +14,7 @@ export const USER_TABLE=pgTable('users',{
     remainingCredits: integer().default(10),
     totalCreditSize: integer().default(10),
     lastCreditReset: timestamp("lastCreditReset").defaultNow(),
-    nextCreditReset: timestamp("nextCreditReset"),
+    nextCreditReset: timestamp("nextCreditReset").default(sql`now() + interval '1 month'`),
     createdAt: varchar(),
 
 })

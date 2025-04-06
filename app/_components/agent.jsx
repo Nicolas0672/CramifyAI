@@ -228,6 +228,7 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
    
       await vapi2.start(teachMeAssistant,{
         variableValues:{
+          username: user?.fullName,
           firstQuestion: questions,
           topic: topic
         }
@@ -264,7 +265,7 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
           <div className='absolute bottom-1/4 left-1/4 w-96 h-96 bg-indigo-300 rounded-full filter blur-3xl opacity-10'></div>
         </div>
 
-        <div className='call-view bg-purple-50 backdrop-blur-sm p-10 rounded-xl shadow-md w-full max-w-6xl mx-auto border border-gray-100'>
+        <div className='  call-view bg-purple-50 backdrop-blur-sm p-8 rounded-xl shadow-md w-full max-w-6xl mx-auto border border-gray-100'>
           <div className='video-grid grid grid-cols-1 md:grid-cols-2 gap-8 my-6'>
             {/* Teacher video */}
             <div className='video-card bg-gradient-to-b from-blue-50 to-indigo-50 rounded-2xl overflow-hidden relative h-96 flex items-center justify-center border border-blue-100 shadow-lg'>
@@ -324,13 +325,22 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
               <div className='absolute inset-0 bg-white/10'></div>
 
               {/* Student avatar */}
-              <div className='avatar z-10'>
-                <div className='p-3 bg-white bg-opacity-70 rounded-full border border-purple-200 shadow-md'>
-                  <div className='w-28 h-28 bg-purple-100 rounded-full flex items-center justify-center text-purple-500 text-3xl font-medium'>
-                    You
-                  </div>
-                </div>
-              </div>
+              <div className="avatar z-10">
+  <div className="p-3 bg-white bg-opacity-70 rounded-full border border-purple-200 shadow-md">
+    {user?.imageUrl ? (
+      <img
+        src={user.imageUrl}
+        alt="User Avatar"
+        className="w-28 h-28 rounded-full object-cover"
+      />
+    ) : (
+      <div className="w-28 h-28 bg-purple-100 rounded-full flex items-center justify-center text-purple-500 text-4xl font-semibold">
+        {user?.emailAddress?.emailAddress?.charAt(0).toUpperCase() ?? "?"}
+      </div>
+    )}
+  </div>
+</div>
+
 
               {/* Conditional pulse effect for student - only shown when user is speaking */}
               {userIsSpeaking && (

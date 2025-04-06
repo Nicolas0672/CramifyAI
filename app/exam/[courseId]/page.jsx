@@ -63,7 +63,7 @@ function ViewExam() {
   if (!examIntro) return <div className="p-6 text-xl">No exam information available</div>
 
   return (
-    <div className="mt-2 sm:mt-15 w-full max-w-5xl mx-auto px-4 sm:px-8 py-6 sm:py-8 relative">
+    <div className="mt-14 sm:mt-15 w-full max-w-5xl mx-auto px-4 sm:px-8 py-6 sm:py-8 relative">
       {/* Background decorative elements */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-10 right-10 w-8 sm:w-16 h-8 sm:h-16 border-2 sm:border-4 border-blue-400/20 rounded-full animate-pulse"></div>

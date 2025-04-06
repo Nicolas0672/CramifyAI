@@ -24,45 +24,44 @@ export default function RootLayout({ children }) {
   const pathname = headersList.get("x-pathname") || "/";
 
   // List of authentication routes where sidebar should be hidden
-  const authRoutes = ["/sign-in", "/sign-up", "/home"];
+  const authRoutes = ["/sign-in", "/sign-up", "/home", "/privacy-policy", "/terms-service", "/about-us"];
 
   // Check if the current path is an auth page
   const isAuthPage = authRoutes.some(route => pathname.startsWith(route));
 
   return (
-    <ClerkProvider>
-      <StudyProvider>
+  <ClerkProvider>
+    <StudyProvider>
       <CourseProvider>
         <html lang="en">
           <body className={outfit.className}>
             <LearningModeProvider>
-              
-            <FloatingStudyElements />
-            <Toaster position="bottom-right" reverseOrder={false} />
-            <Provider>
-              <SidebarProvider>
-                {/* Flex container for sidebar and main content */}
-                <div className="relative flex">
-                  {/* Conditionally render sidebar */}
-                  {!isAuthPage && (
-                    <div className="w-30 fixed h-screen top-0 left-0 z-50">
-                      <SideBar />
+              <FloatingStudyElements />
+              <Toaster position="bottom-right" reverseOrder={false} />
+              <Provider>
+                <SidebarProvider>
+                  {/* Flex container for sidebar and main content */}
+                  <div className="relative flex">
+                    {/* Sidebar with proper handling */}
+                    {!isAuthPage && (
+                      <div className="w-auto md:w-30 fixed h-auto md:h-screen top-0 left-0 z-40">
+                        {/* Only the actual sidebar content */}
+                        <SideBar />
+                      </div>
+                    )}
+                    
+                    {/* Main content with appropriate margins to avoid overlap */}
+                    <div className={`mt-0 flex-1  ${!isAuthPage ? "md:ml-30" : ""} relative z-10`}>
+                      {children}
                     </div>
-                  )}
-
-                  {/* Adjust main content layout */}
-                  <div className={`mt-0 flex-1 p-6 ${!isAuthPage ? "" : ""}`}>
-                    {children}
                   </div>
-                </div>
-              </SidebarProvider>
-            </Provider>
-            
+                </SidebarProvider>
+              </Provider>
             </LearningModeProvider>
           </body>
         </html>
-        </CourseProvider>
-      </StudyProvider>
-    </ClerkProvider>
-  );
+      </CourseProvider>
+    </StudyProvider>
+  </ClerkProvider>
+);
 }

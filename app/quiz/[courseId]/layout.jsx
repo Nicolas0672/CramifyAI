@@ -5,7 +5,7 @@ function PracticeViewLayout({children}) {
   return (
     <div>
         <DashboardHeader/>
-        <div className='mx-10 md:mx-20 lg:px-60 mt-10'>
+        <div className='mx-3 md:mx-5 lg:px-40 mt-5'>
         {children}
         </div>
     </div>

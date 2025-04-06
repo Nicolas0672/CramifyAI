@@ -201,7 +201,7 @@ function Create() {
 
     return (
         <>
-        <div className="min-h-screen flex flex-col items-center justify-center p-5 md:px-24 lg:px-36 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
+        <div className="min-h-screen flex flex-col items-center justify-center  md:px-24 lg:px-36 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
             {/* Form Container */}
             <div className="w-full max-w-3xl p-8 bg-white rounded-xl shadow-2xl border border-gray-100 transform transition-all hover:scale-105">
                 {/* Header */}

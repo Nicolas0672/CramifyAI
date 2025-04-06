@@ -87,7 +87,7 @@ function CourseList() {
                     </span>
                     
                     <div className="flex flex-wrap gap-2">
-                        <div className='p-1 gap-3 bg-gray-50 rounded-lg shadow-sm flex gap-1'>
+                        <div className='p-1  bg-gray-50 rounded-lg shadow-sm flex gap-1'>
                         <Button className={`cursor-pointer px-4 py-2 transition-all duration-300 ${mode === 'exam' ? 'shadow-md' : ''}`}
                                 onClick={() => setMode('teach Me')}
                                 variant={mode === 'teach Me' ? 'default' : 'outline'}

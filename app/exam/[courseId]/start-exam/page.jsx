@@ -143,7 +143,9 @@ function ExamStart() {
   // Handle answer submission
   const handleSubmit = async () => {
     if (questionCount >= 5) return;
-    toast('Deciding your next quesiton...')
+    if(questionCount <= 4){
+      toast('Deciding your next quesiton...')
+    }
     setLoading(true);
 
     // Debugging: Log the values before sending request
@@ -223,7 +225,7 @@ function ExamStart() {
 
   return (
     <MathJaxContext config={{ tex: { inlineMath: [['$', '$']] } }}>
-      <div className="relative p-8 bg-gradient-to-br from-gray-50 to-blue-100 rounded-2xl shadow-xl overflow-hidden">
+      <div className="mt-20 mx-10 relative p-8 bg-gradient-to-br from-gray-50 to-blue-100 rounded-2xl shadow-xl overflow-hidden">
         {/* Floating study elements */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Book */}
@@ -295,7 +297,7 @@ function ExamStart() {
                 handleSubmit();  // First, execute handleSubmit()
                 toast('Redirecting to feedback...')
                 router.push(`/exam/${courseId}/feedback`);  // Then, navigate
-              }} className="cursor-poiner z-20 bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center">
+              }} className="cursor-pointer z-20 bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center">
                 <CheckCircle className="w-5 h-5 mr-2" />
                 Finish
               </Button>

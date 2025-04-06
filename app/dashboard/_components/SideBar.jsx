@@ -160,9 +160,21 @@ function SideBar() {
         }
     }
 
+    useEffect(()=>{
+        user&&updateUserDate()
+    },[user])
+
+    const updateUserDate =async()=>{
+        const res= axios.post('/api/update-user',{
+            createdBy: user?.primaryEmailAddress?.emailAddress
+        })
+        console.log(res)
+    }
+
     const CheckFreeReset = async () => {
         const currentDate = new Date();
         // Compare the timestamps
+       
         if (currentDate.getTime() >= new Date(credit?.nextCreditReset).getTime()) {
             const res = await axios.post('/api/update-credit', {
                 createdBy: user?.primaryEmailAddress?.emailAddress,
@@ -172,7 +184,7 @@ function SideBar() {
     };
     
     useEffect(()=>{
-        credit&&CheckFreeReset()
+        credit?.nextCreditReset&&CheckFreeReset()
     },[user, credit])
 
 
@@ -291,7 +303,7 @@ function SideBar() {
                     {/* Sidebar with hamburger menu that stays fixed */}
                     <div
                         className={`fixed h-screen transition-all duration-300 ease-in-out ${
-                            isSidebarExpanded ? 'w-64' : 'w-16'
+                            isSidebarExpanded ? 'w-64' : 'w-8'
                         }`}
                     >
                         {/* Header with logo and hamburger that's always visible */}
@@ -301,7 +313,7 @@ function SideBar() {
                         {/* Logo with subtle animation */}
                         <div className="relative">
                             <div className="absolute -inset-1 bg-indigo-400 rounded-full blur-md opacity-50 animate-pulse"></div>
-                            <Image src={'/logo.svg'} color='black' alt='logo' width={40} height={40} className="relative drop-shadow-lg" />
+                            <Image src={'/lg.png'} style={{ backgroundColor: 'transparent' }} color='black' alt='logo' width={40} height={40} className="relative drop-shadow-lg" />
                         </div>
     
                             {/* Title - only visible when expanded */}

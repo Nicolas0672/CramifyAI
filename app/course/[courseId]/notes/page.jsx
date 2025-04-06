@@ -74,14 +74,14 @@ function ViewNotes() {
   return (
     <MathJaxContext>
       <MathJax>
-        <div className="relative overflow-hidden p-3 sm:p-6 rounded-2xl bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 shadow-lg border-0">
+        <div className="relative overflow-hidden p-2 sm:p-6 rounded-2xl bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 shadow-lg border-0 w-full">
           {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -mr-20 -mt-20 blur-xl"></div>
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-purple-200/20 to-transparent rounded-full -ml-16 -mb-16 blur-xl"></div>
           
-          <div className="relative z-10">
-            {/* Navigation Buttons and Progress Bar - Adjusted for mobile */}
-            <div className='flex flex-col sm:flex-row gap-3 sm:gap-5 items-center mb-4 sm:mb-6'>
+          <div className="relative z-10 w-full">
+            {/* Navigation Buttons and Progress Bar - Mobile optimized */}
+            <div className='flex flex-col sm:flex-row gap-3 sm:gap-5 items-center mb-4 sm:mb-6 w-full'>
               {/* Progress Bar - Full width on mobile */}
               <div className='w-full order-2 sm:order-1 flex gap-1 sm:gap-2 sm:flex-1 min-w-0 my-2 sm:my-0'>
                 {notes?.map((item, index) => (
@@ -96,56 +96,52 @@ function ViewNotes() {
                 ))}
               </div>
               
-              {/* Navigation Buttons - Stacked on mobile */}
+              {/* Navigation Buttons - Full width on mobile */}
               <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-2 order-1 sm:order-2">
-                <div className="flex justify-center sm:justify-start">
-                  {stepCount !== 0 && (
-                    <Button
-                      className='cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300 w-full sm:w-auto'
-                      onClick={handlePrevious}
-                      variant='outline'
-                      size='sm'
-                    >
-                      <ChevronLeft className="w-4 h-4 mr-1" />
-                      Previous
-                    </Button>
-                  )}
-                </div>
+                {stepCount !== 0 && (
+                  <Button
+                    className='cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300 w-full sm:w-auto'
+                    onClick={handlePrevious}
+                    variant='outline'
+                    size='sm'
+                  >
+                    <ChevronLeft className="w-4 h-4 mr-1" />
+                    Previous
+                  </Button>
+                )}
                 
-                <div className="flex justify-center sm:justify-start">
-                  {stepCount < notes.length - 1 ? (
-                    <Button
-                      className='cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300 w-full sm:w-auto'
-                      onClick={handleNext}
-                      variant='outline'
-                      size='sm'
-                    >
-                      Next
-                      <ChevronRight className="w-4 h-4 ml-1" />
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => router.back()}
-                      className='cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300 w-full sm:w-auto'
-                      variant='outline'
-                      size='sm'
-                    >
-                      Go to Course Page
-                    </Button>
-                  )}
-                </div>
+                {stepCount < notes.length - 1 ? (
+                  <Button
+                    className='cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300 w-full sm:w-auto'
+                    onClick={handleNext}
+                    variant='outline'
+                    size='sm'
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => router.back()}
+                    className='cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300 w-full sm:w-auto'
+                    variant='outline'
+                    size='sm'
+                  >
+                    Go to Course Page
+                  </Button>
+                )}
               </div>
             </div>
             
-            {/* Notes Content - Improved mobile formatting */}
-            <div className='mt-4 sm:mt-6'>
+            {/* Notes Content - Optimized for mobile screens */}
+            <div className='mt-4 sm:mt-6 w-full'>
               <div
-                className='notes-content prose max-w-none space-y-3 sm:space-y-4 text-base sm:text-lg bg-white/70 backdrop-blur-sm p-3 sm:p-6 rounded-xl shadow-sm mx-auto'
+                className='notes-content prose prose-sm sm:prose max-w-none w-full space-y-3 sm:space-y-4 bg-white/70 backdrop-blur-sm p-2 sm:p-6 rounded-xl shadow-sm'
                 style={{ 
                   overflowWrap: 'break-word', 
                   wordWrap: 'break-word', 
                   hyphens: 'auto',
-                  lineHeight: '1.6'
+                  width: '100%'
                 }}
                 dangerouslySetInnerHTML={{
                   __html: formatNotes(notes[stepCount]?.notes || '')
@@ -157,7 +153,7 @@ function ViewNotes() {
                     disabled={loading}
                     onClick={() => handleComplete()}
                     variant='outline'
-                    className='mt-3 sm:mt-5 cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300'
+                    className='mt-3 sm:mt-5 cursor-pointer shadow-sm bg-white hover:bg-gray-50 border-0 text-gray-700 hover:text-gray-900 transition-all duration-300 w-full sm:w-auto'
                   >
                     Mark as completed
                   </Button>

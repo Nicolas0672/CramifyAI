@@ -22,7 +22,7 @@ function TeachIntroCard({course}) {
     
       return (
         <motion.div
-          className="relative overflow-hidden p-8 border-0 shadow-lg rounded-2xl bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 hover:shadow-xl transition-all duration-300"
+          className="mt-5 relative overflow-hidden p-8 border-0 shadow-lg rounded-2xl bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 hover:shadow-xl transition-all duration-300"
           initial="hidden"
           animate="visible"
           variants={containerVariants}

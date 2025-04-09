@@ -29,7 +29,7 @@ function ViewFlashCards() {
   const [loading, setLoading] = useState(false)
   const [flashcardData, setFlashcardData] = useState()
   const [userDetails, setUserDetails] = useState()
-  const { user } = useUser()
+  const { user, isLoaded } = useUser()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingFlashcard, setEditingFlashcard] = useState(null);
   const [editingSide, setEditingSide] = useState('front');
@@ -56,8 +56,9 @@ function ViewFlashCards() {
   }
 
   useEffect(() => {
+    if (!isLoaded || !user) return;
     user && FetchUserDetails()
-  }, [user])
+  }, [user, isLoaded])
 
   const FetchUserDetails = async () => {
     const res = await axios.post('/api/check-new-member', {

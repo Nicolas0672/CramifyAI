@@ -1,7 +1,8 @@
 import { db } from "@/configs/db";
 import { inngest } from "@/inngest/client";
 import { NextResponse } from "next/server";
-
+import { getAuth, clerkClient } from "@clerk/nextjs/server"
+import { rateLimiter } from "../rateLimiter";
 const { FILL_BLANK_TABLE } = require("@/configs/schema");
 
 export async function POST(req) {
@@ -10,7 +11,22 @@ export async function POST(req) {
         console.log("Raw request body:", body);
 
         const { courseId, courseLayout, topic, difficultyLevel } = JSON.parse(body);
-
+        const { userId } = getAuth(req);
+        if (!userId) return { error: "Unauthorized: No userId", status: 401 };
+    
+        const client = await clerkClient()
+const user = await client.users.getUser(userId)
+        const email = user.emailAddresses[0]?.emailAddress;
+    
+                
+                    const { success } = await rateLimiter.limit(userId);  // Check if user has exceeded the limit
+                
+                    if (!success) {
+                        return NextResponse.json({
+                            success: false,
+                            message: "Rate limit exceeded. Please try again later.",
+                        }, { status: 429 });  // HTTP 429 Too Many Requests
+                    }
         if (!courseId || !courseLayout || !topic || !difficultyLevel) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
@@ -47,7 +63,8 @@ export async function POST(req) {
 
         const result = await db.insert(FILL_BLANK_TABLE).values({
             courseId: courseId,
-            type: 'Fill-Blank'
+            type: 'Fill-Blank',
+            createdBy: email
         }).returning({ id: FILL_BLANK_TABLE.id });
 
         console.log("Database insert result:", result);

@@ -2,10 +2,26 @@ import { db } from "@/configs/db"
 import { AI_TEXT_RESPONSE_TABLE, CHAPTER_NOTE_TABLE, EXAM_SESSION_TABLE, FILL_BLANK_TABLE, FLASHCARD_CONTENT, PRACTICE_QUIZ_TABLE } from "@/configs/schema"
 import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
-
+import { getAuth, clerkClient } from "@clerk/nextjs/server";  // Import getAuth for email validation
+import { rateLimiter } from "../rateLimiter"; 
 export async function POST(req) {
     const {courseId, studyType} = await req.json()
+    const { userId } = getAuth(req);
+    if (!userId) return { error: "Unauthorized: No userId", status: 401 };
 
+    const client = await clerkClient()
+    const user = await client.users.getUser(userId)
+    const email = user.emailAddresses[0]?.emailAddress;
+
+    // Rate limiting check for the user (based on email)
+    // const { success } = await rateLimiter.limit(userId);  // Apply rate limiter
+
+    // if (!success) {
+    //     return NextResponse.json({
+    //         success: false,
+    //         message: "Rate limit exceeded. Please try again later.",
+    //     }, { status: 429 });  // HTTP 429 Too Many Requests
+    // }
     if(studyType=='ALL'){
         const notes = await db.select().from(CHAPTER_NOTE_TABLE)
         .where(eq(CHAPTER_NOTE_TABLE?.courseId, courseId))

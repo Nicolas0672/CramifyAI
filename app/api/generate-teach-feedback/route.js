@@ -3,10 +3,37 @@ import { db } from "@/configs/db";
 import { TEACH_ME_FEEDBACK_TABLE, TEACH_ME_QUESTIONS_TABLE } from "@/configs/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server"
-
+import { rateLimiter } from "../rateLimiter";
+import { getAuth, clerkClient} from "@clerk/nextjs/server"
 export async function POST(req) {
     const { courseId, createdBy, transcript, title } = await req.json()
+    const { userId } = getAuth(req);
+    if (!userId) return { error: "Unauthorized: No userId", status: 401 };
 
+    const client = await clerkClient()
+const user = await client.users.getUser(userId)
+    const userEmail = user.emailAddresses[0]?.emailAddress;
+
+    if (!userEmail || userEmail !== createdBy) {
+      return {
+        error: "Unauthorized: Email mismatch",
+        status: 401,
+        debug: {
+          userEmail,
+          createdBy,
+        },
+      };
+    }
+        
+                const { success } = await rateLimiter.limit(userId);  // Check if user has exceeded the limit
+        
+                if (!success) {
+                    return NextResponse.json({
+                        success: false,
+                        message: "Rate limit exceeded. Please try again later.",
+                    }, { status: 429 });  // HTTP 429 Too Many Requests
+                }
+        
     try {
         const formattedTranscript = transcript.map(sentence =>
             `- ${sentence.role}: ${sentence.content}\n`

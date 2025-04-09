@@ -9,7 +9,7 @@ export const SidebarContext = createContext();
 export const SidebarProvider = ({ children }) => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true); // To manage expansion
   const [isSidebarVisible, setIsSidebarVisible] = useState(true); // To manage visibility
-
+  
   const hideSidebar = () => setIsSidebarVisible(false);
   const showSidebar = () => setIsSidebarVisible(true);
 

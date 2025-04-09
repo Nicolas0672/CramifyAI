@@ -6,14 +6,44 @@ import { eq } from "drizzle-orm";
 import moment from "moment/moment";
 import { NextResponse } from "next/server";
 
+import { getAuth, clerkClient } from "@clerk/nextjs/server"
+import { rateLimiter } from "../rateLimiter";
 
 export async function POST(req) {
     try {
         // Parse request body
 
         const { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy } = await req.json();
-        let amount 
-        console.log("Request Data:", { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy });
+        let amount
+        const { userId } = getAuth(req);
+        if (!userId) return { error: "Unauthorized: No userId", status: 401 };
+    
+        const client = await clerkClient()
+const user = await client.users.getUser(userId)
+        const userEmail = user.emailAddresses[0]?.emailAddress;
+
+        if (!userEmail || userEmail !== createdBy) {
+          return {
+            error: "Unauthorized: Email mismatch",
+            status: 401,
+            debug: {
+              userEmail,
+              createdBy,
+            },
+          };
+        }
+    
+        
+            const { success } = await rateLimiter.limit(userId);  // Check if user has exceeded the limit
+        
+            if (!success) {
+                return NextResponse.json({
+                    success: false,
+                    message: "Rate limit exceeded. Please try again later.",
+                }, { status: 429 });  // HTTP 429 Too Many Requests
+            }
+
+      
         const userRes = await db.select().from(USER_TABLE).where(eq(USER_TABLE.email, createdBy))
         if(userRes[0].isMember == true){
           amount = 5

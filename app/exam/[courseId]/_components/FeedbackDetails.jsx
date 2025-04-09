@@ -13,29 +13,21 @@ function FeedbackDetails({ feedback, index }) {
   // Function to fix common LaTeX syntax errors
   const formatMathContent = (content) => {
     if (!content) return '';
-    
-    // Fix common LaTeX syntax errors
-    let formattedContent = content
-      // Fix backslash-space issues (like "\ rac" to "\frac")
-      .replace(/\\ rac{/g, "\\frac{")
-      .replace(/\\ rac/g, "\\frac")
-      
-      // Fix incorrect fraction command
-      .replace(/\\rac{/g, "\\frac{")
-      .replace(/\\rac(\S+)(\S+)/g, "\\frac{$1}{$2}")
-      .replace(/\\rac(\s+)(\S+)(\s+)(\S+)/g, "\\frac{$2}{$4}")
-      
-      // Add missing braces to fractions
-      .replace(/\\frac(\d+)(\d+)/g, "\\frac{$1}{$2}")
-      .replace(/\\frac(\d+)([a-zA-Z]+)(\d+)/g, "\\frac{$1$2}{$3}")
-      .replace(/\\frac([a-zA-Z]+)(\d+)/g, "\\frac{$1}{$2}")
-      
-      // Fix potentially missing $ delimiters around math
-      .replace(/([^$])(\\frac|\\sqrt|\\sum|\\prod|\\int)/g, "$1$$$2")
-      .replace(/(\\frac|\\sqrt|\\sum|\\prod|\\int)([^$])/g, "$1$$2");
-    
-    return formattedContent;
+  
+    // If it already contains $...$, assume it's fine
+    if (content.includes('$')) return content;
+  
+    // If any LaTeX-like pattern is found, wrap the whole thing in $...$
+    const containsMath = /\\(frac|sqrt|int|sum|prod|lim|log|ln|sin|cos|tan)/.test(content);
+  
+    if (containsMath) {
+      return `$${content}$`;  // full expression wrapped in one block
+    }
+  
+    return content;
   };
+  
+  
 
   return (
     <div className="p-4 mb-4 bg-white rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-300">
@@ -81,7 +73,9 @@ function FeedbackDetails({ feedback, index }) {
             <h4 className="text-sm font-semibold text-blue-800">AI Feedback</h4>
           </div>
           <MathJax>
-            <div className="text-sm text-gray-700 math-content" dangerouslySetInnerHTML={{ __html: formatMathContent(feedback.aiResponse.feedback.explanation) }} />
+            <div className="text-sm text-gray-700 math-content">
+            {formatMathContent(feedback.aiResponse.feedback.explanation)}
+              </div>  
           </MathJax>
         </div>
         

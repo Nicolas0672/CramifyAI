@@ -141,6 +141,7 @@ export const GenerateNotes=inngest.createFunction(
               chapterId: index,
               courseId: course?.courseId,
               notes: aiResp,
+              createdBy: course?.createdBy
             });
             console.log(`Successfully inserted chapter ${index}`);
             

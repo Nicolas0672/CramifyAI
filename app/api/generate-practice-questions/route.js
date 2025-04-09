@@ -4,10 +4,38 @@ import { PRACTICE_QUIZ_TABLE, PROGRESS_CREDITS_COMPLETED_TABLE, USER_TABLE } fro
 import { eq } from "drizzle-orm";
 import moment from "moment";
 import { NextResponse } from "next/server";
-
+import { rateLimiter } from "../rateLimiter";
+import { getAuth, clerkClient } from "@clerk/nextjs/server"
 export async function POST (req) {
     const { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy } = await req.json();
 
+    const { userId } = getAuth(req);
+    if (!userId) return { error: "Unauthorized: No userId", status: 401 };
+
+    const client = await clerkClient()
+const user = await client.users.getUser(userId)
+    const userEmail = user.emailAddresses[0]?.emailAddress;
+
+    if (!userEmail || userEmail !== createdBy) {
+      return {
+        error: "Unauthorized: Email mismatch",
+        status: 401,
+        debug: {
+          userEmail,
+          createdBy,
+        },
+      };
+    }
+    
+            const { success } = await rateLimiter.limit(userId);  // Check if user has exceeded the limit
+    
+            if (!success) {
+                return NextResponse.json({
+                    success: false,
+                    message: "Rate limit exceeded. Please try again later.",
+                }, { status: 429 });  // HTTP 429 Too Many Requests
+            }
+    
     const prompt = `Generate quiz on topic: ${topic} with difficulty level: ${difficultyLevel} and content: ${courseLayout} including a title of the topic in simple terms and what will i learn after completing this set. 
                 Provide 5 multiple-choice questions with the following format:
                 - Question: [Text of the question]
@@ -54,10 +82,7 @@ export async function POST (req) {
         difficultyLevel: difficultyLevel
     }).returning({ resp: PRACTICE_QUIZ_TABLE });
 
-    const creditTable = await db.insert(PROGRESS_CREDITS_COMPLETED_TABLE).values({
-      createdBy: createdBy,
-      courseId: courseId
-    })
+ 
 
     const userInfo= await db.select().from(USER_TABLE).where(eq(USER_TABLE?.email, createdBy))
     const newTotal = 1 + userInfo[0]?.totalCredits

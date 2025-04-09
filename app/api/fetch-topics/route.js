@@ -2,11 +2,16 @@ import { db } from "@/configs/db";
 import { PRACTICE_QUIZ_TABLE, TEACH_ME_QUESTIONS_TABLE, AI_TEXT_RESPONSE_TABLE } from "@/configs/schema";
 import { eq, desc } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { validateUser } from "../validate-user/route";
+
 
 export async function POST(req) {
     try {
         const { createdBy, selectedOption } = await req.json();
-
+        const validation = await validateUser(req, createdBy)
+        if (validation.error) {
+            return NextResponse.json({ error: validation.error, ...validation.debug }, { status: validation.status })
+          }
         let topicsList = [];
 
         if (selectedOption === "Study") {

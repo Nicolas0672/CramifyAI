@@ -27,16 +27,15 @@ const LearningProgressStepper = ({ currentMode }) => {
     { id: 'exam', label: 'Exam' }
   ];
   const router = useRouter();
-  const {user} = useUser()
+  const { user, isLoaded } = useUser();
+
   useEffect(() => {
+    if (!isLoaded || !user || !course?.courseId) return;
+  
+    GetUserDetails();
     CheckExist();
-  }, [course?.courseId]);
-
-  useEffect(()=>{
-    user&&GetUserDetails()
-   
-  },[user])
-
+  }, [isLoaded, user, course?.courseId]);
+  
   const GetUserDetails=async()=>{
     const res = await axios.post('/api/check-new-member',{
       createdBy: user?.primaryEmailAddress?.emailAddress

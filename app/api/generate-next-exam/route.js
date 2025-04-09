@@ -2,8 +2,9 @@ import { GenerateNextQuestion } from "@/configs/AiModel";
 import { db } from "@/configs/db";
 import { EXAM_RESPONSE_TABLE, EXAM_SESSION_TABLE } from "@/configs/schema";
 import { eq } from "drizzle-orm";
-
+import { getAuth, clerkClient } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server";
+import { rateLimiter } from "../rateLimiter";
 
 export async function POST(req) {
     console.log("API endpoint hit");
@@ -16,6 +17,33 @@ export async function POST(req) {
         } catch (err) {
             console.error("Error parsing request body:", err);
             return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+        }
+
+        const { userId } = getAuth(req);
+        if (!userId) return { error: "Unauthorized: No userId", status: 401 };
+
+        const client = await clerkClient()
+const user = await client.users.getUser(userId)
+        const userEmail = user.emailAddresses[0]?.emailAddress;
+
+        if (!userEmail || userEmail !== createdBy) {
+            return {
+                error: "Unauthorized: Email mismatch",
+                status: 401,
+                debug: {
+                    userEmail,
+                    createdBy,
+                },
+            };
+        }
+
+        const { success } = await rateLimiter.limit(userId);  // Check if user has exceeded the limit
+
+        if (!success) {
+            return NextResponse.json({
+                success: false,
+                message: "Rate limit exceeded. Please try again later.",
+            }, { status: 429 });  // HTTP 429 Too Many Requests
         }
 
         // Generate AI feedback
@@ -86,33 +114,33 @@ Return only the JSON object. Any response that does not meet these criteria must
         let aiResult;
         try {
             const aiText = aiResp.response.text();
-            
+
             // Step 1: Extract what appears to be JSON
             let jsonText = aiText;
-            
+
             // Remove code blocks if present
             jsonText = jsonText.replace(/```json\s*|\s*```/g, '');
-            
+
             // Find content between { and final }
             const openBraceIndex = jsonText.indexOf('{');
             const closeBraceIndex = jsonText.lastIndexOf('}');
-            
+
             if (openBraceIndex !== -1 && closeBraceIndex !== -1 && openBraceIndex < closeBraceIndex) {
                 jsonText = jsonText.substring(openBraceIndex, closeBraceIndex + 1);
             }
-            
+
             // Step 2: Fix common JSON issues
-            
+
             // Fix newlines in JSON (critical fix for your example)
             jsonText = jsonText.replace(/\n\s*/g, ' ');
-            
+
             // Fix unescaped quotes within string values
             let inString = false;
             let fixedText = '';
             for (let i = 0; i < jsonText.length; i++) {
                 const char = jsonText[i];
                 const nextChar = i < jsonText.length - 1 ? jsonText[i + 1] : '';
-                
+
                 if (char === '"' && (i === 0 || jsonText[i - 1] !== '\\')) {
                     inString = !inString;
                     fixedText += char;
@@ -123,19 +151,19 @@ Return only the JSON object. Any response that does not meet these criteria must
                     fixedText += char;
                 }
             }
-            
+
             // Try parsing the fixed JSON
             try {
                 aiResult = JSON.parse(fixedText);
             } catch (innerErr) {
                 // Fallback handling - create a valid default structure
                 console.error("Error parsing fixed JSON, using fallback:", innerErr);
-                
+
                 // Extract probable content using regex
                 const ratingMatch = fixedText.match(/"rating":\s*(\d+)/);
                 const explanationMatch = fixedText.match(/"explanation":\s*"([^"]*)"/);
                 const questionMatch = fixedText.match(/"question":\s*"([^"]*)"/);
-                
+
                 aiResult = {
                     feedback: {
                         rating: ratingMatch ? parseInt(ratingMatch[1]) : 5,
@@ -146,7 +174,7 @@ Return only the JSON object. Any response that does not meet these criteria must
             }
         } catch (err) {
             console.error("Error processing AI response:", err);
-            
+
             // Ultra fallback - never fail completely
             aiResult = {
                 feedback: {
@@ -174,7 +202,7 @@ Return only the JSON object. Any response that does not meet these criteria must
             console.error("Error inserting data into database:", err);
             return NextResponse.json({ error: "Failed to insert data into database" }, { status: 500 });
         }
-       
+
         // Return the database response
         return NextResponse.json({
             dbResponse: nextDbRes[0],  // Return the first item in the response array

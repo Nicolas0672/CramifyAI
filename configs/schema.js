@@ -57,7 +57,8 @@ export const CHAPTER_NOTE_TABLE=pgTable('chapterNotes',{
     courseId:varchar().notNull(),
     chapterId: integer().notNull(),
     notes:text(),
-    isDone: boolean().default(false)
+    isDone: boolean().default(false),
+    createdBy:varchar().notNull(),
 })
 
 export const FLASHCARD_CONTENT = pgTable('flashCardContent',{
@@ -66,7 +67,8 @@ export const FLASHCARD_CONTENT = pgTable('flashCardContent',{
     content: json(),
     type: varchar().notNull(),
     status: varchar().default('Generating'),
-    isDone: boolean().default(false)
+    isDone: boolean().default(false),
+    createdBy:varchar().notNull(),
 })
 
 export const PRACTICE_QUIZ_TABLE = pgTable('PracticeQuiz',{
@@ -90,7 +92,8 @@ export const FILL_BLANK_TABLE = pgTable('Fill-Blank',{
     courseId: varchar().notNull(),
     type: varchar().notNull(),
     status: varchar().default('Generating'),
-    isDone: boolean().default(false)
+    isDone: boolean().default(false),
+    createdBy:varchar().notNull(),
 })
 
 export const EXAM_SESSION_TABLE = pgTable('Exam-Session',{

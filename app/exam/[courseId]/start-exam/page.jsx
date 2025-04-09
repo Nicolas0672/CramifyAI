@@ -143,7 +143,7 @@ function ExamStart() {
   // Handle answer submission
   const handleSubmit = async () => {
     if (questionCount >= 5) return;
-    if(questionCount <= 4){
+    if(questionCount < 4){
       toast('Deciding your next quesiton...')
     }
     setLoading(true);
@@ -225,7 +225,7 @@ function ExamStart() {
 
   return (
     <MathJaxContext config={{ tex: { inlineMath: [['$', '$']] } }}>
-      <div className="mt-20 mx-10 relative p-8 bg-gradient-to-br from-gray-50 to-blue-100 rounded-2xl shadow-xl overflow-hidden">
+      <div className="mt-25 mx-10 relative p-4 bg-gradient-to-br from-gray-50 to-blue-100 rounded-2xl shadow-xl overflow-hidden">
         {/* Floating study elements */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Book */}

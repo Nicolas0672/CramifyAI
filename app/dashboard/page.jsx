@@ -1,10 +1,13 @@
-
+"use client"
+import { useEffect } from 'react'
+import { useSidebar } from '../SidebarContext'
 import CourseList from './_components/CourseList'
 import DashboardHeader from './_components/DashboardHeader'
 import WelcomeBanner from './_components/WelcomeBanner'
 
 
 function Dashboard() {
+  
   return (
     
     <div className="flex-1 ">

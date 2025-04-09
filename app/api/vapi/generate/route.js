@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
+import { getAuth, clerkClient } from "@clerk/nextjs/server";
+import { rateLimiter } from "../../rateLimiter";
 
 export async function GET() {
   return NextResponse.json({ success: true }, { status: 200 });
@@ -17,6 +19,33 @@ export async function POST(req) {
     if (!difficultyLevel || !amount || !courseLayout || !topic ) {
       return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 });
     }
+
+    const { userId } = getAuth(req);
+    if (!userId) return { error: "Unauthorized: No userId", status: 401 };
+
+    const client = await clerkClient()
+const user = await client.users.getUser(userId)
+    const userEmail = user.emailAddresses[0]?.emailAddress;
+
+    if (!userEmail || userEmail !== createdBy) {
+      return {
+        error: "Unauthorized: Email mismatch",
+        status: 401,
+        debug: {
+          userEmail,
+          createdBy,
+        },
+      };
+    }
+    
+        const { success } = await rateLimiter.limit(userId);  // Check if user has exceeded the limit
+    
+        if (!success) {
+          return NextResponse.json({
+            success: false,
+            message: "Rate limit exceeded. Please try again later.",
+          }, { status: 429 });  // HTTP 429 Too Many Requests
+        }
 
     const prompt = `Imagine you are new to the concept of ${courseLayout} ${topic} and want to learn it. 
     Generate ${amount} questions to ask the user, progressively increasing in difficulty. 

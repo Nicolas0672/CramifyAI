@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 
 const ProfileProgressGraph = () => {
   const [timeframe, setTimeframe] = useState('weekly');
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const [userDetails, setUserDetails] = useState();
   const [teachMode, setTeachMode] = useState([]);
   const [studyMode, setStudyMode] = useState([]);
@@ -52,8 +52,11 @@ const ProfileProgressGraph = () => {
   }
 
   useEffect(() => {
-    user && GetUserDetails();
-  }, [user]);
+    if (!isLoaded || !user) return;
+  
+    GetUserDetails();
+  }, [isLoaded, user]);
+  
 
   // User data
   const userData = {
@@ -293,11 +296,11 @@ const ProfileProgressGraph = () => {
     }
     return null;
   };
-
+  
   const getGradientId = () => {
     return 'progressGradient';
   };
-
+  
   // Calculate current streak and total courses
   const calculateStreakAndTotal = () => {
     let streak = 0;
@@ -330,7 +333,7 @@ const ProfileProgressGraph = () => {
   };
   
   const { streak, total } = calculateStreakAndTotal();
-
+  
   // Custom dot component with emojis based on mode
   const CustomizedDot = (props) => {
     const { cx, cy, index, payload } = props;
@@ -363,10 +366,10 @@ const ProfileProgressGraph = () => {
       </g>
     );
   };
-
+  
   return (
     <motion.div 
-      className="w-full mt-8 bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 overflow-hidden"
+      className="w-full mt-8 bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 md:p-6 overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -374,30 +377,30 @@ const ProfileProgressGraph = () => {
       <FloatingStudyElements/>
       {/* User Profile Info Section */}
       <motion.div 
-        className="mb-8 border-b border-gray-200 dark:border-gray-700 pb-6"
+        className="mb-6 md:mb-8 border-b border-gray-200 dark:border-gray-700 pb-6"
         initial={{ x: -20 }}
         animate={{ x: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between">
           <div className="flex items-center">
             <motion.div 
-              className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full w-16 h-16 flex items-center justify-center text-white text-2xl font-bold shadow-md"
+              className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full w-14 h-14 md:w-16 md:h-16 flex items-center justify-center text-white text-xl md:text-2xl font-bold shadow-md"
               whileHover={{ scale: 1.1, rotate: 5 }}
             >
               {userData.username?.slice(0, 2).toUpperCase() || "ME"}
             </motion.div>
             <div className="ml-4">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{userData.username}</h2>
-              <div className="flex items-center text-gray-500 dark:text-gray-400 mt-1">
-                <Mail size={16} className="mr-1" />
-                <span>{userData.email}</span>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white">{userData.username}</h2>
+              <div className="flex items-center text-sm md:text-base text-gray-500 dark:text-gray-400 mt-1">
+                <Mail size={14} className="mr-1" />
+                <span className="truncate max-w-full md:max-w-none">{userData.email}</span>
               </div>
             </div>
           </div>
           
           <motion.div 
-            className="bg-indigo-100 dark:bg-indigo-900/30 rounded-xl p-3 shadow-md"
+            className="bg-indigo-100 dark:bg-indigo-900/30 rounded-xl p-3 shadow-md mt-4 md:mt-0"
             whileHover={{ scale: 1.05 }}
           >
             <div className="text-indigo-600 dark:text-indigo-300 font-medium text-sm">
@@ -414,22 +417,21 @@ const ProfileProgressGraph = () => {
         </div>
         
         <div className="mt-4 text-sm flex items-center text-gray-600 dark:text-gray-400">
-          <Clock size={16} className="mr-1" />
+          <Clock size={14} className="mr-1" />
           <span>Member since {userData.createdAt}</span>
-         
         </div>
         <Button 
-            variant="outline" 
-            className="cursor-pointer mt-3 text-gray-600 dark:text-gray-400 hover:bg-red-50 transition"
-            onClick={() => signOut({ redirectUrl: '/home' })}
+          variant="outline" 
+          className="cursor-pointer mt-3 text-gray-600 dark:text-gray-400 hover:bg-red-50 transition"
+          onClick={() => signOut({ redirectUrl: '/home' })}
         >
-            Sign out
+          Sign out
         </Button>
       </motion.div>
       
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 space-y-4 md:space-y-0">
         <motion.h2 
-          className="text-xl font-bold text-gray-800 dark:text-white flex items-center"
+          className="text-lg md:text-xl font-bold text-gray-800 dark:text-white flex items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -445,7 +447,7 @@ const ProfileProgressGraph = () => {
           </motion.span>
         </motion.h2>
         <motion.div 
-          className="flex space-x-3"
+          className="flex flex-wrap gap-2 md:gap-3"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -454,7 +456,7 @@ const ProfileProgressGraph = () => {
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setTimeframe('daily')}
-            className={`px-4 py-2 text-sm rounded-full transition-all shadow-md ${
+            className={`px-3 py-1 md:px-4 md:py-2 text-sm rounded-full transition-all shadow-md ${
               timeframe === 'daily'
                 ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -466,7 +468,7 @@ const ProfileProgressGraph = () => {
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setTimeframe('weekly')}
-            className={`px-4 py-2 text-sm rounded-full transition-all shadow-md ${
+            className={`px-3 py-1 md:px-4 md:py-2 text-sm rounded-full transition-all shadow-md ${
               timeframe === 'weekly'
                 ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -478,7 +480,7 @@ const ProfileProgressGraph = () => {
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setTimeframe('monthly')}
-            className={`px-4 py-2 text-sm rounded-full transition-all shadow-md ${
+            className={`px-3 py-1 md:px-4 md:py-2 text-sm rounded-full transition-all shadow-md ${
               timeframe === 'monthly'
                 ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -488,9 +490,9 @@ const ProfileProgressGraph = () => {
           </motion.button>
         </motion.div>
       </div>
-
+  
       <motion.div 
-        className="w-full h-64"
+        className="w-full h-48 md:h-64"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
@@ -498,7 +500,7 @@ const ProfileProgressGraph = () => {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart 
             data={processedData[timeframe]} 
-            margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+            margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
           >
             <defs>
               <linearGradient id={getGradientId()} x1="0" y1="0" x2="0" y2="1">
@@ -509,13 +511,22 @@ const ProfileProgressGraph = () => {
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis 
               dataKey="date" 
-              tick={{ fill: '#6B7280' }}
+              tick={{ fill: '#6B7280', fontSize: '11px' }}
               axisLine={{ stroke: '#E5E7EB' }}
+              tickFormatter={(value) => {
+                // For mobile, we can shorten the date format
+                const isMobile = window.innerWidth < 768;
+                if (isMobile) {
+                  return value.split(' ')[0]; // Just show the first part of the date
+                }
+                return value;
+              }}
             />
             <YAxis 
-              tick={{ fill: '#6B7280' }}
+              tick={{ fill: '#6B7280', fontSize: '11px' }}
               axisLine={{ stroke: '#E5E7EB' }}
               allowDecimals={false}
+              width={30}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={{ marginTop: '10px' }} />
@@ -535,7 +546,7 @@ const ProfileProgressGraph = () => {
       </motion.div>
       
       <motion.div 
-        className="mt-4 flex justify-between items-center text-sm"
+        className="mt-4 flex flex-col md:flex-row md:justify-between md:items-center text-sm space-y-2 md:space-y-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
@@ -564,10 +575,10 @@ const ProfileProgressGraph = () => {
           </motion.span>
         </div>
       </motion.div>
-
+  
       {/* Legend explaining emojis */}
       <motion.div 
-        className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-3 justify-center"
+        className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 justify-center"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
@@ -576,33 +587,31 @@ const ProfileProgressGraph = () => {
           whileHover={{ scale: 1.1, y: -2 }}
           className="flex items-center bg-blue-100 dark:bg-blue-900/20 rounded-full px-3 py-1 shadow-sm"
         >
-          <span className="text-lg mr-1">📚</span>
+          <span className="text-base md:text-lg mr-1">📚</span>
           <span className="text-xs text-gray-700 dark:text-gray-300">Study</span>
         </motion.div>
         <motion.div 
           whileHover={{ scale: 1.1, y: -2 }}
           className="flex items-center bg-green-100 dark:bg-green-900/20 rounded-full px-3 py-1 shadow-sm"
         >
-          <span className="text-lg mr-1">👨‍🏫</span>
+          <span className="text-base md:text-lg mr-1">👨‍🏫</span>
           <span className="text-xs text-gray-700 dark:text-gray-300">Teach</span>
         </motion.div>
         <motion.div 
           whileHover={{ scale: 1.1, y: -2 }}
           className="flex items-center bg-orange-100 dark:bg-orange-900/20 rounded-full px-3 py-1 shadow-sm"
         >
-          <span className="text-lg mr-1">🎯</span>
+          <span className="text-base md:text-lg mr-1">🎯</span>
           <span className="text-xs text-gray-700 dark:text-gray-300">Practice</span>
         </motion.div>
         <motion.div 
           whileHover={{ scale: 1.1, y: -2 }}
           className="flex items-center bg-yellow-100 dark:bg-yellow-900/20 rounded-full px-3 py-1 shadow-sm"
         >
-          <span className="text-lg mr-1">🏆</span>
+          <span className="text-base md:text-lg mr-1">🏆</span>
           <span className="text-xs text-gray-700 dark:text-gray-300">Exam</span>
         </motion.div>
-       
       </motion.div>
-     
     </motion.div>
   );
 };

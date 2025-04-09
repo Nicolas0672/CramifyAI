@@ -12,14 +12,15 @@ import { useUser } from '@clerk/nextjs';
 function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
   const [loading, setLoading] = useState(false);
   const [userDetails, setUserDetails] = useState()
-  const {user} = useUser()
+  const {user, isLoaded} = useUser()
 
 
 
     useEffect(()=>{
+      if (!isLoaded || !user) return;
       user&&GetUserDetails()
      
-    },[user])
+    },[user, isLoaded])
   
     const GetUserDetails=async()=>{
       const res = await axios.post('/api/check-new-member',{

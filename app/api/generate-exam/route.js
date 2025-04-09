@@ -1,12 +1,43 @@
 import { GenerateStartExam } from "@/configs/AiModel";
 import { db } from "@/configs/db";
 import { EXAM_SESSION_TABLE, USER_TABLE } from "@/configs/schema";
+import { getAuth, clerkClient } from "@clerk/nextjs/server"
+
 import { eq } from "drizzle-orm";
 import moment from "moment";
 import { NextResponse } from "next/server";
+import { rateLimiter } from "../rateLimiter";
+
 
 export async function POST(req) {
     const { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy, exam_time } = await req.json();
+    const { userId } = getAuth(req);
+    if (!userId) return { error: "Unauthorized: No userId", status: 401 };
+
+    const client = await clerkClient()
+const user = await client.users.getUser(userId)
+    const userEmail = user.emailAddresses[0]?.emailAddress;
+
+    if (!userEmail || userEmail !== createdBy) {
+      return {
+        error: "Unauthorized: Email mismatch",
+        status: 401,
+        debug: {
+          userEmail,
+          createdBy,
+        },
+      };
+    }
+
+    const { success } = await rateLimiter.limit(userId);  // Check if user has exceeded the limit
+
+    if (!success) {
+        return NextResponse.json({
+            success: false,
+            message: "Rate limit exceeded. Please try again later.",
+        }, { status: 429 });  // HTTP 429 Too Many Requests
+    }
+
 
     const prompt = `Pretend that you are a teacher giving a student an exam. Generate courseTitle, a courseSummary on what student will be tested on and a randomized question based on the following parameters:
 

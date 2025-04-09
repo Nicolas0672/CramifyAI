@@ -35,11 +35,14 @@ function SideBar() {
     const path = usePathname();
     const [openDialogue, setOpenDialogue] = useState(false);
     const [selectedTopic, setSelectedTopic] = useState(null);
-    const { isSidebarExpanded, setIsSidebarExpanded, isSidebarVisible } = useContext(SidebarContext) // State for sidebar expansion
+    const { isSidebarExpanded, setIsSidebarExpanded, isSidebarVisible,  setIsSidebarVisible } = useContext(SidebarContext) // State for sidebar expansion
     const [loading, setLoading] = useState()
     const [tip, setTip] = useState()
     const [credit, setCredit] = useState({})
     const [totalCredit, setTotalCredit] = useState()
+    const router = useRouter();
+
+
     const MenuList = [
         {
             name: 'Dashboard',
@@ -58,8 +61,7 @@ function SideBar() {
         }
     ];
 
-    const router = useRouter();
-
+   
     const Options = [
         {
             name: 'Teach',
@@ -88,6 +90,8 @@ function SideBar() {
         },
 
     ];
+
+    
 
     const handleSelectStudyType = (type) => {
         setSelectedStudyType(type);
@@ -145,6 +149,8 @@ function SideBar() {
     };
 
     const GetCredits=async()=>{
+      
+
         const res = await axios.post('/api/check-new-member',{
             createdBy: user?.primaryEmailAddress?.emailAddress
         })
@@ -189,6 +195,10 @@ function SideBar() {
 
 
     const GenerateSelectedTopic = async () => {
+        if (!selectedTopic) {
+            toast.error("Please select a topic before continuing");
+            return; // Stop execution
+          }
         setLoading(true)
         toast('Your content is generating')
         const res = await axios.post('/api/fetch-courseTopicId', {
@@ -252,7 +262,7 @@ function SideBar() {
             const res = await axios.post('/api/generate-course-outline', payLoad)
             console.log('study content generating', res.data)
         }
-        GetCredits()
+        user&&GetCredits()
         setLoading(false)
         toast("Your content is generated")
 
@@ -266,14 +276,14 @@ function SideBar() {
     }, [user])
 
     useEffect(() => {
-        if (!user) return;
-    
+        if (!user || !isLoaded) return;
+        
         const interval = setInterval(() => {
             GetCredits(); // Fetch the latest credits from the DB
         }, 5000); // Runs every 5 seconds
     
         return () => clearInterval(interval); // Cleanup interval when component unmounts
-    }, [user]);
+    }, [user, isLoaded]);
     
 
   
@@ -297,11 +307,11 @@ function SideBar() {
     }, [isLoaded, user, selectOption]);
 
     return (
-        <>
-            {isSidebarVisible && (
+       
                 <>
                     {/* Sidebar with hamburger menu that stays fixed */}
                     <div
+                    style={{ display: isSidebarVisible ? 'block' : 'none' }}
                         className={`fixed h-screen transition-all duration-300 ease-in-out ${
                             isSidebarExpanded ? 'w-64' : 'w-8'
                         }`}
@@ -419,7 +429,7 @@ function SideBar() {
 
                 {/* Dialog for Study Material Selection */}
                 <Dialog open={openDialogue} onOpenChange={setOpenDialogue}>
-                    <DialogContent className='bg-white rounded-xl shadow-xl max-w-lg border border-indigo-100/30'>
+                <DialogContent className='bg-white rounded-xl shadow-xl max-w-lg border border-indigo-100/30 max-h-[90vh] overflow-y-auto'>
                         <DialogHeader>
                             <DialogTitle className='text-center text-2xl font-bold text-gray-800'>
                                 Select Study Material Type
@@ -537,8 +547,7 @@ function SideBar() {
            
             </>
             )}
-        </>
-    );
-}
+       
+
 
 export default SideBar;

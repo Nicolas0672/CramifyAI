@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 
 const ViewUpgrade = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const {user} = useUser()
+  const { user, isLoaded } = useUser();
   const [userDetails, setUserDetails] = useState()
   const [totalCredit, setTotalCredit]= useState()
   useEffect(() => {
@@ -15,8 +15,9 @@ const ViewUpgrade = () => {
   }, []);
 
   useEffect(()=>{
-    GetUserDetails()
-  },[user])
+    if (!isLoaded || !user) return
+    user&&GetUserDetails()
+  },[user, isLoaded])
 
   const GetUserDetails=async()=>{
     const result = await axios.post('/api/check-new-member',{

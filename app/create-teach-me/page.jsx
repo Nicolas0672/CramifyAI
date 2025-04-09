@@ -5,12 +5,13 @@ import { useUser } from '@clerk/nextjs'
 import axios from 'axios'
 
 function CreateTeach() {
-  const{user} = useUser()
+  const{user, isLoaded} = useUser()
   const [isNewMember, setIsNewMember] = useState(null)
 
   useEffect(()=>{
-      IsNewMember()
-    }, [user])
+    if (!isLoaded || !user) return;
+      user&&IsNewMember()
+    }, [user, isLoaded])
   
     const IsNewMember=async()=>{
       const res = await axios.post('/api/check-new-member', {

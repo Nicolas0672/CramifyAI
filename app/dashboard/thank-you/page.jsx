@@ -22,14 +22,26 @@ function ViewThankYou() {
     
     // Shoot confetti once when component mounts
     shootConfetti();
+    
+    // Prevent scrolling
+    document.body.style.overflow = 'hidden';
+    
+    // Clean up function to restore scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
   }, []);
   
   const handleContinue = () => {
     router.push('/dashboard');
   };
   
+  const handleSupportEmail = () => {
+    window.location.href = 'mailto:support@cramify.ai';
+  };
+  
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6">
+    <div className="h-screen flex flex-col items-center justify-center p-6 overflow-hidden">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -82,6 +94,22 @@ function ViewThankYou() {
             >
               Your new credits are ready to use!
             </motion.p>
+            
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1, duration: 0.5 }}
+              className="mt-6 p-4 bg-gray-50 rounded-xl text-sm text-gray-600"
+            >
+              Don't see your credits? Please{' '}
+              <button 
+                onClick={handleSupportEmail}
+                className="text-blue-500 hover:text-blue-700 font-medium"
+              >
+                contact support
+              </button>{' '}
+              at cramsmart.help@gmail.com
+            </motion.div>
           </div>
         </div>
       </motion.div>

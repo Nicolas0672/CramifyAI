@@ -16,38 +16,30 @@ function PracticeContentCard({quizTypeContent, item, refreshData, practiceCourse
   const [userDetails, setUserDetails] = useState()
   const { user, isLoaded } = useUser();
 
+  useEffect(()=>{
+    if (!isLoaded || !user) return;
+    GetUserDetails()
+  },[user, isLoaded])
 
-
-    useEffect(()=>{
-      if (!isLoaded || !user) return;
-      GetUserDetails()
-    },[user, isLoaded])
-  
-    const GetUserDetails=async()=>{
-      const res = await axios.post('/api/check-new-member',{
-        createdBy: user?.primaryEmailAddress?.emailAddress
-      })
-      setUserDetails(res.data.res)
-   
-  
-    }
+  const GetUserDetails=async()=>{
+    const res = await axios.post('/api/check-new-member',{
+      createdBy: user?.primaryEmailAddress?.emailAddress
+    })
+    setUserDetails(res.data.res)
+  }
 
   const GenerateContent = async () => {
     setLoading(true);
     toast('Generating Content');
     const result = await axios.post('/api/generate-fill-blank',{
       courseId: practiceCourse?.courseId,
-     
       courseLayout: practiceCourse?.courseLayout,
       difficultyLevel: practiceCourse?.difficultyLevel,
       topic: practiceCourse?.topic
-
     })
     if(result){
       checkStatus(result.data.id)
     }
-   
-    
   }
 
   const checkStatus = async(recordId)=>{
@@ -62,7 +54,6 @@ function PracticeContentCard({quizTypeContent, item, refreshData, practiceCourse
         setLoading(false)
         await refreshData();
         toast('Your content is ready to view');
-       
         break;
       }
       await new Promise((res)=> setTimeout(res, 2000))
@@ -74,7 +65,7 @@ function PracticeContentCard({quizTypeContent, item, refreshData, practiceCourse
 
   const isReady = quizTypeContent?.[item.type]?.status == 'Ready';
 
-  return userDetails?.remainingCredits > 0 || isReady ? (
+  return isReady ? (
     <Link href={'/quiz/' + practiceCourse?.courseId + item.path}>
       {CardContent()}
     </Link>
@@ -105,13 +96,9 @@ function PracticeContentCard({quizTypeContent, item, refreshData, practiceCourse
                 <Sparkles className="w-3 h-3" />
                 <span>Ready</span>
               </div>
-            ) : userDetails?.remainingCredits > 0 ? (
+            ) : (
               <div className='flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full text-xs mb-4 shadow-sm'>
                 <Sparkles className="w-3 h-3" />
-                <span>Generate</span>
-              </div>
-            ) : (
-              <div className='flex items-center gap-1 px-3 py-1.5 bg-gray-300 text-gray-500 rounded-full text-xs mb-4 shadow-sm'>
                 <span>Generate</span>
               </div>
             )}
@@ -140,7 +127,7 @@ function PracticeContentCard({quizTypeContent, item, refreshData, practiceCourse
                 <span>View</span>
                 <ArrowRight className="w-4 h-4" />
               </Button>
-            ) : userDetails?.remainingCredits > 0 ? (
+            ) : (
               <Button
                 className="cursor-pointer w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-0 hover:from-indigo-600 hover:to-purple-700 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 py-4 sm:py-5"
                 onClick={(e) => {
@@ -152,19 +139,12 @@ function PracticeContentCard({quizTypeContent, item, refreshData, practiceCourse
                 <span>Generate</span>
                 <ArrowRight className="w-4 h-4" />
               </Button>
-            ) : (
-              <Button className="cursor-not-allowed w-full bg-gray-300 text-gray-500 border-0 shadow-md transition-all duration-300 flex items-center justify-center gap-2 py-4 sm:py-5" disabled>
-                <span>Credit Required</span>
-              </Button>
             )}
           </motion.div>
         </div>
       </motion.div>
     );
   }
-  
-  
-  
 }
 
 export default PracticeContentCard;

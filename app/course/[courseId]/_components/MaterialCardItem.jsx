@@ -14,25 +14,19 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
   const [userDetails, setUserDetails] = useState()
   const {user, isLoaded} = useUser()
 
+  useEffect(()=>{
+    if (!isLoaded || !user) return;
+    user&&GetUserDetails()
+  },[user, isLoaded])
 
-
-    useEffect(()=>{
-      if (!isLoaded || !user) return;
-      user&&GetUserDetails()
-     
-    },[user, isLoaded])
-  
-    const GetUserDetails=async()=>{
-      const res = await axios.post('/api/check-new-member',{
-        createdBy: user?.primaryEmailAddress?.emailAddress
-      })
-      setUserDetails(res.data.res)
-   
-  
-    }
+  const GetUserDetails=async()=>{
+    const res = await axios.post('/api/check-new-member',{
+      createdBy: user?.primaryEmailAddress?.emailAddress
+    })
+    setUserDetails(res.data.res)
+  }
 
   const checkStatus = async(recordId)=>{
-    
     let attemps = 0;
     const maxAttempts = 40
 
@@ -52,12 +46,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
     setLoading(false)
   }
 
-
-
- 
- 
   const GenerateContent = async () => {
-
     toast('Generating content');
     setLoading(true);
     const chapters = course?.aiResponse?.chapters
@@ -74,13 +63,12 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
       courseId: course?.courseId,
       type: item.name,
       chapters: combinedCourseLayout,
-      
     });
     console.log('generating flashcards', result);
     checkStatus(result.data.id)
   };
 
-  return userDetails?.remainingCredits > 0 || studyTypeContent?.[item.type]?.length > 0 ? (
+  return studyTypeContent?.[item.type]?.length > 0 ? (
     <Link href={'/course/' + course?.courseId + item.path}>
       {CardContent()}
     </Link>
@@ -111,13 +99,9 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
                 <Sparkles className="w-3 h-3" />
                 <span>Ready</span>
               </div>
-            ) : userDetails?.remainingCredits > 0 ? (
+            ) : (
               <div className='flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full text-xs mb-4 shadow-sm'>
                 <Sparkles className="w-3 h-3" />
-                <span>Generate</span>
-              </div>
-            ) : (
-              <div className='flex items-center gap-1 px-3 py-1.5 bg-gray-300 text-gray-500 rounded-full text-xs mb-4 shadow-sm'>
                 <span>Generate</span>
               </div>
             )}
@@ -146,7 +130,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
                 <span>View</span>
                 <ArrowRight className="w-4 h-4" />
               </Button>
-            ) : userDetails?.remainingCredits > 0 ? (
+            ) : (
               <Button
                 className="cursor-pointer w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-0 hover:from-indigo-600 hover:to-purple-700 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 py-4 sm:py-5"
                 onClick={(e) => {
@@ -158,17 +142,12 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
                 <span>Generate</span>
                 <ArrowRight className="w-4 h-4" />
               </Button>
-            ) : (
-              <Button className="cursor-not-allowed w-full bg-gray-300 text-gray-500 border-0 shadow-md transition-all duration-300 flex items-center justify-center gap-2 py-4 sm:py-5" disabled>
-                <span>Credit Required</span>
-              </Button>
             )}
           </motion.div>
         </div>
       </motion.div>
     );
   }
-  
 }
 
 export default MaterialCardItem;

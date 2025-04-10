@@ -144,10 +144,7 @@ return NextResponse.json({ success: false, error: "Failed to parse AI response",
                     storageId: null,  // Save only if provided
                 })
 
-    const creditTable = await db.insert(PROGRESS_CREDITS_COMPLETED_TABLE).values({
-      createdBy: createdBy,
-      courseId: finalCourseId
-    })
+   
 
     const userInfo= await db.select().from(USER_TABLE).where(eq(USER_TABLE?.email, createdBy))
     const newTotal = 2 + userInfo[0]?.totalCredits

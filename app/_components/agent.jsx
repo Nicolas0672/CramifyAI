@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 
 
 
-function AgentLayout({ userName, userId, type, courseId, topic, questions, isNewMember }) {
+function AgentLayout({ userDetails,userName, userId, type, courseId, topic, questions, isNewMember }) {
   const CallStatus = {
     INACTIVE: "INACTIVE",
     CONNECTING: "CONNECTING",
@@ -22,6 +22,7 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
   const [courseTitle, setCourseTitle] = useState([])
   const { user } = useUser()
   const [avatar, setAvatar] = useState('')
+ 
 
 
   const SavedMessage = {
@@ -53,11 +54,14 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
    
   }
   useEffect(() => {
-    GetCourseTitle()
+    user&&GetCourseTitle()
+ 
     if(type == 'generate'){
       setAvatar('boy')
     } else { setAvatar('girl')}
   }, [user])
+
+
 
   // Timer effect for vapi2 - countdown from 5 minutes
   useEffect(() => {
@@ -188,53 +192,59 @@ function AgentLayout({ userName, userId, type, courseId, topic, questions, isNew
   }, [messages, callStatus, type, userId])
 
   const handleCall = async () => {
-    const createdBy = user?.primaryEmailAddress?.emailAddress;
-    const username = user?.fullName
-  
-    toast('Call has started')
-    setCallStatus(CallStatus.CONNECTING)
-    
-    // Reset timer when starting vapi2 call
-    if (type !== 'generate') {
-      setTimer(TIMER_START);
-      setIsTimerActive(true);
+    if(userDetails?.remainingCredits - 2 < 0){
+      toast('You do not have enough credits!')
     }
+    else{
+      const createdBy = user?.primaryEmailAddress?.emailAddress;
+      const username = user?.fullName
     
-    if(type == 'generate'){
-      if(isNewMember){
-      const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
-        
-        variableValues: {
-          username: user?.fullName,
-          createdBy: user?.primaryEmailAddress?.emailAddress,
-          topic1: courseTitle[0]?.courseTitle || 'Math',
-          topic2: courseTitle[1]?.courseTitle || 'Science',
-          topic3: courseTitle[2]?.courseTitle || 'History'
-        },
-      })} else {
-        const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID2, {
-        
+      toast('Call has started')
+      setCallStatus(CallStatus.CONNECTING)
+      
+      // Reset timer when starting vapi2 call
+      if (type !== 'generate') {
+        setTimer(TIMER_START);
+        setIsTimerActive(true);
+      }
+      
+      if(type == 'generate'){
+        if(isNewMember){
+        const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
+          
           variableValues: {
             username: user?.fullName,
             createdBy: user?.primaryEmailAddress?.emailAddress,
-            topic1: courseTitle[0]?.courseTitle,
-            topic2: courseTitle[1]?.courseTitle,
-            topic3: courseTitle[2]?.courseTitle
+            topic1: courseTitle[0]?.courseTitle || 'Math',
+            topic2: courseTitle[1]?.courseTitle || 'Science',
+            topic3: courseTitle[2]?.courseTitle || 'History'
           },
+        })} else {
+          const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID2, {
+          
+            variableValues: {
+              username: user?.fullName,
+              createdBy: user?.primaryEmailAddress?.emailAddress,
+              topic1: courseTitle[0]?.courseTitle,
+              topic2: courseTitle[1]?.courseTitle,
+              topic3: courseTitle[2]?.courseTitle
+            },
+          })
+        };
+        
+      } else {
+     
+        await vapi2.start(teachMeAssistant,{
+          variableValues:{
+            username: user?.fullName,
+            firstQuestion: questions,
+            topic: topic
+          }
         })
+        
       };
-      
-    } else {
+    }
    
-      await vapi2.start(teachMeAssistant,{
-        variableValues:{
-          username: user?.fullName,
-          firstQuestion: questions,
-          topic: topic
-        }
-      })
-      
-    };
     }
 
 

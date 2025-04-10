@@ -148,10 +148,7 @@ Please output in the following JSON structure:
                 }
             })
 
-            const creditTable = await db.insert(PROGRESS_CREDITS_COMPLETED_TABLE).values({
-                createdBy: createdBy,
-                courseId: courseId
-              })
+       
           
               const userInfo= await db.select().from(USER_TABLE).where(eq(USER_TABLE?.email, createdBy))
               const newTotal = 1 + userInfo[0]?.totalCredits

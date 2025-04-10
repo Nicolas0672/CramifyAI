@@ -30,11 +30,16 @@ function Create() {
     const AddFileEntry = useMutation(api.fileStorage.AddFileEntryToDb)
     const GetFileUrl=useMutation(api.fileStorage.getFileUrl)
     const [fileName, setFileName] = useState()
+    const[userDetails, setUserDetails] = useState()
 
 
     const { user } = useUser()
 
     const [loading, setLoading] = useState(false)
+
+    useEffect(()=>{
+        user&&GetUserDetails()
+    },[user])
 
     const handleUserInput = (fieldName, fieldValue) => {
         setFormData(prev => ({
@@ -49,9 +54,18 @@ function Create() {
         setHasPdf(file ? true : false)
     }
 
+    const GetUserDetails=async()=>{
+        const res = await axios.post('/api/check-new-member',{
+            createdBy: user?.primaryEmailAddress?.emailAddress
+        })
+        setUserDetails(res.data.res)
+        console.log(res.data.res)
+    }
+
     const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl)
 
     const OnUpload = async () => {
+     
         if (!formData.topic || !formData.difficultyLevel) {
             console.log('err')
             toast.error("Please fill in all required fields.");
@@ -116,15 +130,20 @@ function Create() {
         // }
         // else {
             // MAKE AN API TO INSERT DATA
-            const resp = await axios.post('/api/insert-new-study',{
-                courseType: formData.studyType,
-                topic: formData.topic,
-                difficultyLevel: formData.difficultyLevel,
-                courseLayout: formData.comment,
-                createdBy: user?.primaryEmailAddress?.emailAddress,
-            })
-            const res = resp.data
-            setData(res)      
+            if(userDetails?.remainingCredits - 1 < 0){
+                toast('You do not have enough credits!')
+            } else {
+                const resp = await axios.post('/api/insert-new-study',{
+                    courseType: formData.studyType,
+                    topic: formData.topic,
+                    difficultyLevel: formData.difficultyLevel,
+                    courseLayout: formData.comment,
+                    createdBy: user?.primaryEmailAddress?.emailAddress,
+                })
+                const res = resp.data
+                setData(res)      
+            }
+            
     }
     useEffect(()=>{
         console.log(data)

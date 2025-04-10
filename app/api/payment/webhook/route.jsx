@@ -73,13 +73,14 @@ if (!userDb || userDb.length === 0) {
 
           
         
-    
-        break;
+  return NextResponse.json({ success: true });
+      
+        
         
       // Other event types...
     }
     
-    return NextResponse.json({ success: true });
+   
   }
   } catch (err) {
 

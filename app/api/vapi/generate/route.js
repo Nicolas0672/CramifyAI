@@ -21,22 +21,28 @@ export async function POST(req) {
     }
 
     const { userId } = getAuth(req);
-    if (!userId) return { error: "Unauthorized: No userId", status: 401 };
+   
 
     const client = await clerkClient()
 const user = await client.users.getUser(userId)
     const userEmail = user.emailAddresses[0]?.emailAddress;
 
+    if (!userId) {
+      return NextResponse.json({ success: false, error: "Unauthorized: No userId" }, { status: 401 });
+    }
+    
     if (!userEmail || userEmail !== createdBy) {
-      return {
+      return NextResponse.json({
+        success: false,
         error: "Unauthorized: Email mismatch",
-        status: 401,
         debug: {
           userEmail,
           createdBy,
         },
-      };
+      }, { status: 401 });
     }
+    
+    
     
         const { success } = await rateLimiter.limit(userId);  // Check if user has exceeded the limit
     

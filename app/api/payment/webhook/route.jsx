@@ -42,33 +42,35 @@ export async function POST(req) {
         
      
           // Check if user exists
-          const userDb = await db.select().from(USER_TABLE).where(eq(USER_TABLE.email, customerEmail));
-          
-          if (!userDb || userDb.length === 0) {
-         
-                  
-            // Update existing user
-            const oldPurchasedCredit = userDb[0].newPurchasedCredit || 0;
-            const oldTotalCreditSize = userDb[0].totalCreditSize || 0;
-            const newRemainCredit = userDb[0].remainingCredits || 0;
-            
-            await db.update(USER_TABLE).set({
-              newPurchasedCredit: 20 + oldPurchasedCredit,
-              totalCreditSize: 20 + oldTotalCreditSize,
-              isMember: true,
-              remainingCredits: 20 + newRemainCredit
-            }).where(eq(USER_TABLE.email, customerEmail));
-          
-          
-          // Add payment record
-          await db.insert(PAYMENT_USER_TABLE).values({
-            createdBy: customerEmail,
-            transactionId: transactionId,
-            amountPaid: data.object.amount_total ,
-            status: data.object.payment_status,
-            creditAmount: 20,
-            customerId: data.object.customer || 'guest_customer' // Handle null customer
-          });
+          // Check if user exists
+const userDb = await db.select().from(USER_TABLE).where(eq(USER_TABLE.email, customerEmail));
+
+if (!userDb || userDb.length === 0) {
+  // User doesn't exist - you might want to handle this case differently
+  return NextResponse.json({ error: "User not found" }, { status: 400 });
+} else {
+  // Update existing user
+  const oldPurchasedCredit = userDb[0].newPurchasedCredit || 0;
+  const oldTotalCreditSize = userDb[0].totalCreditSize || 0;
+  const newRemainCredit = userDb[0].remainingCredits || 0;
+  
+  await db.update(USER_TABLE).set({
+    newPurchasedCredit: 20 + oldPurchasedCredit,
+    totalCreditSize: 20 + oldTotalCreditSize,
+    isMember: true,
+    remainingCredits: 20 + newRemainCredit
+  }).where(eq(USER_TABLE.email, customerEmail));
+  
+  // Add payment record
+  await db.insert(PAYMENT_USER_TABLE).values({
+    createdBy: customerEmail,
+    transactionId: transactionId,
+    amountPaid: data.object.amount_total,
+    status: data.object.payment_status,
+    creditAmount: 20,
+    customerId: data.object.customer || 'guest_customer'
+  });
+
           
         
     

@@ -22,6 +22,8 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
   const [courseTitle, setCourseTitle] = useState([])
   const { user } = useUser()
   const [avatar, setAvatar] = useState('')
+  // New state for noise warning popup
+  const [showNoiseWarning, setShowNoiseWarning] = useState(false);
  
 
 
@@ -175,11 +177,7 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
     }
   };
 
-
-  
-
   useEffect(() => {
-    
     if (callStatus === CallStatus.FINISHED){
       if(type == 'generate'){
         router.push('/')
@@ -191,27 +189,34 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
     } 
   }, [messages, callStatus, type, userId])
 
-  const handleCall = async () => {
+  // Modified to show popup first, then connect call
+  const handleCall = () => {
     if(userDetails?.remainingCredits - 2 < 0){
       toast('You do not have enough credits!')
+    } else {
+      // Show the noise warning popup instead of immediately starting the call
+      setShowNoiseWarning(true);
     }
-    else{
-      const createdBy = user?.primaryEmailAddress?.emailAddress;
-      const username = user?.fullName
+  }
+
+  // New function to handle the actual call connection after user confirmation
+  const initiateCall = async () => {
+    const createdBy = user?.primaryEmailAddress?.emailAddress;
+    const username = user?.fullName;
+  
+    toast('Call has started');
+    setCallStatus(CallStatus.CONNECTING);
+    setShowNoiseWarning(false); // Hide the popup
     
-      toast('Call has started')
-      setCallStatus(CallStatus.CONNECTING)
-      
-      // Reset timer when starting vapi2 call
-      if (type !== 'generate') {
-        setTimer(TIMER_START);
-        setIsTimerActive(true);
-      }
-      
-      if(type == 'generate'){
-        if(isNewMember){
+    // Reset timer when starting vapi2 call
+    if (type !== 'generate') {
+      setTimer(TIMER_START);
+      setIsTimerActive(true);
+    }
+    
+    if(type == 'generate') {
+      if(isNewMember) {
         const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
-          
           variableValues: {
             username: user?.fullName,
             createdBy: user?.primaryEmailAddress?.emailAddress,
@@ -219,51 +224,40 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
             topic2: courseTitle[1]?.courseTitle || 'Science',
             topic3: courseTitle[2]?.courseTitle || 'History'
           },
-        })} else {
-          const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID2, {
-          
-            variableValues: {
-              username: user?.fullName,
-              createdBy: user?.primaryEmailAddress?.emailAddress,
-              topic1: courseTitle[0]?.courseTitle,
-              topic2: courseTitle[1]?.courseTitle,
-              topic3: courseTitle[2]?.courseTitle
-            },
-          })
-        };
-        
+        });
       } else {
-     
-        await vapi2.start(teachMeAssistant,{
-          variableValues:{
+        const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID2, {
+          variableValues: {
             username: user?.fullName,
-            firstQuestion: questions,
-            topic: topic
-          }
-        })
-        
-      };
+            createdBy: user?.primaryEmailAddress?.emailAddress,
+            topic1: courseTitle[0]?.courseTitle,
+            topic2: courseTitle[1]?.courseTitle,
+            topic3: courseTitle[2]?.courseTitle
+          },
+        });
+      }
+    } else {
+      await vapi2.start(teachMeAssistant, {
+        variableValues: {
+          username: user?.fullName,
+          firstQuestion: questions,
+          topic: topic
+        }
+      });
     }
-   
-    }
+  }
 
+  const handleDisconnect = async () => {
+    setCallStatus(CallStatus.FINISHED);
+    setIsTimerActive(false);
+    
+    // Stop the appropriate VAPI instance based on the type
+    type === 'generate' ? vapi.stop() : vapi2.stop();
+  }
 
-    const handleDisconnect = async () => {
-      
-      setCallStatus(CallStatus.FINISHED)
-      setIsTimerActive(false);
-      
-      // Stop the appropriate VAPI instance based on the type
-      type === 'generate' ? vapi.stop() : vapi2.stop()
-    }
-
-  const latestMessage = messages[messages.length - 1]?.content
-  const isCallInactiveOrFinished = callStatus == CallStatus.INACTIVE || callStatus == CallStatus.FINISHED
-
-
-
-
-  const lastMessages = messages[messages.length - 1]
+  const latestMessage = messages[messages.length - 1]?.content;
+  const isCallInactiveOrFinished = callStatus == CallStatus.INACTIVE || callStatus == CallStatus.FINISHED;
+  const lastMessages = messages[messages.length - 1];
 
   return (
     <>
@@ -275,7 +269,42 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
           <div className='absolute bottom-1/4 left-1/4 w-96 h-96 bg-indigo-300 rounded-full filter blur-3xl opacity-10'></div>
         </div>
 
-        <div className='  call-view bg-purple-50 backdrop-blur-sm p-8 rounded-xl shadow-md w-full max-w-6xl mx-auto border border-gray-100'>
+        {/* Noise Warning Popup */}
+        {showNoiseWarning && (
+          <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-gradient-to-b from-indigo-50 to-purple-50 rounded-2xl p-6 m-4 max-w-md shadow-xl border border-purple-100 transform transition-all animate-fadeIn">
+              <div className="text-center mb-4">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-100 text-indigo-500 mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 017.072 0m-9.9-2.828a9 9 0 0112.728 0" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-indigo-700">Prepare Your Environment</h3>
+              </div>
+              
+              <p className="text-gray-600 mb-6">
+                Please ensure your surroundings are free from noise for the best call experience. Find a quiet space and check that your microphone is working properly.
+              </p>
+              
+              <div className="flex justify-between space-x-3">
+                <button 
+                  onClick={() => setShowNoiseWarning(false)} 
+                  className="flex-1 px-4 py-2 bg-white hover:bg-gray-50 text-indigo-500 rounded-lg border border-indigo-200 transition duration-200 shadow-sm"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={initiateCall} 
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg transition duration-200 shadow-md"
+                >
+                  Proceed
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className='call-view bg-purple-50 backdrop-blur-sm p-8 rounded-xl shadow-md w-full max-w-6xl mx-auto border border-gray-100'>
           <div className='video-grid grid grid-cols-1 md:grid-cols-2 gap-8 my-6'>
             {/* Teacher video */}
             <div className='video-card bg-gradient-to-b from-blue-50 to-indigo-50 rounded-2xl overflow-hidden relative h-96 flex items-center justify-center border border-blue-100 shadow-lg'>
@@ -336,20 +365,20 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
 
               {/* Student avatar */}
               <div className="avatar z-10">
-  <div className="p-3 bg-white bg-opacity-70 rounded-full border border-purple-200 shadow-md">
-    {user?.imageUrl ? (
-      <img
-        src={user.imageUrl}
-        alt="User Avatar"
-        className="w-28 h-28 rounded-full object-cover"
-      />
-    ) : (
-      <div className="w-28 h-28 bg-purple-100 rounded-full flex items-center justify-center text-purple-500 text-4xl font-semibold">
-        {user?.emailAddress?.emailAddress?.charAt(0).toUpperCase() ?? "?"}
-      </div>
-    )}
-  </div>
-</div>
+                <div className="p-3 bg-white bg-opacity-70 rounded-full border border-purple-200 shadow-md">
+                  {user?.imageUrl ? (
+                    <img
+                      src={user.imageUrl}
+                      alt="User Avatar"
+                      className="w-28 h-28 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-28 h-28 bg-purple-100 rounded-full flex items-center justify-center text-purple-500 text-4xl font-semibold">
+                      {user?.emailAddress?.emailAddress?.charAt(0).toUpperCase() ?? "?"}
+                    </div>
+                  )}
+                </div>
+              </div>
 
 
               {/* Conditional pulse effect for student - only shown when user is speaking */}
@@ -374,31 +403,27 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
             </div>
           </div>
 
-
-          
-    <div className='mt-8 mb-6 mx-auto max-w-3xl bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-indigo-100 overflow-hidden'>
-      <div className='p-5 bg-gradient-to-r from-blue-50 to-purple-50'>
-        <h3 className='text-center text-indigo-600 font-medium mb-3'>Conversation</h3>
-        <div className='transcript-content bg-white/70 p-4 rounded-xl'>
-          <p 
-            key={latestMessage}
-            className="
-              text-gray-700 
-              transition-all 
-              duration-300 
-              ease-in-out
-              opacity-100
-              transform 
-              translate-y-0
-            "
-          >
-            {latestMessage}
-          </p>
-        </div>
-      </div>
-    </div>
- 
-
+          <div className='mt-8 mb-6 mx-auto max-w-3xl bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-indigo-100 overflow-hidden'>
+            <div className='p-5 bg-gradient-to-r from-blue-50 to-purple-50'>
+              <h3 className='text-center text-indigo-600 font-medium mb-3'>Conversation</h3>
+              <div className='transcript-content bg-white/70 p-4 rounded-xl'>
+                <p 
+                  key={latestMessage}
+                  className="
+                    text-gray-700 
+                    transition-all 
+                    duration-300 
+                    ease-in-out
+                    opacity-100
+                    transform 
+                    translate-y-0
+                  "
+                >
+                  {latestMessage}
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Call control buttons */}
           <div className='w-full flex justify-center mt-2'>

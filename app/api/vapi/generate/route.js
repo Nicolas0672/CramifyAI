@@ -22,7 +22,7 @@ export async function POST(req) {
     
     
     
-        const { success } = await rateLimiter.limit(userId);  // Check if user has exceeded the limit
+        const { success } = await rateLimiter.limit(createdBy);  // Check if user has exceeded the limit
     
         if (!success) {
           return NextResponse.json({

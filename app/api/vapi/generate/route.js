@@ -98,7 +98,8 @@ return NextResponse.json({ success: false, error: "Failed to parse AI response",
    
     aiTitleResult = JSON.parse(cleanedTitle)
     const dbRes = await db.insert(TEACH_ME_QUESTIONS_TABLE).values({
-        courseId: courseId.length > 3 ? courseId : id,
+      courseId: typeof courseId === "string" && courseId.length > 3 ? courseId : id,
+
         question: aiResult,
         createdAt: moment().format("DD-MM-yyyy"),
        

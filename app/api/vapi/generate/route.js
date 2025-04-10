@@ -19,28 +19,6 @@ export async function POST(req) {
     if (!difficultyLevel || !amount || !courseLayout || !topic ) {
       return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 });
     }
-
-    const { userId } = getAuth(req);
-   
-
-    const client = await clerkClient()
-const user = await client.users.getUser(userId)
-    const userEmail = user.emailAddresses[0]?.emailAddress;
-
-    if (!userId) {
-      return NextResponse.json({ success: false, error: "Unauthorized: No userId" }, { status: 401 });
-    }
-    
-    if (!userEmail || userEmail !== createdBy) {
-      return NextResponse.json({
-        success: false,
-        error: "Unauthorized: Email mismatch",
-        debug: {
-          userEmail,
-          createdBy,
-        },
-      }, { status: 401 });
-    }
     
     
     

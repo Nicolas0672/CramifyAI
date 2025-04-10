@@ -14,7 +14,7 @@ export async function POST(req) {
             },
         ],
         payment_method_types: ['card'], // Ensures only card payments are allowed
-        success_url: `${process.env.HOST_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${process.env.HOST_URL}/dashboard/thank-you`,
         cancel_url: process.env.HOST_URL,
     });
 

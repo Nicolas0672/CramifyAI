@@ -25,14 +25,20 @@ const middleware = (req, evt) => {
 
 // Combine with Clerk middleware
 export default clerkMiddleware((auth, req, evt) => {
-  // Handle Clerk authentication
+  const pathname = req.nextUrl.pathname;
+
+  // ✅ Skip auth for Inngest webhook
+  if (pathname.startsWith("/api/inngest")) {
+    return NextResponse.next(); // skip Clerk
+  }
+
   if (isProtectedRoute(req)) {
     return auth.protect().then(() => middleware(req, evt));
   }
-  
-  // For non-protected routes, just run our middleware
+
   return middleware(req, evt);
 });
+
 
 // Keep the same matcher configuration
 export const config = {

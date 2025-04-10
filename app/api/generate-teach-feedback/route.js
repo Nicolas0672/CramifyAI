@@ -60,7 +60,7 @@ const user = await client.users.getUser(userId)
                             "strengths": ["<AI-generated strength 1>", "<AI-generated strength 2>", "..."],
                             "weaknesses": ["<AI-generated weakness 1>", "<AI-generated weakness 2>", "..."],
                             "improvements": ["<AI-generated improvement 1>", "<AI-generated improvement 2>", "..."],
-                            "overallScore": "<AI-generated score>"
+                            "overallScore": "<PLEASE ENSURE THAT THAT THE OUTPUT IS A NUMBER FOR EXAMPLE: 8/10>"
                         }
                         
                         `

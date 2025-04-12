@@ -310,6 +310,12 @@ const CramSmartLandingPage = () => {
     },
   ];
 
+  const handleGetStarted = () => {
+    setIsMenuOpen(false)
+    // Set a flag in localStorage that we're navigating from home
+    localStorage.setItem('fromHome', 'true');
+  }
+
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans overflow-hidden">
@@ -335,8 +341,9 @@ const CramSmartLandingPage = () => {
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 transition-all duration-300 group-hover:w-full"></span>
               </a>
             ))}
-            <Link href="/sign-up">
+            <Link href="/dashboard" >
               <button
+                onClick={handleGetStarted}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full text-sm font-medium hover:shadow-lg hover:scale-105 transition-all transform"
               >
                 Get Started
@@ -379,13 +386,14 @@ const CramSmartLandingPage = () => {
                       key={link.href}
                       href={link.href}
                       className="text-gray-700 font-medium py-2 hover:text-purple-600 transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
+                      onClick={handleGetStarted}
                     >
                       {link.label}
                     </a>
                   ))}
-                  <Link href="/sign-up" onClick={() => setIsMenuOpen(false)}>
+                  <Link href="/dashboard" >
                     <button
+                     onClick={handleGetStarted}
                       className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-md text-sm font-medium hover:opacity-90 transition-opacity mt-2"
                     >
                       Get Started
@@ -430,7 +438,9 @@ const CramSmartLandingPage = () => {
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link href="/sign-up">
-                    <button className="cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all transform">
+                    <button 
+                    onClick={handleGetStarted}
+                    className="cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all transform">
                       Start Learning Now
                     </button>
                   </Link>
@@ -855,8 +865,10 @@ const CramSmartLandingPage = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.4 }}
               >
-                <Link href="/sign-up">
-                  <button className="bg-white text-purple-600 px-10 py-4 rounded-full font-bold text-lg hover:bg-opacity-90 shadow-xl hover:shadow-2xl hover:scale-105 transform transition-all">
+                <Link href="/dashboard">
+                  <button 
+                  onClick={handleGetStarted}
+                  className="bg-white text-purple-600 px-10 py-4 rounded-full font-bold text-lg hover:bg-opacity-90 shadow-xl hover:shadow-2xl hover:scale-105 transform transition-all">
                     Get Started Free
                   </button>
                 </Link>

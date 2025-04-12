@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import toast from 'react-hot-toast'
 import { useUser } from '@clerk/nextjs'
 import FlashcardEditModal from './_components/FlashcardEditModal'
+import { CheckCircle } from 'lucide-react'
 
 function ViewFlashCards() {
   const { courseId } = useParams()
@@ -80,6 +81,46 @@ function ViewFlashCards() {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % flashCards.length);
   };
 
+  const showSuccessToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-green-100 p-2 rounded-full">
+          <CheckCircle className="w-5 h-5 text-green-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #f0fdf4, #dcfce7)',
+          border: '1px solid #86efac',
+          color: '#166534',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+  
+  const showErrorToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-red-100 p-2 rounded-full">
+          <XCircle className="w-5 h-5 text-red-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #fef2f2, #fee2e2)',
+          border: '1px solid #fca5a5',
+          color: '#b91c1c',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+
   const handleComplete = async () => {
     setLoading(true)
     const res = await axios.post('/api/handle-complete', {
@@ -87,7 +128,7 @@ function ViewFlashCards() {
       studyType: 'flashcard',
       type: 'study'
     })
-    toast("Congratulations on finishing this section!")
+    showSuccessToast("Congratulations on finishing this section!")
     setLoading(false)
     setShowComplete(false)
   }
@@ -106,7 +147,7 @@ function ViewFlashCards() {
     // const updatedFlashcards = flashcards.map(card =>
     //   card.id === updatedFlashcard.id ? updatedFlashcard : card
     // );
-  toast('Updating Flashcard...')
+  showSuccessToast('Updating Flashcard...')
     const updatedFlashcards = flashCards.map(card => {
       if (card.id === updatedFlashcard.id) {
         return {

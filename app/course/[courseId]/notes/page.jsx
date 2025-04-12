@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { MathJax, MathJaxContext } from 'better-react-mathjax';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 function ViewNotes() {
@@ -52,6 +52,46 @@ function ViewNotes() {
     }
   }, [stepCount, notes]);
 
+  const showSuccessToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-green-100 p-2 rounded-full">
+          <CheckCircle className="w-5 h-5 text-green-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #f0fdf4, #dcfce7)',
+          border: '1px solid #86efac',
+          color: '#166534',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+  
+  const showErrorToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-red-100 p-2 rounded-full">
+          <XCircle className="w-5 h-5 text-red-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #fef2f2, #fee2e2)',
+          border: '1px solid #fca5a5',
+          color: '#b91c1c',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+
   const handleComplete=async()=>{
     setLoading(true)
     const res = await axios.post('/api/handle-complete',{
@@ -59,7 +99,7 @@ function ViewNotes() {
       studyType: 'notes',
       type: 'study'
     })
-    toast('Congratulations on finishing this section!')
+    showSuccessToast('Congratulations on finishing this section!')
     setLoading(false)
     setShowComplete(false)
     

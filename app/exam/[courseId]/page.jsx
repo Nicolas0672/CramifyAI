@@ -1,9 +1,11 @@
 "use client"
 import axios from 'axios'
+import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+
 
 function ViewExam() {
   const { courseId } = useParams()
@@ -17,13 +19,33 @@ function ViewExam() {
     GetExamIntro()
   }, [])
 
+  const showRedirectToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-green-100 p-2 rounded-full">
+          <ArrowRight className="w-5 h-5 text-green-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #ecfdf5, #d1fae5)',
+          border: '1px solid #6ee7b7',
+          color: '#065f46',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+
   useEffect(()=>{
     examIntro&&CheckStartedExam()
   },[examIntro])
 
   const CheckStartedExam=()=>{
     if(examIntro?.questionCount > 0){
-      toast('Redirecting to exam page...')
+      showRedirectToast('Redirecting to exam page...')
       router.push(`/exam/${courseId}/start-exam`)
     }
   }

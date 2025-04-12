@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { vapi } from '@/lib/vapi.sdk';
 import { useUser } from '@clerk/nextjs';
 import axios from 'axios';
+import { ArrowRight, CheckCircle, XCircle } from 'lucide-react';
 import Image from 'next/image'
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
@@ -157,6 +158,66 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
     }
   }, [type])  
 
+  const showSuccessToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-green-100 p-2 rounded-full">
+          <CheckCircle className="w-5 h-5 text-green-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #f0fdf4, #dcfce7)',
+          border: '1px solid #86efac',
+          color: '#166534',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+  
+  const showErrorToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-red-100 p-2 rounded-full">
+          <XCircle className="w-5 h-5 text-red-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #fef2f2, #fee2e2)',
+          border: '1px solid #fca5a5',
+          color: '#b91c1c',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+
+  const showRedirectToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-green-100 p-2 rounded-full">
+          <ArrowRight className="w-5 h-5 text-green-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #ecfdf5, #d1fae5)',
+          border: '1px solid #6ee7b7',
+          color: '#065f46',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+
   const handleGenerateFeedback = async (messages) => {
     console.log('Full Messages Array:', messages);
     try {
@@ -166,7 +227,7 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
         transcript: messages,
         title: topic
       });
-      toast('Redirecting...')
+      showRedirectToast('Redirecting...')
   
       console.log(res.data)
         router.push(`/teach-me/${res.data.courseId}/feedback`);
@@ -183,7 +244,7 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
         router.push('/')
       }
       else{
-        toast('Your feedback is being generated...')
+        showSuccessToast('Your feedback is being generated...')
         handleGenerateFeedback(messages)
       }
     } 
@@ -192,7 +253,7 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
   // Modified to show popup first, then connect call
   const handleCall = () => {
     if(userDetails?.remainingCredits - 2 < 0){
-      toast('You do not have enough credits!')
+      showErrorToast('You do not have enough credits!')
     } else {
       // Show the noise warning popup instead of immediately starting the call
       setShowNoiseWarning(true);
@@ -204,7 +265,7 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
     const createdBy = user?.primaryEmailAddress?.emailAddress;
     const username = user?.fullName;
   
-    toast('Call has started');
+    showSuccessToast('Call has started');
     setCallStatus(CallStatus.CONNECTING);
     setShowNoiseWarning(false); // Hide the popup
     

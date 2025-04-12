@@ -5,7 +5,7 @@ import { MathJax, MathJaxContext } from 'better-react-mathjax'
 import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import ExamPage from '../_components/ExamPage'
-import { ArrowRight, CheckCircle, Clock } from 'lucide-react'
+import { ArrowRight, CheckCircle, Clock, CheckCircle, XCircle, BrainCircuit } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 function ExamStart() {
@@ -89,17 +89,121 @@ function ExamStart() {
   // },[elapsedTime, userAnswer, courseId])
 
 
+  const showSuccessToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-green-100 p-2 rounded-full">
+          <CheckCircle className="w-5 h-5 text-green-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #f0fdf4, #dcfce7)',
+          border: '1px solid #86efac',
+          color: '#166534',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+  
+  const showErrorToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-red-100 p-2 rounded-full">
+          <XCircle className="w-5 h-5 text-red-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #fef2f2, #fee2e2)',
+          border: '1px solid #fca5a5',
+          color: '#b91c1c',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
 
+  // For redirecting
+const showRedirectToast = (message) => {
+  toast(
+    <div className="flex items-center gap-2">
+      <div className="bg-green-100 p-2 rounded-full">
+        <ArrowRight className="w-5 h-5 text-green-500" />
+      </div>
+      <span>{message}</span>
+    </div>,
+    {
+      style: {
+        background: 'linear-gradient(to right, #ecfdf5, #d1fae5)',
+        border: '1px solid #6ee7b7',
+        color: '#065f46',
+        borderRadius: '0.5rem',
+      },
+      duration: 3000,
+    }
+  );
+};
+
+// For deciding next question
+const showThinkingToast = (message) => {
+  toast(
+    <div className="flex items-center gap-2">
+      <div className="bg-purple-100 p-2 rounded-full">
+        <BrainCircuit className="w-5 h-5 text-purple-500" />
+      </div>
+      <span>{message}</span>
+    </div>,
+    {
+      style: {
+        background: 'linear-gradient(to right, #f5f3ff, #ede9fe)',
+        border: '1px solid #c4b5fd',
+        color: '#5b21b6',
+        borderRadius: '0.5rem',
+      },
+      duration: 3000,
+    }
+  );
+};
+
+// For time's up
+const showTimeUpToast = (message) => {
+  toast(
+    <div className="flex items-center gap-2">
+      <div className="bg-amber-100 p-2 rounded-full">
+        <Clock className="w-5 h-5 text-amber-500" />
+      </div>
+      <span>{message}</span>
+    </div>,
+    {
+      style: {
+        background: 'linear-gradient(to right, #fffbeb, #fef3c7)',
+        border: '1px solid #fcd34d',
+        color: '#92400e',
+        borderRadius: '0.5rem',
+      },
+      duration: 3000,
+    }
+  );
+};
+  
   const handleSave = async () => {
-    toast('Saving answer...')
+
     const resUpdate = await axios.post('/api/save-question', {
       courseId: course.courseId,
 
       question: currentQuestion,
       userAns: userAnswer || ""
     })
-    toast('Answer Saved!')
+    showSuccessToast('Answer Saved!')
   }
+
+
 
   useEffect(() => {
     const storedStartTime = localStorage.getItem(`exam_start_time_${courseId}`);
@@ -124,7 +228,7 @@ function ExamStart() {
 
       if (remaining === 0) {
         updateExamTime()
-        toast('Time is up!')
+        showTimeUpToast('Time is up!')
         clearInterval(interval);
         router.push(`/exam/${courseId}/feedback`)
        } // Stop timer when time is up
@@ -144,7 +248,7 @@ function ExamStart() {
   const handleSubmit = async () => {
     if (questionCount >= 5) return;
     if(questionCount < 4){
-      toast('Deciding your next quesiton...')
+      showThinkingToast('Deciding your next quesiton...')
     }
     setLoading(true);
 
@@ -295,7 +399,7 @@ function ExamStart() {
               onClick={() => {
                 
                 handleSubmit();  // First, execute handleSubmit()
-                toast('Redirecting to feedback...')
+                showRedirectToast('Redirecting to feedback...')
                 router.push(`/exam/${courseId}/feedback`);  // Then, navigate
               }} className="cursor-pointer z-20 bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center">
                 <CheckCircle className="w-5 h-5 mr-2" />

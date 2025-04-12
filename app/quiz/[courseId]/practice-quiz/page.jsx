@@ -5,8 +5,9 @@ import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import QuizCardItem from '../_components/QuizCardItem'
-import { Check, X, ChevronLeft, ChevronRight, BookOpen, RotateCw } from 'lucide-react'
+import { Check, X, CheckCircle, XCircle,ChevronLeft, ChevronRight, BookOpen, RotateCw } from 'lucide-react'
 import toast from 'react-hot-toast'
+
 
 function QuizContent() {
   const { courseId } = useParams()
@@ -49,11 +50,51 @@ function QuizContent() {
       type: 'practice'
     })
     setShowComplete(false)
-    toast('You have successfully finished this section!')
+    showSuccessToast('You have successfully finished this section!')
     setLoading(false)
     router.back()
     
   }
+
+   const showSuccessToast = (message) => {
+      toast(
+        <div className="flex items-center gap-2">
+          <div className="bg-green-100 p-2 rounded-full">
+            <CheckCircle className="w-5 h-5 text-green-500" />
+          </div>
+          <span>{message}</span>
+        </div>,
+        {
+          style: {
+            background: 'linear-gradient(to right, #f0fdf4, #dcfce7)',
+            border: '1px solid #86efac',
+            color: '#166534',
+            borderRadius: '0.5rem',
+          },
+          duration: 3000,
+        }
+      );
+    };
+    
+    const showErrorToast = (message) => {
+      toast(
+        <div className="flex items-center gap-2">
+          <div className="bg-red-100 p-2 rounded-full">
+            <XCircle className="w-5 h-5 text-red-500" />
+          </div>
+          <span>{message}</span>
+        </div>,
+        {
+          style: {
+            background: 'linear-gradient(to right, #fef2f2, #fee2e2)',
+            border: '1px solid #fca5a5',
+            color: '#b91c1c',
+            borderRadius: '0.5rem',
+          },
+          duration: 3000,
+        }
+      );
+    };
 
   useEffect(()=>{
     setShowComplete(!quizData.isDone)

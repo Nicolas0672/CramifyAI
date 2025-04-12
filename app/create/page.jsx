@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import TopicInput from './_components/TopicInput'
 import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
-import { Loader2Icon } from 'lucide-react'
+import { CheckCircle, Loader2Icon, XCircle } from 'lucide-react'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { STUDY_MATERIAL_TABLE } from '@/configs/schema'
 import { db } from '@/configs/db'
@@ -68,11 +68,11 @@ function Create() {
      
         if (!formData.topic || !formData.difficultyLevel) {
             console.log('err')
-            toast.error("Please fill in all required fields.");
+            showErrorToast.error("Please fill in all required fields.");
             return; // Stop execution
         }
         if (!pdfFile && !formData.comment) {
-            toast.error("Please provide either a PDF file or text.");
+            showErrorToast.error("Please provide either a PDF file or text.");
             return;
         }
         setLoading(true);
@@ -131,7 +131,7 @@ function Create() {
         // else {
             // MAKE AN API TO INSERT DATA
             if(userDetails?.remainingCredits - 1 < 0){
-                toast('You do not have enough credits!')
+                showErrorToast('You do not have enough credits!')
             } else {
                 const resp = await axios.post('/api/insert-new-study',{
                     courseType: formData.studyType,
@@ -150,6 +150,46 @@ function Create() {
         console.log(data?.courseType)
         GenerateCourseOutline()
     },[data])
+
+    const showSuccessToast = (message) => {
+        toast(
+          <div className="flex items-center gap-2">
+            <div className="bg-green-100 p-2 rounded-full">
+              <CheckCircle className="w-5 h-5 text-green-500" />
+            </div>
+            <span>{message}</span>
+          </div>,
+          {
+            style: {
+              background: 'linear-gradient(to right, #f0fdf4, #dcfce7)',
+              border: '1px solid #86efac',
+              color: '#166534',
+              borderRadius: '0.5rem',
+            },
+            duration: 3000,
+          }
+        );
+      };
+      
+      const showErrorToast = (message) => {
+        toast(
+          <div className="flex items-center gap-2">
+            <div className="bg-red-100 p-2 rounded-full">
+              <XCircle className="w-5 h-5 text-red-500" />
+            </div>
+            <span>{message}</span>
+          </div>,
+          {
+            style: {
+              background: 'linear-gradient(to right, #fef2f2, #fee2e2)',
+              border: '1px solid #fca5a5',
+              color: '#b91c1c',
+              borderRadius: '0.5rem',
+            },
+            duration: 3000,
+          }
+        );
+      };
 
     const GenerateCourseOutline = async () => {
         setLoading(true);
@@ -173,7 +213,7 @@ function Create() {
                     // Send the POST request
                     const res = await axios.post('/api/generate-course-outline', payload);
                     console.log("Response from API:", res.data);
-                    toast("Your course content is generating...")
+                    showSuccessToast("Your course content is generating...")
                     router.replace('/dashboard')
                 
             }
@@ -189,7 +229,7 @@ function Create() {
         
                 const res = await axios.post('/api/generate-practice-questions', practicePayload);
                 console.log("Response from API:", res.data);
-                toast("Your practice questions are generating...");
+                showSuccessToast("Your practice questions are generating...");
                 router.replace('/dashboard')
             }
             else if(data?.courseType == 'Exam'){
@@ -203,7 +243,7 @@ function Create() {
                 }
                 const res = await axios.post('/api/generate-exam',examPayload)
                 console.log("Response from API:", res.data);
-                toast("Your exam is generating...");
+                showSuccessToast("Your exam is generating...");
                 router.replace('/dashboard')
             }
     

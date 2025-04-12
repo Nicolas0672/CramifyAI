@@ -1,6 +1,6 @@
 "use client";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { Loader2Icon, Trash } from "lucide-react";
+import { CheckCircle, Loader2Icon, Trash } from "lucide-react";
 import { SidebarContext } from '@/app/SidebarContext';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -14,10 +14,50 @@ import toast from "react-hot-toast";
 function CourseCardItem({ course, index, mode, status, setCourses }) {
   const { isSidebarExpanded } = useContext(SidebarContext);
   const [loading, setLoading] = useState(false)
+
+  const showSuccessToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-green-100 p-2 rounded-full">
+          <CheckCircle className="w-5 h-5 text-green-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #f0fdf4, #dcfce7)',
+          border: '1px solid #86efac',
+          color: '#166534',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+  
+  const showErrorToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-red-100 p-2 rounded-full">
+          <XCircle className="w-5 h-5 text-red-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #fef2f2, #fee2e2)',
+          border: '1px solid #fca5a5',
+          color: '#b91c1c',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
   const DeleteCourseContent = async () => {
     setCourses((prevCourse) => prevCourse.filter((c) => c.courseId !== course?.courseId))
     console.log(course?.courseId + mode)
-    toast('Course has been deleted')
+    showSuccessToast('Course has been deleted')
     const res = await axios.delete('/api/delete-content', {
       data: { // Pass data in the 'data' property
         courseId: course?.courseId,

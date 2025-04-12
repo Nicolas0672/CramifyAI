@@ -6,6 +6,7 @@ import { useCourse } from './CourseIdProvider';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast'; // Make sure this import is added
 import { useUser } from '@clerk/nextjs';
+import { ArrowRight, CheckCircle, XCircle } from 'lucide-react';
 
 const LearningProgressStepper = ({ currentMode }) => {
   const { setMode, currentModes } = useLearningMode();
@@ -28,13 +29,25 @@ const LearningProgressStepper = ({ currentMode }) => {
   ];
   const router = useRouter();
   const { user, isLoaded } = useUser();
-
+  const [showIntroOverlay, setShowIntroOverlay] = useState(false);
   useEffect(() => {
     if (!isLoaded || !user || !course?.courseId) return;
   
     GetUserDetails();
     CheckExist();
   }, [isLoaded, user, course?.courseId]);
+
+  useEffect(() => {
+    const hasSeenIntro = localStorage.getItem('cramsmartCourseIntroSeen') === 'true';
+    if (!hasSeenIntro) {
+      setShowIntroOverlay(true);
+    }
+  }, []);
+
+  const dismissOverlay = () => {
+    setShowIntroOverlay(false);
+    localStorage.setItem('cramsmartCourseIntroSeen', 'true');
+  };
   
   const GetUserDetails=async()=>{
     const res = await axios.post('/api/check-new-member',{
@@ -44,6 +57,66 @@ const LearningProgressStepper = ({ currentMode }) => {
  
 
   }
+
+  const showRedirectToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-green-100 p-2 rounded-full">
+          <ArrowRight className="w-5 h-5 text-green-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #ecfdf5, #d1fae5)',
+          border: '1px solid #6ee7b7',
+          color: '#065f46',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+
+  const showSuccessToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-green-100 p-2 rounded-full">
+          <CheckCircle className="w-5 h-5 text-green-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #f0fdf4, #dcfce7)',
+          border: '1px solid #86efac',
+          color: '#166534',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+  
+  const showErrorToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-red-100 p-2 rounded-full">
+          <XCircle className="w-5 h-5 text-red-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #fef2f2, #fee2e2)',
+          border: '1px solid #fca5a5',
+          color: '#b91c1c',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
 
 
 
@@ -69,7 +142,7 @@ const LearningProgressStepper = ({ currentMode }) => {
       if(userDetails?.remainingCredits - 2  >= 0){
         setLoading(true);
         setLoadingMode(mode); // Set which mode is currently loading
-        toast('Content is generating...');
+        showSuccessToast('Content is generating...');
         const summary = await GetModeDetails(lastMode);
         const topic = await GetModeTopics(lastMode)
         console.log(summary);
@@ -95,10 +168,10 @@ const LearningProgressStepper = ({ currentMode }) => {
   
         const res = await axios.post('/api/vapi/generate', payload);
         console.log(res.data);
-        toast('Redirecting...')
+        showRedirectToast('Redirecting...')
         router.push('/teach-me/' + course?.courseId);
       } else {
-        toast('Insufficient Credit')
+        showErrorToast('Insufficient Credit')
       }
      
 
@@ -106,7 +179,7 @@ const LearningProgressStepper = ({ currentMode }) => {
       if(userDetails?.remainingCredits - 1 >= 0){
         setLoading(true);
         setLoadingMode(mode); // Set which mode is currently loading
-        toast('Content is generating...');
+        showSuccessToast('Content is generating...');
         const summary = await GetModeDetails(lastMode);
         const topic = await GetModeTopics(lastMode)
         console.log(summary);
@@ -132,10 +205,10 @@ const LearningProgressStepper = ({ currentMode }) => {
   
         const res = await axios.post('/api/generate-course-outline', payload);
         console.log(res.data);
-        toast('Redirecting...')
+        showRedirectToast('Redirecting...')
         router.push('/course/' + course?.courseId);
       } else {
-        toast('Insufficient Credit')
+        showErrorToast('Insufficient Credit')
       }
       
 
@@ -143,7 +216,7 @@ const LearningProgressStepper = ({ currentMode }) => {
       if(userDetails?.remainingCredits - 1 >= 0){
         setLoading(true);
         setLoadingMode(mode); // Set which mode is currently loading
-        toast('Content is generating...');
+        showSuccessToast('Content is generating...');
         const summary = await GetModeDetails(lastMode);
         const topic = await GetModeTopics(lastMode)
         console.log(summary);
@@ -169,10 +242,10 @@ const LearningProgressStepper = ({ currentMode }) => {
   
         const res = await axios.post('/api/generate-practice-questions', payload);
         console.log(res.data);
-        toast('Redirecting...')
+        showRedirectToast('Redirecting...')
         router.push('/quiz/' + course?.courseId);
       } else {
-        toast('Insufficient Credit')
+        showErrorToast('Insufficient Credit')
       }
   
 
@@ -180,7 +253,7 @@ const LearningProgressStepper = ({ currentMode }) => {
       if(userDetails?.remainingCredits - 1 >= 0){
         setLoading(true);
         setLoadingMode(mode); // Set which mode is currently loading
-        toast('Content is generating...');
+        showSuccessToast('Content is generating...');
         const summary = await GetModeDetails(lastMode);
         const topic = await GetModeTopics(lastMode)
         console.log(summary);
@@ -207,10 +280,10 @@ const LearningProgressStepper = ({ currentMode }) => {
   
         const res = await axios.post('/api/generate-exam', payload);
         console.log(res.data);
-        toast('Redirecting...')
+        showRedirectToast('Redirecting...')
         router.push('/exam/' + course?.courseId);
       } else {
-        toast('Insufficient Credit')
+        showErrorToast('Insufficient Credit')
       }
     
     }
@@ -325,15 +398,121 @@ const LearningProgressStepper = ({ currentMode }) => {
   // Calculate progress percentage (0% for teach, 33% for study, 66% for practice, 100% for exam)
   const progressWidth = currentModeIndex > 0 ? ((currentModeIndex) / (modes.length - 1)) * 100 : 0;
 
+  const shimmerStyles = `
+  @keyframes subtle-diamond-shine {
+    0% {
+      background-position: -100% 0;
+    }
+    25% {
+      background-position: 0% 0;
+    }
+    50% {
+      background-position: 100% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .diamond-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .diamond-shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(
+      90deg, 
+      rgba(255,255,255,0) 0%, 
+      rgba(255,255,255,0.15) 25%, 
+      rgba(255,255,255,0.3) 30%, 
+      rgba(255,255,255,0.15) 35%, 
+      rgba(255,255,255,0) 60%
+    );
+    background-size: 200% 100%;
+    animation: subtle-diamond-shine 4s linear infinite;
+    pointer-events: none;
+    border-radius: 50%; /* Ensure the shine respects the circle shape */
+  }
+`;
+
+const calloutStyles = `
+  /* Enhanced pulse effect for ALL circles */
+  .diamond-shimmer {
+    animation: circle-pulse 4s infinite;
+  }
+  
+  @keyframes circle-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.3);
+  }
+  40% {
+    box-shadow: 0 0 0 12px rgba(124, 58, 237, 0.2);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(124, 58, 237, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
+  }
+}
+  
+  /* Different pulse timing for each circle to create a wave effect */
+.diamond-shimmer:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.diamond-shimmer:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+.diamond-shimmer:nth-child(3) {
+  animation-delay: 1.2s;
+}
+
+.diamond-shimmer:nth-child(4) {
+  animation-delay: 1.4s;
+}
+  /* Fallback enhancement for when mode isn't generated */
+  .mode-not-generated .diamond-shimmer {
+    animation-duration: 6s;
+    animation: circle-pulse-enhanced 6s infinite;
+  }
+  
+  @keyframes circle-pulse-enhanced {
+    0% {
+      box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.6);
+    }
+    30% {
+      box-shadow: 0 0 0 14px rgba(124, 58, 237, 0.4);
+    }
+    60% {
+      box-shadow: 0 0 0 20px rgba(124, 58, 237, 0.2);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
+    }
+  }
+`;
+
+
+
   return (
     <div className="w-full max-w-3xl mx-auto mb-10">
+       <style>{shimmerStyles}</style>
+       <style>{calloutStyles}</style>
       {/* Top label showing current mode */}
       <div className="text-center mb-4">
         <motion.span
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-sm font-medium text-indigo-500 bg-indigo-50 px-4 py-1 rounded-full"
+          className="text-m font-medium text-indigo-500 bg-indigo-50 px-4 py-1 rounded-full"
         >
           Learning Mode: {modes[currentIndex]?.label || 'Not Started'}
         </motion.span>
@@ -354,76 +533,75 @@ const LearningProgressStepper = ({ currentMode }) => {
 
         {/* Step circles */}
         <div className="relative flex justify-between">
-          {modes.map((mode, index) => {
-            const isCompleted = index <= currentIndex && generatedModes[mode.id];
-            const isActive = index === currentIndex;
-            const isGenerated = generatedModes[mode.id];
-            const isLoading = loadingMode === mode.id && loading;
+        {modes.map((mode, index) => {
+          const isCompleted = index <= currentIndex && generatedModes[mode.id];
+          const isActive = index === currentIndex;
+          const isGenerated = generatedModes[mode.id];
+          const isLoading = loadingMode === mode.id && loading;
 
-            return (
-              <div key={mode.id} className="flex flex-col items-center">
-                {/* Circle */}
-                <motion.div
-                  initial={{ scale: 0.8 }}
-                  animate={{
-                    scale: isActive ? 1.2 : 1,
-                    boxShadow: isActive ? '0 0 0 4px rgba(99, 102, 241, 0.2)' : 'none',
-                    rotate: isLoading ? 360 : 0,
-                  }}
-                  transition={{
-                    rotate: isLoading ? { repeat: Infinity, duration: 1, ease: "linear" } : { duration: 0 }
-                  }}
-                  whileHover={{ scale: 1.1, cursor: 'pointer' }}
-                  onClick={() => !loading && handleStepClick(mode)}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center z-10 transition-colors ${
-                    isLoading
-                      ? 'bg-indigo-300 text-white'
-                      : isActive
-                        ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-                        : isGenerated
-                          ? 'bg-indigo-400 text-white'
-                          : isCompleted
-                            ? 'bg-gradient-to-r from-indigo-300 to-purple-400 text-white'
-                            : 'bg-white border-2 border-gray-200 text-gray-400'
-                  }`}
-                >
-                  {isLoading ? (
-                    <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  ) : isActive || isGenerated || isCompleted ? (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                  ) : (
-                    index + 1
-                  )}
-                </motion.div>
-
-                {/* Label */}
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 + (index * 0.1) }}
-                  className={`mt-2 text-sm font-medium ${
-                    isActive
-                      ? 'text-indigo-600 font-semibold'
+          return (
+            <div key={mode.id} className="flex flex-col items-center">
+              {/* Circle - diamond-shimmer class applied to ALL circles */}
+              <motion.div
+                initial={{ scale: 0.8 }}
+                animate={{
+                  scale: isActive ? 1.2 : 1,
+                  boxShadow: isActive ? '0 0 0 4px rgba(99, 102, 241, 0.2)' : 'none',
+                  rotate: isLoading ? 360 : 0,
+                }}
+                transition={{
+                  rotate: isLoading ? { repeat: Infinity, duration: 1, ease: "linear" } : { duration: 0 }
+                }}
+                whileHover={{ scale: 1.1, cursor: 'pointer' }}
+                onClick={() => !loading && handleStepClick(mode)}
+                className={`w-10 h-10 rounded-full flex items-center justify-center z-10 transition-colors diamond-shimmer ${
+                  isLoading
+                    ? 'bg-indigo-300 text-white'
+                    : isActive
+                      ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
                       : isGenerated
-                        ? 'text-indigo-500'
+                        ? 'bg-indigo-400 text-white'
                         : isCompleted
-                          ? 'text-gray-600'
-                          : 'text-gray-400'
-                  }`}
-                >
-                  {mode.label}
-                </motion.span>
-              </div>
-            );
-          })}
-        </div>
+                          ? 'bg-gradient-to-r from-indigo-300 to-purple-400 text-white'
+                          : 'bg-white border-2 border-gray-200 text-gray-400'
+                }`}
+              >
+                {isLoading ? (
+                  <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : isActive || isGenerated || isCompleted ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                ) : (
+                  index + 1
+                )}
+              </motion.div>
+
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 + (index * 0.1) }}
+                className={`mt-2 text-sm font-medium ${
+                  isActive
+                    ? 'text-indigo-600 font-semibold'
+                    : isGenerated
+                      ? 'text-indigo-500'
+                      : isCompleted
+                        ? 'text-gray-600'
+                        : 'text-gray-400'
+                }`}
+              >
+                {mode.label}
+              </motion.span>
+            </div>
+          );
+        })}
       </div>
     </div>
+  </div>
   );
 };
 

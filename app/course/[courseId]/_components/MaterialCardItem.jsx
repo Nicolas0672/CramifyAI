@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion'; // For animations
-import { ArrowRight, RefreshCcw, Sparkles } from 'lucide-react'; // Modern icon
+import { ArrowRight, CheckCircle, RefreshCcw, Sparkles } from 'lucide-react'; // Modern icon
 import axios from 'axios';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -36,7 +36,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
       if(res.data.status == 'Ready'){
         setLoading(false)
         await refreshData();
-        toast('Your content is ready to view');
+        showSuccessToast('Your content is ready to view');
         break;
       }
       await new Promise((res)=> setTimeout(res, 2000))
@@ -46,8 +46,48 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
     setLoading(false)
   }
 
+  const showSuccessToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-green-100 p-2 rounded-full">
+          <CheckCircle className="w-5 h-5 text-green-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #f0fdf4, #dcfce7)',
+          border: '1px solid #86efac',
+          color: '#166534',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+  
+  const showErrorToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-red-100 p-2 rounded-full">
+          <XCircle className="w-5 h-5 text-red-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #fef2f2, #fee2e2)',
+          border: '1px solid #fca5a5',
+          color: '#b91c1c',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+
   const GenerateContent = async () => {
-    toast('Generating content');
+    showSuccessToast('Generating content');
     setLoading(true);
     const chapters = course?.aiResponse?.chapters
 

@@ -5,7 +5,7 @@ import { MathJax, MathJaxContext } from 'better-react-mathjax'
 import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import ExamPage from '../_components/ExamPage'
-import { ArrowRight, CheckCircle, Clock, CheckCircle, XCircle, BrainCircuit } from 'lucide-react'
+import { ArrowRight, CheckCircle, Clock,  XCircle, BrainCircuit } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 function ExamStart() {

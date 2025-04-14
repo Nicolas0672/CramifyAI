@@ -32,32 +32,27 @@ const user = await client.users.getUser(userId)
         }
 
         const prompt = `
-    Generate 5 **fill-in-the-blank** on Topic: ${topic}, ContentType: ${courseLayout}, DifficultyLevel: ${difficultyLevel} questions  
-    Ensure the question has **only one correct answer**. Provide the correct answer separately.
+   
+IMPORTANT: Each question MUST contain exactly one blank space represented by "____" (four underscores) where the answer would go.
 
-    Requirements:
-    - Keep the question concise but clear.
-    - Ensure only **one** word, phrase, or number is missing.
-    - If it's a **math question**, format the question using LaTeX syntax and return it as a **string** that can be rendered with MathJax.
-    - The correct answer should also be formatted properly but kept as a plain string.
-    - Format the response as an array of objects with the structure below:
-    -ENSURE THAT QUESTION ONLY CONTAINS QUESTION AND ANSWER ONLY CONTAINS ANSWER. DO NOT PUT ANYTHING ELSE IN THE FORMAT. PLEASE USE REFERENCE BELOW
-    Example Output:
-    [
-      {
-        "question": "The capital of France is ____.",
-        "answer": "Paris"
-      },
-      {
-        "question": "Water boils at ____ degrees Celsius.",
-        "answer": "100"
-      },
-      {
-        "question": "Solve for x: \\( 2x + 3 = 7 \\), so \\( x = \\) ____",
-        "answer": "2"
-      },
-      ...
-    ]
+Requirements:
+- Keep questions concise but clear
+- Each question must include exactly one "____" placeholder where the answer belongs
+- The correct answer should be ONE specific word, phrase, or number
+- Format the response as an array of objects with this structure:
+
+[
+  {
+    "question": "The capital of France is ____.",
+    "answer": "Paris"
+  },
+  {
+    "question": "Water boils at ____ degrees Celsius.",
+    "answer": "100"
+  }
+]
+
+DO NOT PROVIDE ANY ADDITIONAL TEXT. ENSURE EACH QUESTION CONTAINS THE ____ PLACEHOLDER.
 `
 
 

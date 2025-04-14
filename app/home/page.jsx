@@ -422,11 +422,11 @@ const CramSmartLandingPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
               >
-                <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
-                    <AnimatedText />
-                  </span>
-                </h1>
+<h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+  <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 block h-32 md:h-40">
+    <AnimatedText />
+  </span>
+</h1>
 
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-800">
                   Your AI Study Partner
@@ -436,7 +436,7 @@ const CramSmartLandingPage = () => {
                   CramSmart doesn't waste your time with what you already know. It detects your weak points, challenges you to explain them, and helps you improve through focused feedback and interaction.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-row  gap-4">
                   <Link href="/sign-up">
                     <button 
                     onClick={handleGetStarted}

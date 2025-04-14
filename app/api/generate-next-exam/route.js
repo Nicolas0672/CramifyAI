@@ -49,8 +49,14 @@ const user = await client.users.getUser(userId)
         // Generate AI feedback
         let aiResp;
         try {
-            const prompt = `
-Based on the student's answer: "${userAns}", the difficulty level: "${difficultyLevel}", and the question: "${question}", please assume the role of a professional educator grading the student's response. If the answer is correct, it's a 10/10; if it is partially correct, grade lightly. You are more interested in the result than the process.
+            const prompt = `Based on the student's answer: "${userAns}", the difficulty level: "${difficultyLevel}", and the question: "${question}", please assume the role of a professional educator grading the student's response.
+
+GRADING RULES:
+- Correct answer: 10/10
+- Partially correct answer: 5-9/10 (depending on how close)
+- Completely incorrect answer: 0-4/10
+- Responses like "idk", "I don't know", or clearly off-topic answers: MAXIMUM 4/10
+- For math questions: Only award 10/10 if the final numerical answer is EXACTLY correct (including units if applicable)
 
 Your response MUST be a **100% valid, parseable JSON object** with the **exact** following structure:
 
@@ -69,16 +75,13 @@ CRITICAL FORMATTING RULES FOR JSON OUTPUT:
 2. **STRING FORMATTING**:
    - Use double quotes (") for ALL strings and property names
    - NEVER use single quotes (') anywhere in the JSON
-   - Escape all special characters within strings: \" for quotes, \\ for backslashes, \n for newlines
+   - Escape all special characters within strings: \\" for quotes, \\\\ for backslashes, \\n for newlines
 
 3. **MATHEMATICAL NOTATION**:
-   Use double backslashes (\\) for LaTeX commands (e.g., \\alpha for α, \\frac{x}{y} for fractions).
-
-Avoid using triple backslashes (\\\\) unless required by JavaScript string escaping rules. Only use \\ inside LaTeX expressions.
-
-Ensure LaTeX commands are written correctly and don't have extra spaces or escapes (e.g., use \\frac{x}{y}, not \\ frac{x}{y}).
-
-Test expressions to verify they render correctly with MathJax.
+   Use double backslashes (\\\\) for LaTeX commands (e.g., \\\\alpha for α, \\\\frac{x}{y} for fractions).
+   Avoid using triple backslashes (\\\\\\\\) unless required by JavaScript string escaping rules. Only use \\\\ inside LaTeX expressions.
+   Ensure LaTeX commands are written correctly and don't have extra spaces or escapes (e.g., use \\\\frac{x}{y}, not \\\\ frac{x}{y}).
+   Test expressions to verify they render correctly with MathJax.
    
 4. **STRUCTURAL INTEGRITY**:
    - NO line breaks within string values
@@ -102,8 +105,7 @@ Test expressions to verify they render correctly with MathJax.
    - After generating JSON, mentally parse it to confirm validity
    - If any question about validity arises, rewrite the problematic section
 
-Return only the JSON object. Any response that does not meet these criteria must be corrected automatically before returning.
-`;
+Return only the JSON object. Any response that does not meet these criteria must be corrected automatically before returning.`;
             aiResp = await GenerateNextQuestion.sendMessage(prompt);
         } catch (err) {
             console.error("Error generating AI response:", err);

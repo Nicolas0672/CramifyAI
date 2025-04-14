@@ -24,11 +24,23 @@ function ViewExamFeedback() {
     setMode('exam')
   }, [courseId])
 
-  const GetFeedbackData = async()=>{
-    const res = await axios.get(`/api/get-feedback?courseId=${courseId}`)
-    setFeedbackDetails(res.data.result)
-    console.log(res.data.result)
-  }
+  const GetFeedbackData = async () => {
+    try {
+      const res = await axios.get(`/api/get-feedback?courseId=${courseId}`);
+      const result = res.data.result;
+      console.log("Fetched data:", result);
+      
+      if (result && result.length > 0) {
+        setFeedbackDetails(result);
+        setCourse(result[0]); // Set course with the first item once we have data
+        triggerConfetti(); // Move confetti trigger here as well
+      } else {
+        console.log("No feedback data returned or empty array");
+      }
+    } catch (error) {
+      console.error("Error fetching feedback data:", error);
+    }
+  };
 
   function triggerConfetti() {
     confetti({
@@ -38,10 +50,7 @@ function ViewExamFeedback() {
     });
   }
 
-  useEffect(()=>{
-    setCourse(feedbackDetails[0])
-    triggerConfetti()
-  },[feedbackDetails])
+ 
 
   
 

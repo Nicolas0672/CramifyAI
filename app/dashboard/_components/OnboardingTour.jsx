@@ -14,7 +14,7 @@ const OnboardingTour = ({ onComplete }) => {
     {
       selector: '#study-mode-tab',
       title: 'Study Mode 📖',
-      description: "Next up: Study Mode. We turn what you taught us into clean AI-generated notes and flashcards — everything you need to review fast."
+      description: "Next up: Study Mode. We turn what you taught us into clean AI-generated notes and flashcards — and we fill in the gaps based on what you missed or didn’t mention. Smart studying, tailored to you."
     },
     {
       selector: '#practice-mode-tab',
@@ -24,7 +24,7 @@ const OnboardingTour = ({ onComplete }) => {
     {
       selector: '#exam-mode-tab',
       title: 'Exam Mode ⏱️',
-      description: "Exam Mode. Simulate a real test with a timer and full exam structure. Perfect for crunch time."
+      description: "Exam Mode. Simulate a real test with a timer and full exam structure. The questions dynamically change based on your progress, keeping you sharp every time."
     },
     {
       selector: '#create-new-button',
@@ -32,6 +32,7 @@ const OnboardingTour = ({ onComplete }) => {
       description: "You're ready. Click here to create your first course and lock in your study flow 💪"
     }
   ];
+  
 
   // Scroll to and highlight the current element
   useEffect(() => {

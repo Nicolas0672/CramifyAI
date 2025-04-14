@@ -183,6 +183,24 @@ function ViewTeachFeedback() {
             </motion.div>
           )}
           
+          {/* Weakness Section */}
+          {teachFeedback.aiFeedback.weakness && (
+            <motion.div 
+              whileHover={{ y: -5 }}
+              className="bg-white p-6 rounded-3xl shadow-md border-2 border-red-100"
+            >
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-gradient-to-r from-red-400 to-pink-400 rounded-2xl mr-4 shadow-md">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-red-600">Areas to Improve</h3>
+              </div>
+              <p className="text-gray-600 leading-relaxed pl-4 border-l-2 border-red-100">{teachFeedback.aiFeedback.weakness}</p>
+            </motion.div>
+          )}
+          
           {/* Improvements Section */}
           {teachFeedback.aiFeedback.improvements && (
             <motion.div 

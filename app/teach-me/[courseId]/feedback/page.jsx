@@ -184,7 +184,7 @@ function ViewTeachFeedback() {
           )}
           
           {/* Weakness Section */}
-          {teachFeedback.aiFeedback.weakness && (
+          {teachFeedback.aiFeedback.weaknesses && (
             <motion.div 
               whileHover={{ y: -5 }}
               className="bg-white p-6 rounded-3xl shadow-md border-2 border-red-100"
@@ -197,7 +197,7 @@ function ViewTeachFeedback() {
                 </div>
                 <h3 className="text-xl font-bold text-red-600">Areas to Improve</h3>
               </div>
-              <p className="text-gray-600 leading-relaxed pl-4 border-l-2 border-red-100">{teachFeedback.aiFeedback.weakness}</p>
+              <p className="text-gray-600 leading-relaxed pl-4 border-l-2 border-red-100">{teachFeedback.aiFeedback.weaknesses}</p>
             </motion.div>
           )}
           

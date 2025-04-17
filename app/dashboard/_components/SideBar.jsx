@@ -197,7 +197,7 @@ const [dataLoaded, setDataLoaded] = useState(false);
     }
 
     if (!dataLoaded && res != null) {
-      console.log('set')
+  
       setDataLoaded(true);
       setInitialLoading(false);
       // Store timestamp of when data was first loaded
@@ -328,10 +328,10 @@ const [dataLoaded, setDataLoaded] = useState(false);
     setInitialLoading(false);
   }
 
-  GetCredits()
+  user&&GetCredits()
 
     const interval = setInterval(() => {
-      GetCredits(); // Fetch the latest credits from the DB
+      user&&GetCredits(); // Fetch the latest credits from the DB
     }, 5000); // Runs every 5 seconds
 
     return () => clearInterval(interval); // Cleanup interval when component unmounts

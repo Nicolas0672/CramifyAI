@@ -68,6 +68,18 @@ function ExamStart() {
     }
   }
 
+  useEffect(()=>{
+    if(course != null){
+      if(course?.exam_time == 0 || course?.questionCount >= 5){
+        showTimeUpToast('Exam is completed!')
+        router.push(`/exam/${courseId}/feedback`)
+        
+      }
+     
+    }
+    
+  },[userAnswer, course])
+
   // useEffect(()=>{
   //     const interval = setInterval(()=>{
   //         setElapstedTime((prev) => prev + 1)

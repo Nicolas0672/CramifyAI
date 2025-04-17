@@ -41,6 +41,7 @@ function ViewTeachMe() {
               questions={teachDetails?.question || ''} 
               topic={teachDetails?.topics?.courseTitle || ''} 
               courseId={teachDetails?.courseId}
+              progress={teachDetails?.progress || 10}
             />
           </div>
         </div>

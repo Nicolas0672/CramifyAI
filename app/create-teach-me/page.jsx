@@ -27,7 +27,7 @@ function CreateTeach() {
     <div className='mt-27'>
         
        
-        <AgentLayout userDetails={userDetails} isNewMember={isNewMember} userName={user?.name} userId={user?.primaryEmailAddress?.emailAddress} type="generate" question='' courseId='' topic=''/>
+        <AgentLayout userDetails={userDetails} isNewMember={isNewMember} userName={user?.name} userId={user?.primaryEmailAddress?.emailAddress} type="generate" question='' courseId='' topic='' progress={10}/>
     </div>
   )
 }

@@ -1,10 +1,20 @@
+"use client"
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion'; // For animations
 import {  BookOpen, Star, Brain, Zap, MessageSquare } from 'lucide-react'; // Fun icons
+import { useRouter } from 'next/navigation';
 
 function TeachIntroCard({course}) {
+
+  const router = useRouter()
+  useEffect(()=>{
+    if(course?.progress == 100 && course != null){
+      router.push(`/teach-me/${course?.courseId}/feedback`);
+    }
+  },[course])
+
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: { 

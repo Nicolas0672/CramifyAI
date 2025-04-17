@@ -7,13 +7,13 @@ import { useUser } from '@clerk/nextjs';
 import axios from 'axios';
 import { ArrowRight, CheckCircle, XCircle } from 'lucide-react';
 import Image from 'next/image'
-import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast';
 
 
 
-function AgentLayout({ userDetails,userName, userId, type, courseId, topic, questions, isNewMember }) {
+function AgentLayout({ progress ,userDetails,userName, userId, type, courseId, topic, questions, isNewMember }) {
   const CallStatus = {
     INACTIVE: "INACTIVE",
     CONNECTING: "CONNECTING",
@@ -25,8 +25,9 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
   const [avatar, setAvatar] = useState('')
   // New state for noise warning popup
   const [showNoiseWarning, setShowNoiseWarning] = useState(false);
- 
+  const MIN_DURATION_MS = 60000
 
+  
 
   const SavedMessage = {
     role: ['user', 'system', 'assistant'], // Possible roles
@@ -39,10 +40,16 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
 
   const [messages, setMessages] = useState([]);
   
+  
   // Timer state for vapi2 - starting from 5 minutes (300 seconds)
   const TIMER_START = 300; // 5 minutes in seconds
   const [timer, setTimer] = useState(TIMER_START);
   const [isTimerActive, setIsTimerActive] = useState(false);
+  const [startCall, setStartCall] = useState(false)
+  const pathname = usePathname();
+const searchParams = useSearchParams();
+const previousPathname = useRef(pathname);
+const latestMessagesRef = useRef(messages);
 
   const GetCourseTitle = async () => {
     const res = await axios.post('/api/courses', {
@@ -63,6 +70,10 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
       setAvatar('boy')
     } else { setAvatar('girl')}
   }, [user])
+
+  useEffect(() => {
+    latestMessagesRef.current = messages;
+  }, [messages]);
 
 
 
@@ -102,6 +113,7 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
 
     const onCallStart = () => {
       setCallStatus(CallStatus.ACTIVE);
+      setStartCall(true)
       // Start timer only for vapi2
       if (type !== 'generate') {
         setIsTimerActive(true);
@@ -230,6 +242,7 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
       showRedirectToast('Redirecting...')
   
       console.log(res.data)
+      
         router.push(`/teach-me/${res.data.courseId}/feedback`);
     
     } catch (error) {
@@ -264,6 +277,7 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
   const initiateCall = async () => {
     const createdBy = user?.primaryEmailAddress?.emailAddress;
     const username = user?.fullName;
+    setStartCall(true)
   
     showSuccessToast('Call has started');
     setCallStatus(CallStatus.CONNECTING);
@@ -308,12 +322,106 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
     }
   }
 
+  
+
+
+
+  useEffect(() => {
+    if (startCall && !sessionStorage.getItem('sessionStart')) {
+      sessionStorage.setItem('sessionStart', Date.now().toString());
+      console.log('Session started at:', Date.now());
+    }
+  }, [startCall]);
+  
+  // Helper function to determine if we should generate feedback
+  const shouldGenerateFeedback = () => {
+    const startTime = parseInt(sessionStorage.getItem('sessionStart') || '0', 10);
+    const duration = Date.now() - startTime;
+    
+    console.log('Current duration:', duration);
+    console.log('Session requirements check:', {
+      notGenerate: type !== 'generate',
+      hasStartCall: startCall,
+      messagesLength:  latestMessagesRef.current.length,
+      durationMet: duration >= MIN_DURATION_MS
+    });
+    
+    return (
+      type !== 'generate' &&
+      startCall &&
+      latestMessagesRef.current.length > 5 &&
+      duration >= MIN_DURATION_MS
+    );
+  };
+  
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (shouldGenerateFeedback()) {
+      
+        setCallStatus(CallStatus.FINISHED);
+        setIsTimerActive(false);
+        const blob = new Blob([JSON.stringify({
+          courseId: courseId,
+          createdBy: userId,
+          transcript: latestMessagesRef.current,
+          title: topic
+        })], {type: 'application/json'});
+        
+        navigator.sendBeacon('/api/generate-teach-feedback', blob);
+       
+        // Stop the appropriate VAPI instance based on the type
+        type === 'generate' ? vapi.stop() : vapi2.stop();
+        e.preventDefault();
+        e.returnValue = ''; // Required for confirmation dialog in some browsers
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [callStatus]);;
+
+
+
+  
+  useEffect(() => {
+    // Cleanup when component unmounts or page refreshes
+    return () => {
+      if (startCall) {
+        console.log('last useEffect call')
+        const shouldGenerate = shouldGenerateFeedback();
+        console.log('🤖 Should generate feedback on route change?', shouldGenerate);
+        
+        if (shouldGenerate) {
+          console.log('✅ All good! Generating feedback...');
+          handleGenerateFeedback(latestMessagesRef.current);
+        } else {
+          console.log('⛔️ Not generating feedback');
+        }
+        stopAIProcess(); // Stop the AI talking
+        sessionStorage.removeItem('sessionStart');
+        sessionStorage.removeItem('feedbackGenerated');
+      }
+    };
+  }, [callStatus]);
+  
+  const stopAIProcess = () => {
+    // Implement your logic to stop the AI here
+    type === 'generate' ? vapi.stop() : vapi2.stop(); // Adjust for your VAPI instances
+  };
+  
+
+
   const handleDisconnect = async () => {
     setCallStatus(CallStatus.FINISHED);
     setIsTimerActive(false);
     
     // Stop the appropriate VAPI instance based on the type
     type === 'generate' ? vapi.stop() : vapi2.stop();
+    sessionStorage.removeItem('sessionStart');
+    sessionStorage.removeItem('feedbackGenerated');
   }
 
   const latestMessage = messages[messages.length - 1]?.content;
@@ -487,27 +595,45 @@ function AgentLayout({ userDetails,userName, userId, type, courseId, topic, ques
           </div>
 
           {/* Call control buttons */}
-          <div className='w-full flex justify-center mt-2'>
-            {callStatus != 'CONNECTING' ? (
-              <Button onClick={handleCall} className='cursor-pointer px-6 py-2 bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-white font-medium'>
-                <span className='flex items-center'>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                  </svg>
-                  {callStatus === 'INACTIVE' || callStatus === 'FINISHED' ? 'Start Call' : '...'}
-                </span>
-              </Button>
-            ) : (
-              <Button onClick={handleDisconnect} className='cursor-pointer px-6 py-2 bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-white font-medium'>
-                <span className='flex items-center'>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                  End Call
-                </span>
-              </Button>
-            )}
-          </div>
+          {progress ? (
+  progress === 100 && type !== 'generate' ? null : (
+    <div className='w-full flex justify-center mt-2'>
+      {callStatus !== 'CONNECTING' ? (
+        <Button
+          onClick={handleCall}
+          className='cursor-pointer px-6 py-2 bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-white font-medium'
+        >
+          <span className='flex items-center'>
+            {/* SVG icon */}
+            {callStatus === 'INACTIVE' || callStatus === 'FINISHED' ? 'Start Call' : '...'}
+          </span>
+        </Button>
+      ) : (
+        <Button
+          onClick={handleDisconnect}
+          className='cursor-pointer px-6 py-2 bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-white font-medium'
+        >
+          <span className='flex items-center'>
+            {/* SVG icon */}
+            End Call
+          </span>
+        </Button>
+      )}
+    </div>
+  )
+) : (
+  // Optionally, render a loading indicator or placeholder here
+  <div className="w-full flex justify-center mt-2">
+  <div className="flex items-center space-x-1 text-sm text-gray-600 font-medium">
+    <span>Loading</span>
+    <span className="animate-bounce [animation-delay:-0.3s]">.</span>
+    <span className="animate-bounce [animation-delay:-0.15s]">.</span>
+    <span className="animate-bounce">.</span>
+  </div>
+</div>
+
+)}
+
         </div>
       </div>
     </>

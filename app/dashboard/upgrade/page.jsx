@@ -244,21 +244,7 @@ const ViewUpgrade = () => {
       </div>
 
       {/* Footer */}
-      <footer className="mt-24 border-t border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <h3 className="text-lg font-medium text-gray-900">Need Help?</h3>
-              <p className="text-gray-600">Our support team is here for you</p>
-            </div>
-            <div className="flex space-x-6">
-              <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Terms</a>
-              <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Privacy</a>
-              <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Support</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+     
     </div>
   );
 };

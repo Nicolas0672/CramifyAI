@@ -603,8 +603,8 @@ const [dataLoaded, setDataLoaded] = useState(false);
           }`}>
           {/* Logo with subtle animation */}
           <div className="relative">
-            <div className="absolute -inset-1 bg-indigo-400 rounded-full blur-md opacity-50 animate-pulse"></div>
-            <Image src={'/lg.png'} style={{ backgroundColor: 'transparent' }} color='black' alt='logo' width={40} height={40} className="relative drop-shadow-lg" />
+            <div className="absolute -inset-1  rounded-full blur-md opacity-50 animate-pulse"></div>
+            <Image src={'/lg.png'} style={{ backgroundColor: 'transparent' }} color='black' alt='logo' width={40} height={40}  />
           </div>
 
           {/* Title - only visible when expanded */}

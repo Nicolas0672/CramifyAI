@@ -270,7 +270,7 @@ const CramSmartLandingPage = () => {
     },
     {
       question: "Is CramSmart free to use?",
-      answer: "CramSmart offers a free tier that gives access to core features. For unlimited AI interactions, advanced analytics, and exam simulations, we offer affordable subscription plans designed specifically for students' budgets. Early adopters receive special pricing."
+      answer: "CramSmart gives you free access to the essentials. Need more AI sessions, detailed feedback, or mock exams? Just grab some credits — no subscription needed. Early users get bonus credits and exclusive perks!"
     },
     {
       question: "Does it work with college-level or AP courses?",

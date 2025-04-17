@@ -27,7 +27,19 @@ export default function RootLayout({ children }) {
   const authRoutes = ["/sign-in", "/sign-up", "/home", "/privacy-policy", "/terms-service", "/about-us"];
   
   // Check if the current path is an auth page
-  const isAuthPage = authRoutes.some(route => pathname.startsWith(route));
+  const isAuthPage = authRoutes.some(route => {
+    // For exact matches (like "/home")
+    if (pathname === route) {
+      return true;
+    }
+    
+    // For child routes with path boundary
+    if (pathname.startsWith(route + '/')) {
+      return true;
+    }
+    
+    return false;
+  });
   
   // Force sidebar visible for dashboard pages
   const isDashboardPage = pathname.includes('/dashboard');

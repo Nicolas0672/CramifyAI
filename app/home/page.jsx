@@ -437,7 +437,7 @@ const CramSmartLandingPage = () => {
                 </p>
 
                 <div className="flex flex-row  gap-4">
-                  <Link href="/sign-up">
+                  <Link href="/dashboard">
                     <button 
                     onClick={handleGetStarted}
                     className="cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all transform">

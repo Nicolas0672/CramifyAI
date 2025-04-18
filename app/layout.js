@@ -22,6 +22,9 @@ export default function RootLayout({ children }) {
   // Get the current URL path from the header set by middleware
   const headersList = headers();
   const pathname = headersList.get("x-pathname") || "/";
+
+  const searchParams = new URLSearchParams(headersList.get("x-search") || "");
+  const isFreshLoad = searchParams.get("fresh") === "true";
   
   // List of authentication routes where sidebar should be hidden
   const authRoutes = ["/sign-in", "/sign-up", "/home", "/privacy-policy", "/terms-service", "/about-us"];
@@ -43,7 +46,7 @@ export default function RootLayout({ children }) {
   
   // Force sidebar visible for dashboard pages
   const isDashboardPage = pathname.includes('/dashboard');
-  const showSidebar = isDashboardPage || !isAuthPage;
+  const showSidebar = isDashboardPage || (!isAuthPage && !(pathname === "/home" && isFreshLoad));
   
   return (
     <ClerkProvider>
@@ -60,7 +63,7 @@ export default function RootLayout({ children }) {
                     <div className="relative flex">
                       {/* Sidebar with proper handling - adding the dashboard condition */}
                       {showSidebar && (
-                        <div className="w-auto md:w-30 fixed h-auto md:h-screen top-0 left-0 z-40">
+                        <div className="w-auto md:min-w-30 fixed h-auto md:h-screen top-0 left-0 z-40">
                           {/* Only the actual sidebar content */}
                           <SideBar />
                         </div>

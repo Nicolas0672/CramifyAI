@@ -19,6 +19,16 @@ const middleware = (req, evt) => {
   
   // Add the current path as a header for server components to use
   response.headers.set('x-pathname', req.nextUrl.pathname);
+
+  response.headers.set('x-search', req.nextUrl.search);
+  
+  // Handle root redirect to /home
+  if (req.nextUrl.pathname === '/' || req.nextUrl.pathname === '') {
+    // When redirecting to home, add the fresh parameter
+    const homeUrl = new URL('/home', req.url);
+    homeUrl.searchParams.set('fresh', 'true');
+    return NextResponse.redirect(homeUrl);
+  }
   
   return response;
 };

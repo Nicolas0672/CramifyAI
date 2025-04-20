@@ -21,7 +21,7 @@ const outfit = Outfit({ subsets: ["latin"] });
 export default function RootLayout({ children }) {
   // Get the current URL path from the header set by middleware
   const headersList = headers();
-  const pathname = headersList.get("x-pathname") || "/";
+  const pathname =  headersList.get("x-pathname") || "/";
 
   const searchParams = new URLSearchParams(headersList.get("x-search") || "");
   const isFreshLoad = searchParams.get("fresh") === "true";

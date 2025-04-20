@@ -100,7 +100,7 @@ function TopicInput({ setFileName ,setTopic, setDifficultyLevel, setComment, han
             ) : (
                 <div className="mt-6">
                     <h2 className="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2">
-                        <PenTool size={20} className="text-blue-500" /> Type your content
+                        <PenTool size={20} className="text-blue-500" /> Type/Paste your content
                     </h2>
                     <Textarea
                         required

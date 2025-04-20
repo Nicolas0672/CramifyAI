@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 
 
 
-function AgentLayout({ progress ,userDetails,userName, userId, type, courseId, topic, questions, isNewMember }) {
+function AgentLayout({ progress, userDetails, userName, userId, type, courseId, topic, questions, isNewMember }) {
   const CallStatus = {
     INACTIVE: "INACTIVE",
     CONNECTING: "CONNECTING",
@@ -26,30 +26,31 @@ function AgentLayout({ progress ,userDetails,userName, userId, type, courseId, t
   // New state for noise warning popup
   const [showNoiseWarning, setShowNoiseWarning] = useState(false);
   const MIN_DURATION_MS = 60000
-
-  
-
-  const SavedMessage = {
-    role: ['user', 'system', 'assistant'], // Possible roles
-    content: "", // String content
-  };
+  const userClickRef = useRef(false);
   const router = useRouter()
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [userIsSpeaking, setUserIsSpeaking] = useState(false)
   const [callStatus, setCallStatus] = useState(CallStatus.INACTIVE);
 
   const [messages, setMessages] = useState([]);
-  
-  
+
+
   // Timer state for vapi2 - starting from 5 minutes (300 seconds)
   const TIMER_START = 300; // 5 minutes in seconds
   const [timer, setTimer] = useState(TIMER_START);
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [startCall, setStartCall] = useState(false)
   const pathname = usePathname();
-const searchParams = useSearchParams();
-const previousPathname = useRef(pathname);
-const latestMessagesRef = useRef(messages);
+  const searchParams = useSearchParams();
+  const previousPathname = useRef(pathname);
+  const latestMessagesRef = useRef(messages);
+  const [userClick, setUserClick] = useState(false)
+
+  const SavedMessage = {
+    role: ['user', 'system', 'assistant'], // Possible roles
+    content: "", // String content
+  };
+
 
   const GetCourseTitle = async () => {
     const res = await axios.post('/api/courses', {
@@ -61,14 +62,14 @@ const latestMessagesRef = useRef(messages);
       courseTitle: course.aiResponse.courseTitle
     }))
     setCourseTitle(courseTitle)
-   
+
   }
   useEffect(() => {
-    user&&GetCourseTitle()
- 
-    if(type == 'generate'){
+    user && GetCourseTitle()
+
+    if (type == 'generate') {
       setAvatar('boy')
-    } else { setAvatar('girl')}
+    } else { setAvatar('girl') }
   }, [user])
 
   useEffect(() => {
@@ -80,7 +81,7 @@ const latestMessagesRef = useRef(messages);
   // Timer effect for vapi2 - countdown from 5 minutes
   useEffect(() => {
     let interval = null;
-    
+
     if (isTimerActive && type !== 'generate') {
       interval = setInterval(() => {
         setTimer(seconds => {
@@ -97,7 +98,7 @@ const latestMessagesRef = useRef(messages);
     } else if (!isTimerActive) {
       clearInterval(interval);
     }
-    
+
     return () => clearInterval(interval);
   }, [isTimerActive, type]);
 
@@ -119,7 +120,7 @@ const latestMessagesRef = useRef(messages);
         setIsTimerActive(true);
       }
     }
-    
+
     const onCallEnd = () => {
       setCallStatus(CallStatus.FINISHED);
       // Stop timer
@@ -150,7 +151,7 @@ const latestMessagesRef = useRef(messages);
     const onSpeechEnd = () => setIsSpeaking(false)
 
     const onError = (err) => console.log('error', err)
-    
+
     // Use the appropriate VAPI instance for event listeners
     currentVapi.on('call=start', onCallStart)
     currentVapi.on('call-end', onCallEnd)
@@ -168,7 +169,7 @@ const latestMessagesRef = useRef(messages);
       currentVapi.off('speech-end', onSpeechEnd)
       currentVapi.off('error', onError)
     }
-  }, [type])  
+  }, [type])
 
   const showSuccessToast = (message) => {
     toast(
@@ -189,7 +190,7 @@ const latestMessagesRef = useRef(messages);
       }
     );
   };
-  
+
   const showErrorToast = (message) => {
     toast(
       <div className="flex items-center gap-2">
@@ -240,32 +241,33 @@ const latestMessagesRef = useRef(messages);
         title: topic
       });
       showRedirectToast('Redirecting...')
-  
+
       console.log(res.data)
-      
-        router.push(`/teach-me/${res.data.courseId}/feedback`);
-    
+
+      router.push(`/teach-me/${res.data.courseId}/feedback`);
+
     } catch (error) {
       console.error("Error generating feedback:", error);
-      router.push('/');
+      router.push('/dashboard');
     }
   };
 
   useEffect(() => {
-    if (callStatus === CallStatus.FINISHED){
-      if(type == 'generate'){
-        router.push('/')
+    if (callStatus === CallStatus.FINISHED) {
+      if (type == 'generate') {
+        router.push('/dashboard')
       }
-      else{
+      else {
         showSuccessToast('Your feedback is being generated...')
+        setUserClick(true)
         handleGenerateFeedback(messages)
       }
-    } 
+    }
   }, [messages, callStatus, type, userId])
 
   // Modified to show popup first, then connect call
   const handleCall = () => {
-    if(userDetails?.remainingCredits - 2 < 0){
+    if (userDetails?.remainingCredits - 2 < 0) {
       showErrorToast('You do not have enough credits!')
     } else {
       // Show the noise warning popup instead of immediately starting the call
@@ -278,19 +280,19 @@ const latestMessagesRef = useRef(messages);
     const createdBy = user?.primaryEmailAddress?.emailAddress;
     const username = user?.fullName;
     setStartCall(true)
-  
+
     showSuccessToast('Call has started');
     setCallStatus(CallStatus.CONNECTING);
     setShowNoiseWarning(false); // Hide the popup
-    
+
     // Reset timer when starting vapi2 call
     if (type !== 'generate') {
       setTimer(TIMER_START);
       setIsTimerActive(true);
     }
-    
-    if(type == 'generate') {
-      if(isNewMember) {
+
+    if (type == 'generate') {
+      if (isNewMember) {
         const response = await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
           variableValues: {
             username: user?.fullName,
@@ -322,42 +324,65 @@ const latestMessagesRef = useRef(messages);
     }
   }
 
-  
 
 
+  // Update the ref when state changes
+  useEffect(() => {
+    userClickRef.current = userClick;
+  }, [userClick]);
 
+  // Session timing setup (this stays the same)
   useEffect(() => {
     if (startCall && !sessionStorage.getItem('sessionStart')) {
-      sessionStorage.setItem('sessionStart', Date.now().toString());
-      console.log('Session started at:', Date.now());
+      const timestamp = Date.now().toString();
+      sessionStorage.setItem('sessionStart', timestamp);
+      console.log('Session started at:', timestamp);
     }
   }, [startCall]);
-  
-  // Helper function to determine if we should generate feedback
+
+  // Modified shouldGenerateFeedback to use ref instead of state
   const shouldGenerateFeedback = () => {
-    const startTime = parseInt(sessionStorage.getItem('sessionStart') || '0', 10);
-    const duration = Date.now() - startTime;
-    
-    console.log('Current duration:', duration);
+    // Check userClickRef instead of the state
+    if (userClickRef.current === true) {
+      return false;
+    }
+
+    const startTimeString = sessionStorage.getItem('sessionStart');
+    const startTime = startTimeString ? parseInt(startTimeString, 10) : null;
+
+    if (!startTime) {
+      console.log('No valid start time found');
+      return false;
+    }
+
+    const currentTime = Date.now();
+    const duration = currentTime - startTime;
+
+    console.log('Start time:', startTime);
+    console.log('Current time:', currentTime);
+    console.log('Current duration (ms):', duration);
+
     console.log('Session requirements check:', {
       notGenerate: type !== 'generate',
       hasStartCall: startCall,
-      messagesLength:  latestMessagesRef.current.length,
-      durationMet: duration >= MIN_DURATION_MS
+      messagesLength: latestMessagesRef.current.length,
+      durationMet: duration >= MIN_DURATION_MS,
+      userClick: userClickRef.current
     });
-    
+
     return (
       type !== 'generate' &&
       startCall &&
       latestMessagesRef.current.length > 5 &&
-      duration >= MIN_DURATION_MS
+      duration >= MIN_DURATION_MS &&
+      userClickRef.current === false
     );
   };
-  
+
+  // beforeUnload handler 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       if (shouldGenerateFeedback()) {
-      
         setCallStatus(CallStatus.FINISHED);
         setIsTimerActive(false);
         const blob = new Blob([JSON.stringify({
@@ -365,14 +390,13 @@ const latestMessagesRef = useRef(messages);
           createdBy: userId,
           transcript: latestMessagesRef.current,
           title: topic
-        })], {type: 'application/json'});
-        
+        })], { type: 'application/json' });
+
         navigator.sendBeacon('/api/generate-teach-feedback', blob);
-       
-        // Stop the appropriate VAPI instance based on the type
+
         type === 'generate' ? vapi.stop() : vapi2.stop();
         e.preventDefault();
-        e.returnValue = ''; // Required for confirmation dialog in some browsers
+        e.returnValue = '';
       }
     };
 
@@ -381,48 +405,51 @@ const latestMessagesRef = useRef(messages);
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [callStatus]);;
+  }, [callStatus]);
 
-
-
-  
+  // Cleanup effect without userClick as dependency
   useEffect(() => {
-    // Cleanup when component unmounts or page refreshes
     return () => {
       if (startCall) {
-        console.log('last useEffect call')
+        console.log('last useEffect call');
         const shouldGenerate = shouldGenerateFeedback();
         console.log('🤖 Should generate feedback on route change?', shouldGenerate);
-        
+
         if (shouldGenerate) {
           console.log('✅ All good! Generating feedback...');
           handleGenerateFeedback(latestMessagesRef.current);
         } else {
           console.log('⛔️ Not generating feedback');
         }
-        stopAIProcess(); // Stop the AI talking
+        stopAIProcess();
         sessionStorage.removeItem('sessionStart');
         sessionStorage.removeItem('feedbackGenerated');
       }
     };
-  }, [callStatus]);
-  
+  }, [startCall]); // Remove userClick dependency
+
   const stopAIProcess = () => {
     // Implement your logic to stop the AI here
     type === 'generate' ? vapi.stop() : vapi2.stop(); // Adjust for your VAPI instances
   };
-  
 
 
-  const handleDisconnect = async () => {
+
+  const handleDisconnect = () => {
+    // Update the ref immediately
+    userClickRef.current = true;
+    // Then update the state
+    setUserClick(true);
+
     setCallStatus(CallStatus.FINISHED);
     setIsTimerActive(false);
-    
-    // Stop the appropriate VAPI instance based on the type
+
     type === 'generate' ? vapi.stop() : vapi2.stop();
     sessionStorage.removeItem('sessionStart');
     sessionStorage.removeItem('feedbackGenerated');
   }
+
+
 
   const latestMessage = messages[messages.length - 1]?.content;
   const isCallInactiveOrFinished = callStatus == CallStatus.INACTIVE || callStatus == CallStatus.FINISHED;
@@ -450,20 +477,20 @@ const latestMessagesRef = useRef(messages);
                 </div>
                 <h3 className="text-lg font-medium text-indigo-700">Prepare Your Environment</h3>
               </div>
-              
+
               <p className="text-gray-600 mb-6">
                 Please ensure your surroundings are free from noise for the best call experience. Find a quiet space and check that your microphone is working properly.
               </p>
-              
+
               <div className="flex justify-between space-x-3">
-                <button 
-                  onClick={() => setShowNoiseWarning(false)} 
+                <button
+                  onClick={() => setShowNoiseWarning(false)}
                   className="flex-1 px-4 py-2 bg-white hover:bg-gray-50 text-indigo-500 rounded-lg border border-indigo-200 transition duration-200 shadow-sm"
                 >
                   Cancel
                 </button>
-                <button 
-                  onClick={initiateCall} 
+                <button
+                  onClick={initiateCall}
                   className="flex-1 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg transition duration-200 shadow-md"
                 >
                   Proceed
@@ -480,18 +507,18 @@ const latestMessagesRef = useRef(messages);
               <div className='absolute inset-0 bg-white/10'></div>
               <div className='avatar z-10 transform transition-all duration-300 hover:scale-105'>
                 <div className='p-3 bg-white bg-opacity-70 rounded-full border border-blue-200 shadow-md'>
-                  {avatar=='boy'?<Image
+                  {avatar == 'boy' ? <Image
                     src='/image-generate.jpg'
                     alt="vapi"
                     width={150}
                     height={130}
                     className='object-cover rounded-full'
-                  />: <Image
-                  src='/thumbnail.png'
-                  alt="vapi"
-                  width={150}
-                  height={130}
-                  className='object-cover rounded-full'/>}
+                  /> : <Image
+                    src='/thumbnail.png'
+                    alt="vapi"
+                    width={150}
+                    height={130}
+                    className='object-cover rounded-full' />}
                 </div>
               </div>
 
@@ -514,7 +541,7 @@ const latestMessagesRef = useRef(messages);
                   {isSpeaking ? 'Speaking' : 'Connected'}
                 </div>
               </div>
-              
+
               {/* Timer for vapi2 */}
               {type !== 'generate' && (callStatus === CallStatus.CONNECTING || callStatus === CallStatus.ACTIVE) && (
                 <div className={`absolute top-4 right-4 bg-white/80 px-3 py-1 rounded-full text-sm font-medium ${timer <= 60 ? 'text-red-600' : 'text-blue-600'}`}>
@@ -543,7 +570,7 @@ const latestMessagesRef = useRef(messages);
                     />
                   ) : (
                     <div className="w-28 h-28 bg-purple-100 rounded-full flex items-center justify-center text-purple-500 text-4xl font-semibold">
-                      {user?.emailAddress?.emailAddress?.charAt(0).toUpperCase() ?? "?"}
+                      {user?.primaryEmailAddress?.emailAddress?.charAt(0).toUpperCase() ?? "?"}
                     </div>
                   )}
                 </div>
@@ -576,7 +603,7 @@ const latestMessagesRef = useRef(messages);
             <div className='p-5 bg-gradient-to-r from-blue-50 to-purple-50'>
               <h3 className='text-center text-indigo-600 font-medium mb-3'>Conversation</h3>
               <div className='transcript-content bg-white/70 p-4 rounded-xl'>
-                <p 
+                <p
                   key={latestMessage}
                   className="
                     text-gray-700 
@@ -596,43 +623,43 @@ const latestMessagesRef = useRef(messages);
 
           {/* Call control buttons */}
           {progress ? (
-  progress === 100 && type !== 'generate' ? null : (
-    <div className='w-full flex justify-center mt-2'>
-      {callStatus !== 'CONNECTING' ? (
-        <Button
-          onClick={handleCall}
-          className='cursor-pointer px-6 py-2 bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-white font-medium'
-        >
-          <span className='flex items-center'>
-            {/* SVG icon */}
-            {callStatus === 'INACTIVE' || callStatus === 'FINISHED' ? 'Start Call' : '...'}
-          </span>
-        </Button>
-      ) : (
-        <Button
-          onClick={handleDisconnect}
-          className='cursor-pointer px-6 py-2 bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-white font-medium'
-        >
-          <span className='flex items-center'>
-            {/* SVG icon */}
-            End Call
-          </span>
-        </Button>
-      )}
-    </div>
-  )
-) : (
-  // Optionally, render a loading indicator or placeholder here
-  <div className="w-full flex justify-center mt-2">
-  <div className="flex items-center space-x-1 text-sm text-gray-600 font-medium">
-    <span>Loading</span>
-    <span className="animate-bounce [animation-delay:-0.3s]">.</span>
-    <span className="animate-bounce [animation-delay:-0.15s]">.</span>
-    <span className="animate-bounce">.</span>
-  </div>
-</div>
+            progress === 100 && type !== 'generate' ? null : (
+              <div className='w-full flex justify-center mt-2'>
+                {callStatus !== 'CONNECTING' ? (
+                  <Button
+                    onClick={handleCall}
+                    className='cursor-pointer px-6 py-2 bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-white font-medium'
+                  >
+                    <span className='flex items-center'>
+                      {/* SVG icon */}
+                      {callStatus === 'INACTIVE' || callStatus === 'FINISHED' ? 'Start Call' : '...'}
+                    </span>
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleDisconnect}
+                    className='cursor-pointer px-6 py-2 bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-white font-medium'
+                  >
+                    <span className='flex items-center'>
+                      {/* SVG icon */}
+                      End Call
+                    </span>
+                  </Button>
+                )}
+              </div>
+            )
+          ) : (
+            // Optionally, render a loading indicator or placeholder here
+            <div className="w-full flex justify-center mt-2">
+              <div className="flex items-center space-x-1 text-sm text-gray-600 font-medium">
+                <span>Loading</span>
+                <span className="animate-bounce [animation-delay:-0.3s]">.</span>
+                <span className="animate-bounce [animation-delay:-0.15s]">.</span>
+                <span className="animate-bounce">.</span>
+              </div>
+            </div>
 
-)}
+          )}
 
         </div>
       </div>

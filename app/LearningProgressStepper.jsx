@@ -11,12 +11,13 @@ import { ArrowRight, CheckCircle, XCircle } from 'lucide-react';
 const LearningProgressStepper = ({ currentMode }) => {
   const { setMode, currentModes } = useLearningMode();
   const { course } = useCourse();
-  const [generatedModes, setGeneratedModes] = useState({
-    teach: false,
-    study: false,
-    practice: false,
-    exam: false
-  });
+// Update the state structure to include both exists flag and data
+const [generatedModes, setGeneratedModes] = useState({
+  teach: { exists: false, data: null },
+  study: { exists: false, data: null },
+  practice: { exists: false, data: null },
+  exam: { exists: false, data: null }
+});
   const [loading, setLoading] = useState(false);
   const [loadingMode, setLoadingMode] = useState(null); // Track which mode is loading
   const [prevMode, setPrevMode] = useState();
@@ -32,7 +33,7 @@ const LearningProgressStepper = ({ currentMode }) => {
   const [showIntroOverlay, setShowIntroOverlay] = useState(false);
   useEffect(() => {
     if (!isLoaded || !user || !course?.courseId) return;
-  
+ 
     GetUserDetails();
     CheckExist();
   }, [isLoaded, user, course?.courseId]);
@@ -44,6 +45,10 @@ const LearningProgressStepper = ({ currentMode }) => {
     }
   }, []);
 
+ 
+
+
+
   const dismissOverlay = () => {
     setShowIntroOverlay(false);
     localStorage.setItem('cramsmartCourseIntroSeen', 'true');
@@ -54,10 +59,9 @@ const LearningProgressStepper = ({ currentMode }) => {
       createdBy: user?.primaryEmailAddress?.emailAddress
     })
     setUserDetails(res.data.res)
- 
-
   }
 
+ 
   const showRedirectToast = (message) => {
     toast(
       <div className="flex items-center gap-2">
@@ -127,6 +131,7 @@ const LearningProgressStepper = ({ currentMode }) => {
     const res = await axios.post('/api/check-exist', {
       courseId: course?.courseId
     });
+    console.log(res.data)
     setGeneratedModes(res.data);
    
   };
@@ -351,10 +356,12 @@ const LearningProgressStepper = ({ currentMode }) => {
 
     setPrevMode(lastMode); // Still update state for reference
     setMode(mode.id);
+    console.log(generatedModes)
 
-    if (generatedModes[mode.id]) {
+    if (generatedModes[mode.id].exists) {
       if (mode.id === 'teach') {
-        if(course?.progress >= 100){
+        console.log(generatedModes[mode.id]?.data?.progress)
+        if(generatedModes[mode.id]?.data?.progress >= 100){
           router.push('/teach-me/' + course?.courseId + '/feedback');
         } else {
           router.push('/teach-me/' + course?.courseId);
@@ -365,10 +372,10 @@ const LearningProgressStepper = ({ currentMode }) => {
       } else if (mode.id === 'study') {
         router.push('/course/' + course?.courseId);
       } else if (mode.id === 'exam') {
-        console.log(course?.questionCount)
-        console.log(course?.exam_time)
+        console.log(generatedModes[mode.id]?.data?.questionCount)
+        console.log(generatedModes[mode.id]?.data?.exam_time)
         console.log(course)
-        if(course?.questionCounts >= 5 || course?.exam_time == 0){
+        if(generatedModes[mode.id]?.data?.questionCount >= 5 || generatedModes[mode.id]?.data?.exam_time == 0){
           router.push('/exam/' + course?.courseId + '/feedback');
         } else {
           router.push('/exam/' + course?.courseId)
@@ -534,9 +541,9 @@ const calloutStyles = `
         {/* Step circles */}
         <div className="relative flex justify-between">
         {modes.map((mode, index) => {
-          const isCompleted = index <= currentIndex && generatedModes[mode.id];
+          const isCompleted = index <= currentIndex && generatedModes[mode.id].exists;
           const isActive = index === currentIndex;
-          const isGenerated = generatedModes[mode.id];
+          const isGenerated = generatedModes[mode.id].exists;
           const isLoading = loadingMode === mode.id && loading;
 
           return (

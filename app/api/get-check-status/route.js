@@ -17,16 +17,6 @@ export async function GET(req) {
 const user = await client.users.getUser(userId)
     const email = user.emailAddresses[0]?.emailAddress;
 
-    // Rate limiting check for the user (based on email)
-    // const { success } = await rateLimiter.limit(userId);  // Apply rate limiter
-
-    // if (!success) {
-    //     return NextResponse.json({
-    //         success: false,
-    //         message: "Rate limit exceeded. Please try again later.",
-    //     }, { status: 429 });  // HTTP 429 Too Many Requests
-    // }
-
     // Query the database for flashcard content based on recordId
     const res = await db.select().from(FLASHCARD_CONTENT).where(eq(FLASHCARD_CONTENT.id, recordId));
 

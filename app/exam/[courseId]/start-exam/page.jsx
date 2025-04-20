@@ -21,6 +21,12 @@ function ExamStart() {
 
   const { courseId } = useParams()
 
+  useEffect(() => {
+    if (window.MathJax) {
+      window.MathJax.typesetPromise();
+    }
+  }, []);
+
   // Fetch the first question and initialize timer
   useEffect(() => {
     GetExamQuestion()
@@ -205,7 +211,10 @@ const showTimeUpToast = (message) => {
 };
   
   const handleSave = async () => {
-
+    if(userAnswer.length == 0){
+      showErrorToast('Invalid Answer')
+      return;
+    }
     const resUpdate = await axios.post('/api/save-question', {
       courseId: course.courseId,
 
@@ -258,6 +267,10 @@ const showTimeUpToast = (message) => {
   }
   // Handle answer submission
   const handleSubmit = async () => {
+    if(userAnswer.length == 0){
+      showErrorToast('Invalid Answer')
+      return;
+    }
     if (questionCount >= 5) return;
     if(questionCount < 4){
       showThinkingToast('Deciding your next quesiton...')

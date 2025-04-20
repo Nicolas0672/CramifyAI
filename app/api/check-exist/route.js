@@ -69,10 +69,22 @@ export async function POST(req) {
 
     // Return the results as a JSON response
     return NextResponse.json({
-      teach: teachResult.length > 0,
-      study: studyResult.length > 0,
-      practice: practiceResult.length > 0,
-      exam: examResult.length > 0
+      teach: {
+        exists: teachResult.length > 0,
+        data: teachResult.length > 0 ? teachResult[0] : null
+      },
+      study: {
+        exists: studyResult.length > 0,
+        data: studyResult.length > 0 ? studyResult[0] : null
+      },
+      practice: {
+        exists: practiceResult.length > 0,
+        data: practiceResult.length > 0 ? practiceResult[0] : null
+      },
+      exam: {
+        exists: examResult.length > 0,
+        data: examResult.length > 0 ? examResult[0] : null
+      }
     });
 
   } catch (error) {

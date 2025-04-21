@@ -45,7 +45,9 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
       console.log('Check status')
       const res = await axios.get(`/api/get-note-status?courseId=${course?.courseId}`)
       if (res.data.status == 'Ready') {
+        setLoading(false)
         setNoteLoading(false)
+        await refreshData();
         showSuccessToast('Your content is ready to view')
         break
       }

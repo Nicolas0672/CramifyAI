@@ -39,25 +39,44 @@ const user = await client.users.getUser(userId)
     }
 
 
-    const prompt = `Pretend that you are a teacher giving a student an exam. Generate courseTitle, a courseSummary on what student will be tested on and a randomized question based on the following parameters:
+    const prompt = `As an expert teacher, create an assessment targeting learning weaknesses based on these parameters:
 
-    - Topic: ${topic}
-    - Course Layout: ${courseLayout}
-    - Difficulty Level: ${difficultyLevel}
-    - Time to complete the question: 5 minutes
-    
-    The question should require a **short or long answer** (no multiple choices) and should challenge the student but be solvable within 5 minutes. Only the final answer is required (no steps or intermediate reasoning needed).
-    
-    For **math-related questions**:
-    - Provide the complete problem without breaking it into steps.
-    - Ensure that the answer is the final result, and use LaTeX formatting for rendering.
-    
-    Example:
-    
-    {
-      "question": "A particle's position in space is given by the vector function $\\mathbf{r}(t) = \\langle \\cos(t^2), \\sin(t^2), t \\rangle$. Find the magnitude of the particle's acceleration vector at time $t = \\sqrt{\\frac{\\pi}{2}}$.",
-      "answer": "2\\sqrt{1 + \\pi^2}"
-    }`
+- Topic: ${topic}
+- Course Layout: ${courseLayout}
+- Difficulty Level: ${difficultyLevel}
+- Time to complete: 5 minutes
+
+ASSESSMENT DEVELOPMENT PROCESS:
+1. First, analyze ${courseLayout} to identify potential knowledge gaps, challenging concepts, or areas where students typically struggle
+2. Focus your question on these identified weak areas to provide targeted assessment and learning
+3. Design a question that tests understanding of fundamental concepts rather than memorization
+4. Ensure the question challenges critical thinking but remains solvable within the 5-minute timeframe
+5. For mathematical topics, create problems that address common misconceptions or error patterns
+
+RESPONSE REQUIREMENTS:
+- Generate a courseTitle that clearly identifies the topic area
+- Create a courseSummary outlining what knowledge/skills are being tested, with emphasis on challenging areas
+- Develop ONE high-quality question requiring a short or long answer (not multiple choice)
+- Provide the correct answer (final result only, no steps required)
+- For math questions, use proper LaTeX formatting for mathematical expressions
+
+OUTPUT FORMAT:
+Return the response as a valid JSON object with this structure:
+
+{
+  "courseTitle": "Clear title identifying the topic area",
+  "courseSummary": "Concise summary of what will be tested, focusing on challenging concepts",
+  "question": "A challenging but solvable question targeting a common weakness area",
+  "answer": "The correct final answer"
+}
+
+SPECIAL INSTRUCTIONS FOR MATH QUESTIONS:
+- Present the complete problem without breaking it into steps
+- Format all mathematical expressions using LaTeX syntax (e.g., $\\frac{x^2}{y}$ for fractions)
+- Ensure the answer is the simplified final result only
+
+ENSURE THE OUTPUT IS VALID JSON THAT CAN BE PARSED WITHOUT ERRORS.
+`;
 
     const aiResponse = await GenerateStartExam.sendMessage(prompt)
     const aiText = aiResponse.response.text();

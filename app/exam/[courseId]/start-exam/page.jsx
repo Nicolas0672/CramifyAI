@@ -267,7 +267,7 @@ const showTimeUpToast = (message) => {
   }
   // Handle answer submission
   const handleSubmit = async () => {
-    if(userAnswer.length == 0){
+    if(userAnswer.length == 0 || userAnswer == null){
       showErrorToast('Invalid Answer')
       return;
     }

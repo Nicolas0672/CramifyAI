@@ -26,27 +26,47 @@ const user = await client.users.getUser(userId)
 
     const { chapters, courseId, type } = await req.json()
 
-    const PROMPT = `Generate up to 10 high-quality flashcards on the topic: "${chapters}" in JSON format. 
-Each flashcard should include:
-- A clear and concise **question** for the front.
-- A detailed yet simple **answer** for the back. 
-- If the content involves a math equation, include a key called "isMath" set to true.
-Format the output as an array of objects with "front", "back", and "isMath" keys.
-** DO NOT INCLUDE CHAPTER NUMBER
-MAKE SURE IT'S IN JSON FORMAT
-If it's a **math question**, format the question using LaTeX syntax and return it as a **string** that can be rendered with MathJax.
-Each flashcard should have:
-- a 'front' field (question)
-- a 'back' field (answer)
-- an 'isMath' boolean (true if math-related, false otherwise)
-- a unique 'id' (UUID)
+    const PROMPT = `Generate up to 10 high-quality flashcards on the topic: "${chapters}" that target common areas of difficulty. Review the topic to identify concepts students typically struggle with and focus your flashcards on these challenging areas.
 
-Return the response as a JSON array, e.g.:
-[
-  { "id": "uuid1", "front": "What is the Chain Rule?", "back": "hi", "isMath": false },
-  { "id": "uuid2", "front": "What is Derivative?", "back": "A function's rate of change", "isMath": true }
-]
-`
+    REQUIREMENTS FOR WEAKNESS-FOCUSED FLASHCARDS:
+    1. Analyze "${chapters}" to identify challenging concepts, common misconceptions, or typically difficult material
+    2. Focus flashcards on these weak areas to strengthen understanding
+    3. Create questions that address foundational concepts students must master
+    4. Include examples that highlight nuanced distinctions or common error patterns
+    5. For mathematical topics, include application problems that test conceptual understanding
+    
+    FLASHCARD FORMAT:
+    - Each flashcard must include:
+      * A clear, concise question for the front
+      * A detailed yet simple answer for the back
+      * A boolean 'isMath' indicator (true for math-related content)
+      * A unique 'id' field (UUID format)
+    
+    TECHNICAL SPECIFICATIONS:
+    - For math questions, format using LaTeX syntax that can be rendered with MathJax
+    - DO NOT include chapter numbers in the content
+    - Return EXACTLY valid JSON array format with no additional text
+    - Ensure all special characters are properly escaped
+    - Verify the output is parseable JSON before returning
+    
+    EXAMPLE OUTPUT FORMAT:
+    [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "front": "What is the Chain Rule?",
+        "back": "The Chain Rule is a formula for computing the derivative of a composite function. If f(x) = g(h(x)), then f'(x) = g'(h(x)) · h'(x).",
+        "isMath": true
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440001",
+        "front": "What is a limiting reagent in a chemical reaction?",
+        "back": "The limiting reagent is the reactant that is completely consumed in a chemical reaction and determines the amount of product formed.",
+        "isMath": false
+      }
+    ]
+    
+    ENSURE THE OUTPUT IS VALID JSON THAT CAN BE PARSED WITHOUT ERRORS.
+    `;
 
     const result = await db.insert(FLASHCARD_CONTENT).values({
         courseId,

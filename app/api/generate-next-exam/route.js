@@ -60,6 +60,8 @@ GRADING RULES:
 
 Your response MUST be a **100% valid, parseable JSON object** with the **exact** following structure:
 
+
+
 {
     "feedback": {
         "rating": 7,
@@ -69,6 +71,7 @@ Your response MUST be a **100% valid, parseable JSON object** with the **exact**
 }
 
 CRITICAL FORMATTING RULES FOR JSON OUTPUT:
+0. ENSURE THAT EACH QUESTION CAN BE ANSWERED IN A INPUT BOX. THAT MEANS NO QUESTION WHICH INVOLVES DRAWING 
 
 1. **OUTPUT FORMAT**: Return ONLY valid, parseable JSON—NO markdown formatting, code blocks, backticks, explanatory text, or commentary before or after the JSON.
 

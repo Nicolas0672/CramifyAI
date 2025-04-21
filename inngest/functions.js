@@ -73,28 +73,36 @@ export const GenerateNotes=inngest.createFunction(
           console.log(`Processing chapter ${index} of ${Chapters.length}`);
           
           const PROMPT = `
-          Generate concise and student-friendly content for the following chapter. Follow these rules:
+          Generate concise, student-friendly content for the following chapter with special focus on addressing identified learning weaknesses. Follow these rules:
           
-          1. **Content**:
-             - Focus only on the most important concepts and avoid unnecessary details.
-             - Break down complex ideas into simple, easy-to-understand steps.
-             - Include methods or tips to help students learn and remember the material.
-             - Use analogies or real-world examples where helpful.
+          1. **Content Strategy (PRIORITY)**:
+             - Analyze the chapter data for any specified weaknesses or difficult concepts
+             - Prioritize and emphasize content that addresses these weak areas
+             - Provide extra examples, practice problems, or explanations for challenging topics
+             - Create memory aids, shortcuts, or learning techniques specifically for difficult concepts
+             - Include confidence-building elements for areas where students typically struggle
           
-          2. **Format**:
-             - Use modern HTML tags for formatting (e.g., <h2> for headings, <p> for paragraphs, <ul> and <li> for lists, <strong> for emphasis, <blockquote> for key points, and <code> for code snippets).
-             - For mathematical equations, use **MathJax** or **LaTeX** syntax wrapped in appropriate delimiters:
+          2. **Core Content Requirements**:
+             - Focus on essential concepts while eliminating unnecessary details
+             - Break complex ideas into simple, sequential steps
+             - Include effective learning methods tailored to the topic
+             - Use relevant analogies or real-world applications that clarify difficult concepts
+             - Provide progressive learning paths (basic → intermediate → advanced) for key topics
+          
+          3. **Format**:
+             - Use modern HTML tags (&lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;blockquote&gt;, &lt;code&gt;)
+             - Format mathematical equations with MathJax/LaTeX syntax:
                - Inline equations: \\( ... \\)
                - Block equations: \\[ ... \\]
                Example:
                \`\`\`html
-               <p>To find the derivative of \(y = \sin(u)\) where \(u = x^2\), we use the chain rule:</p>
+               <p>To find the derivative of \\(y = \\sin(u)\\) where \\(u = x^2\\), we use the chain rule:</p>
                \\[
                \\frac{dy}{dx} = \\cos(u) \\cdot \\frac{du}{dx} = \\cos(x^2) \\cdot 2x
                \\]
                \`\`\`
-               ** PLEASE ONLY USE CODING EXAMPLE IF RELATED TO CODING OTHERWISE DO NOT OUTPUT AS CODE FORMAT AS IT WILL BREAK MATHJAX RENDER**
-             - Wrap ALL code snippets in <pre><code> tags for proper formatting. For example:
+             - **IMPORTANT:** ONLY use coding examples with &lt;pre&gt;&lt;code&gt; tags when content is programming-related, otherwise avoid this format as it will break MathJax rendering
+             - Wrap code snippets in proper tags:
                \`\`\`html
                <pre class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto">
                  <code class="font-mono text-sm">
@@ -105,21 +113,28 @@ export const GenerateNotes=inngest.createFunction(
                  </code>
                </pre>
                \`\`\`
-                 ** PLEASE ONLY USE CODING EXAMPLE IF RELATED TO CODING OTHERWISE DO NOT OUTPUT AS CODE FORMAT AS IT WILL BREAK MATHJAX RENDER**
-               
-             - Add inline styles or Tailwind CSS classes for better visual appeal (e.g., use classes like "text-lg", "font-bold", "bg-gray-100", "p-4", "rounded-lg", etc.).
-             - Structure the content into sections with clear headings and subheadings.
-             - Use spacing and dividers (<hr>) to separate sections for better readability.
-             
           
-          3. **Layout**:
-             - Ensure the layout is clean, modern, and responsive.
-             - Use a combination of headings, paragraphs, lists, and visual elements (e.g., icons or emojis) to make the content engaging.
-             - MAKE SURE THAT ALL CHAPTERS CONTAIN CONSISTENT FORMAT.
-             - Ensure code snippets and mathematical equations are properly formatted and do not overflow. Use horizontal scrolling for long lines of code or equations.
-            -MAKE SURE ALL CHAPTERS TITLE ARE BOLDED AND HAVE CONSISTENT FORMATTING THROUGHOUT EACH CHAPTER
-          4. **Accuracy**:
-             - Ensure all mathematical formulas, examples, and explanations are factually correct and free of errors.
+          4. **Enhanced Visual Structure**:
+             - Use Tailwind CSS classes for visual appeal (text-lg, font-bold, bg-gray-100, etc.)
+             - Implement consistent heading styles across all chapters
+             - Create visual hierarchy with proper spacing and section dividers
+             - Add progress indicators for difficult concepts (e.g., "Mastery Challenge" sections)
+             - Include targeted practice exercises for weak areas
+             - Use callout boxes to highlight common misconceptions or error patterns
+             - Bold all chapter titles consistently across chapters
+          
+          5. **Weakness-Based Learning Elements**:
+             - Include "Common Pitfalls" sections for frequently misunderstood concepts
+             - Create "Checkpoint" review questions targeting weak areas
+             - Provide alternative explanations for difficult topics using different learning modalities
+             - Include scaffolded examples that gradually increase in difficulty
+             - Add visual cues or icons to mark content addressing known weakness areas
+          
+          6. **Quality Assurance**:
+             - Ensure mathematical formulas, examples, and explanations are accurate
+             - Verify all content flows logically from foundational to more complex concepts
+             - Confirm that challenging concepts receive proportionally more attention
+             - Check that all HTML tags are properly closed and formatted
           
           Here is the chapter data:
           \`\`\`json
@@ -128,6 +143,7 @@ export const GenerateNotes=inngest.createFunction(
           
           Return only the HTML content without additional notes or irrelevant information.
           `;
+          
     
           try {
             console.log(`Sending AI request for chapter ${index}`);

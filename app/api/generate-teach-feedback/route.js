@@ -39,31 +39,48 @@ const user = await client.users.getUser(userId)
             `- ${sentence.role}: ${sentence.content}\n`
         ).join('');
 
-        const prompt = `You are an AI tutor evaluating a learning session. Below is a transcript of a student explaining a topic to an AI assistant. Provide feedback on their explanation based on , accuracy, depth,. Also, suggest two areas for improvement.
+        const prompt = `You are an AI tutor evaluating a student's learning session. Below is a transcript of a student explaining a topic to an AI assistant. Provide a focused evaluation that identifies strengths and weaknesses to help them improve their understanding.
 
-                        Transcript:
-                        """
-                        ${formattedTranscript}
-                        """
-                        **Please return in JSON FORMAT and DO NOT OTHER CATEGORIES BESIDES THE ONE PROVIDED. ENSURE THAT IT IS ABLE TO PARSE AS JSON. DO NOT ADD ANYTHING THAT WILL BREAK THE PARSE
-                        
-                        ### Feedback:
-                        
-                        - **Summary:** (What the conversation was about)
-                        - **Strength:** (Did they cover the topic in enough detail?)
-                       - Weakness (What can user improve on in terms of study materials)
-                        - **Improvements:** (Give two actionable tips to help them improve.)
-                        - Overall rating out of 10. Ensure that the rating is lighthearted
-                        **PLEASE OUTPUT IN THIS JSON FORMAT**
-                        {
-                            "summary": "<AI-generated summary here>",
-                            "strengths": ["<AI-generated strength 1>", "<AI-generated strength 2>", "..."],
-                            "weaknesses": ["<AI-generated weakness 1>", "<AI-generated weakness 2>", "..."],
-                            "improvements": ["<AI-generated improvement 1>", "<AI-generated improvement 2>", "..."],
-                            "overallScore": "<PLEASE ENSURE THAT THAT THE OUTPUT IS A NUMBER FOR EXAMPLE: 8/10>"
-                        }
-                        
-                        `
+        Transcript:
+        """
+        ${formattedTranscript}
+        """
+        
+        EVALUATION INSTRUCTIONS:
+        1. Analyze the student's explanation for conceptual understanding, accuracy, and depth
+        2. Identify specific knowledge gaps or misconceptions that need addressing
+        3. Note areas where the student demonstrates strong understanding
+        4. Provide actionable improvement suggestions targeting their specific weaknesses
+        5. Rate their overall performance on a scale of 1-10
+        
+        OUTPUT REQUIREMENTS:
+        - Return ONLY valid, parseable JSON with the EXACT structure shown below
+        - Do not include additional categories beyond those specified
+        - Ensure all JSON syntax is correct (quotes, commas, brackets)
+        - Keep weaknesses and improvements focused on addressable learning gaps
+        - Make the overall score a simple number out of 10 (e.g., 7)
+        
+        {
+          "summary": "Brief overview of what the conversation covered",
+          "strengths": [
+            "Specific strength 1 focused on what the student understood well",
+            "Specific strength 2 with examples from the transcript"
+          ],
+          "weaknesses": [
+            "Specific knowledge gap or misconception 1 that requires attention",
+            "Specific weakness 2 in understanding core concepts"
+          ],
+          "improvements": [
+            "Concrete, actionable suggestion 1 addressing a specific weakness",
+            "Concrete, actionable suggestion 2 for developing deeper understanding"
+          ],
+          "overallScore": 7
+        }
+        
+        DO NOT INCLUDE ANY TEXT BEFORE OR AFTER THE JSON OBJECT.
+        ENSURE THE JSON IS PROPERLY FORMATTED AND CAN BE PARSED WITHOUT ERRORS.
+        THE OVERALL SCORE MUST BE A NUMBER WITHOUT ANY ADDITIONAL TEXT.
+        `;
         const aiResp = await GenereateTeachFeedback.sendMessage(prompt)
         const aiText = aiResp.response.text()
 

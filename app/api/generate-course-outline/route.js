@@ -53,50 +53,48 @@ const user = await client.users.getUser(userId)
         
         // Generate course layout using AI
         const prompt = `
-Generate a high-quality study guide for the course. The topic is "${topic}", the course type is "${courseType}", the difficulty level is "${difficultyLevel}", and the course layout is "${courseLayout}".
-**IF COURSELAYOUT IS RECEIVED AS A JSON WHICH CONTAINS INFO ABOUT A USER CONVERSATION SUMMARY, STRENGTH, IMPROVEMENTS AND RATING, USE THIS TO GENERATE CONTENT 
-TO HELP ACCOMODATE WEAKPOINTS
+Generate a high-quality study guide for the course. The topic is "${topic}", the course type is "${courseType}", the difficulty level is "${difficultyLevel}", and the course layout is provided as "${courseLayout}".
 
-1. **Introduction**: Provide a clear and engaging introduction to the course topic "${topic}". Explain why this topic is important, its relevance, and what learners can expect to gain from studying it.
+**IMPORTANT INSTRUCTIONS:**
+1. If courseLayout is provided as JSON containing user conversation data (summary, strengths, weaknesses, improvements, rating), parse this information and prioritize addressing the identified WEAKNESSES in your generated content.
+2. Ensure the output is valid, parseable JSON with properly escaped characters.
 
-2. **Chapter Breakdown**: Break down the course into 3 chapters and 2 topics based on the provided course layout ("${courseLayout}" as a guide). For each chapter, provide:
-   - **Chapter Title**: A descriptive and engaging title for the chapter.
-   - **Chapter Summary**: A concise yet insightful summary of the chapter, outlining the key concepts and objectives.
-   - **Topic List**: ${amount} topics name that will be covered in this chapter. For each topic, provide:
-     
+**Content Requirements:**
+1. **Introduction**: Provide a clear and engaging introduction to "${topic}", explaining its importance, relevance, and learning objectives.
 
-3. **Content Quality**: Ensure the content is:
-   - **Insightful**: Provide deep, meaningful explanations that go beyond surface-level descriptions.
-   - **Engaging**: Use clear, concise language and include examples or analogies to make the content relatable.
-   - **Structured**: Organize the content logically, with a clear flow from one topic to the next.
-   - **Actionable**: Include practical tips or insights that learners can apply immediately.
+2. **Chapter Breakdown**: Create 3 chapters with ${amount} topics each:
+   - If user weaknesses are identified, design chapters that specifically target these weak areas
+   - Otherwise, follow the general course layout provided
 
-4. **Output in JSON Format**: Output the entire study guide in a well-structured JSON format. Each chapter should be an object with the following keys: "title", "summary", and "topics". Each topic should only include the topic name.
-5. DO NOT INCLUDE ANYTHING IN THE CONTENT THAT WILL RUIN A JSON PARSE** ENSURE THAT THE CONTENT GENERATED CAN PARSE THROUGH AS A JSON**
-Please output in the following JSON structure:
-6. **INCLUDE EMOJI ICON FOR EACH CHAPTER**
+3. **Content Quality Standards**:
+   - **Targeted**: Address specific knowledge gaps or weaknesses identified
+   - **Insightful**: Provide deep, meaningful explanations beyond surface-level
+   - **Engaging**: Use clear language with relevant examples
+   - **Structured**: Organize content logically with clear progression
+   - **Actionable**: Include practical application tips
 
-7. PLEASE OUTPUT IN VALID JSON FORMAT
+4. **Output Format**: Provide a complete study guide in the following JSON structure:
 
 {
-  "courseTitle": "Course Title Here",
+  "courseTitle": "Descriptive Title for ${topic} Course",
   "courseType": "${courseType}",
   "difficultyLevel": "${difficultyLevel}",
-  "courseSummary" : summary
-  "courseLayout": "${courseLayout}",
-  
+  "courseSummary": "Concise overview of the course focusing on addressing key weaknesses if identified",
+  "courseLayout": "Custom structure based on ${courseLayout} with focus on weak areas",
   "chapters": [
     {
-      "title": "Chapter 1: Introduction to ${topic}",
-        "emoji: "
-      "summary": "Brief yet insightful summary of the chapter.",
-      "  topics": [
+      "title": "Chapter Title",
+      "emoji": "📊",
+      "summary": "Chapter summary with emphasis on addressing weaknesses",
+      "topics": [
         "Topic 1",
         "Topic 2"
       ]
     }
   ]
 }
+
+**CRITICAL: Ensure the output is valid JSON that can be parsed without errors. Double-check all quotes, commas, and special characters are properly escaped.**
 `;
 
         console.log("Prompt:", prompt);

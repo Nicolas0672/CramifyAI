@@ -51,64 +51,70 @@ const user = await client.users.getUser(userId)
         try {
             const prompt = `Based on the student's answer: "${userAns}", the difficulty level: "${difficultyLevel}", and the question: "${question}", please assume the role of a professional educator grading the student's response.
 
-GRADING RULES:
-- Correct answer: 10/10
-- Partially correct answer: 5-9/10 (depending on how close)
-- Completely incorrect answer: 0-4/10
-- Responses like "idk", "I don't know", or clearly off-topic answers: MAXIMUM 4/10
-- For math questions: Only award 10/10 if the final numerical answer is EXACTLY correct (including units if applicable)
-
-Your response MUST be a **100% valid, parseable JSON object** with the **exact** following structure:
-
-**PLS ENSURE THAT RATING IS A NUMBER AND NOT A STRING** IF OUTPUT AS A STRING, CONVERT INTO A NUMBER
-
-{
-    "feedback": {
-        "rating": 7,
-        "explanation": "Your explanation here...",
-        "question": "Your new question here..."
-    }
-}
-
-CRITICAL FORMATTING RULES FOR JSON OUTPUT:
-0. ENSURE THAT EACH QUESTION CAN BE ANSWERED IN A INPUT BOX. THAT MEANS NO QUESTION WHICH INVOLVES DRAWING 
-
-1. **OUTPUT FORMAT**: Return ONLY valid, parseable JSON—NO markdown formatting, code blocks, backticks, explanatory text, or commentary before or after the JSON.
-
-2. **STRING FORMATTING**:
-   - Use double quotes (") for ALL strings and property names
-   - NEVER use single quotes (') anywhere in the JSON
-   - Escape all special characters within strings: \\" for quotes, \\\\ for backslashes, \\n for newlines
-
-3. **MATHEMATICAL NOTATION**:
-   Use double backslashes (\\\\) for LaTeX commands (e.g., \\\\alpha for α, \\\\frac{x}{y} for fractions).
-   Avoid using triple backslashes (\\\\\\\\) unless required by JavaScript string escaping rules. Only use \\\\ inside LaTeX expressions.
-   Ensure LaTeX commands are written correctly and don't have extra spaces or escapes (e.g., use \\\\frac{x}{y}, not \\\\ frac{x}{y}).
-   Test expressions to verify they render correctly with MathJax.
-   
-4. **STRUCTURAL INTEGRITY**:
-   - NO line breaks within string values
-   - NO trailing commas after the last element in arrays or objects
-   - Ensure all arrays and objects are properly closed with matching brackets/braces
-   - Ensure all property names are quoted
-
-5. **VALIDATION REQUIREMENTS**:
-   - Check that the output passes JSON.parse() without errors
-   - Verify LaTeX expressions are properly escaped for MathJax compatibility
-   - Double-check the entire structure before finalizing response
-
-6. **ABSOLUTELY NO**:
-   - Comments (// or /**/)
-   - Undefined values
-   - NaN or Infinity literals (use strings instead)
-   - Extra text outside the JSON structure
-   - Explanations of the JSON structure
-
-7. **OUTPUT VERIFICATION**:
-   - After generating JSON, mentally parse it to confirm validity
-   - If any question about validity arises, rewrite the problematic section
-
-Return only the JSON object. Any response that does not meet these criteria must be corrected automatically before returning.`;
+            GRADING RULES:
+            - Correct answer: 10/10
+            - Partially correct answer: 5-9/10 (depending on how close)
+            - Completely incorrect answer: 0-4/10
+            - Responses like "idk", "I don't know", or clearly off-topic answers: MAXIMUM 4/10
+            - For math questions: Only award 10/10 if the final numerical answer is EXACTLY correct (including units if applicable)
+            
+            ADAPTIVE QUESTION GENERATION RULES:
+            - If answer is correct (rating 9-10): Generate a harder but related question that builds on the same concepts
+            - If answer is partially correct (rating 5-8): Generate a question of similar difficulty that reinforces the same concepts
+            - If answer is incorrect (rating 0-4): Generate an easier question that focuses on the fundamental concepts the student is struggling with
+            - Always ensure the new question relates to the same topic or concept as the original question
+            
+            Your response MUST be a **100% valid, parseable JSON object** with the **exact** following structure:
+            
+            **PLS ENSURE THAT RATING IS A NUMBER AND NOT A STRING** IF OUTPUT AS A STRING, CONVERT INTO A NUMBER
+             
+            {
+                "feedback": {
+                    "rating": 7,
+                    "explanation": "Your explanation here...",
+                    "question": "Your new question here..."
+                }
+            }
+            
+            CRITICAL FORMATTING RULES FOR JSON OUTPUT:
+            0. ENSURE THAT EACH QUESTION CAN BE ANSWERED IN A INPUT BOX. THAT MEANS NO QUESTION WHICH INVOLVES DRAWING
+             
+            1. **OUTPUT FORMAT**: Return ONLY valid, parseable JSON—NO markdown formatting, code blocks, backticks, explanatory text, or commentary before or after the JSON.
+            
+            2. **STRING FORMATTING**:
+               - Use double quotes (") for ALL strings and property names
+               - NEVER use single quotes (') anywhere in the JSON
+               - Escape all special characters within strings: \\" for quotes, \\\\ for backslashes, \\n for newlines
+            
+            3. **MATHEMATICAL NOTATION**:
+               Use double backslashes (\\\\) for LaTeX commands (e.g., \\\\alpha for α, \\\\frac{x}{y} for fractions).
+               Avoid using triple backslashes (\\\\\\\\) unless required by JavaScript string escaping rules. Only use \\\\ inside LaTeX expressions.
+               Ensure LaTeX commands are written correctly and don't have extra spaces or escapes (e.g., use \\\\frac{x}{y}, not \\\\ frac{x}{y}).
+               Test expressions to verify they render correctly with MathJax.
+               
+            4. **STRUCTURAL INTEGRITY**:
+               - NO line breaks within string values
+               - NO trailing commas after the last element in arrays or objects
+               - Ensure all arrays and objects are properly closed with matching brackets/braces
+               - Ensure all property names are quoted
+            
+            5. **VALIDATION REQUIREMENTS**:
+               - Check that the output passes JSON.parse() without errors
+               - Verify LaTeX expressions are properly escaped for MathJax compatibility
+               - Double-check the entire structure before finalizing response
+            
+            6. **ABSOLUTELY NO**:
+               - Comments (// or /**/)
+               - Undefined values
+               - NaN or Infinity literals (use strings instead)
+               - Extra text outside the JSON structure
+               - Explanations of the JSON structure
+            
+            7. **OUTPUT VERIFICATION**:
+               - After generating JSON, mentally parse it to confirm validity
+               - If any question about validity arises, rewrite the problematic section
+            
+            Return only the JSON object. Any response that does not meet these criteria must be corrected automatically before returning.`;
             aiResp = await GenerateNextQuestion.sendMessage(prompt);
         } catch (err) {
             console.error("Error generating AI response:", err);

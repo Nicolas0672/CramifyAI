@@ -31,11 +31,13 @@ const [generatedModes, setGeneratedModes] = useState({
   const router = useRouter();
   const { user, isLoaded } = useUser();
   const [showIntroOverlay, setShowIntroOverlay] = useState(false);
+  const [teachFeedback,setTeachFeedback] = useState()
   useEffect(() => {
     if (!isLoaded || !user || !course?.courseId) return;
  
     GetUserDetails();
     CheckExist();
+    GetTeachFeedback()
   }, [isLoaded, user, course?.courseId]);
 
   useEffect(() => {
@@ -142,6 +144,11 @@ const [generatedModes, setGeneratedModes] = useState({
     );
   };
 
+  const GetTeachFeedback=async()=>{
+    const dbRes = await axios.get('/api/get-teach-feedback?courseId=' + course?.courseId)
+    setTeachFeedback(dbRes.data.result)
+  }
+
 
 
 
@@ -223,8 +230,8 @@ const [generatedModes, setGeneratedModes] = useState({
           courseId: course?.courseId,
           topic: topic,
           courseType: 'Study',
-          courseLayout: summary,
-          difficultyLevel: 'Easy',
+          courseLayout: teachFeedback == null ? summary : teachFeedback,
+          difficultyLevel: 'Medium',
           createdBy: course?.createdBy
         };
         console.log("Study Payload: ", payload);
@@ -261,8 +268,8 @@ const [generatedModes, setGeneratedModes] = useState({
           courseId: course?.courseId,
           topic: topic,
           courseType: 'practice',
-          courseLayout: summary,
-          difficultyLevel: 'Easy',
+          courseLayout: teachFeedback == null ? summary : teachFeedback,
+          difficultyLevel: 'Medium',
           createdBy: course?.createdBy
         };
         console.log("Practice Payload: ", payload);
@@ -299,8 +306,8 @@ const [generatedModes, setGeneratedModes] = useState({
           courseId: course?.courseId,
           topic: topic,
           courseType: 'exam',
-          courseLayout: summary,
-          difficultyLevel: 'Easy',
+          courseLayout: teachFeedback == null ? summary : teachFeedback,
+          difficultyLevel: 'Medium',
           createdBy: course?.createdBy,
           exam_time: 30
         };

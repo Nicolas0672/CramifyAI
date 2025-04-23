@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import TopicInput from './_components/TopicInput'
 import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
-import { CheckCircle, Loader2Icon, XCircle } from 'lucide-react'
+import { CheckCircle, CreditCard, Loader2Icon, XCircle } from 'lucide-react'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { STUDY_MATERIAL_TABLE } from '@/configs/schema'
 import { db } from '@/configs/db'
@@ -170,6 +170,26 @@ function Create() {
           }
         );
       };
+
+      const showCreditSpentToast = (amount) => {
+        toast(
+          <div className="flex items-center gap-2">
+            <div className="bg-blue-100 p-2 rounded-full">
+              <CreditCard className="w-5 h-5 text-blue-500" />
+            </div>
+            <span>Credits spent: ${amount}</span>
+          </div>,
+          {
+            style: {
+              background: 'linear-gradient(to right, #eff6ff, #dbeafe)',
+              border: '1px solid #93c5fd',
+              color: '#1e40af',
+              borderRadius: '0.5rem',
+            },
+            duration: 3000,
+          }
+        );
+      };
       
       const showErrorToast = (message) => {
         toast(
@@ -213,6 +233,7 @@ function Create() {
                     // Send the POST request
                     const res = await axios.post('/api/generate-course-outline', payload);
                     console.log("Response from API:", res.data);
+                    showCreditSpentToast('1 Credits Spent')
                     showSuccessToast("Your course content is generating...")
                     router.replace('/dashboard')
                 
@@ -229,6 +250,7 @@ function Create() {
         
                 const res = await axios.post('/api/generate-practice-questions', practicePayload);
                 console.log("Response from API:", res.data);
+                showCreditSpentToast('1 Credits Spent')
                 showSuccessToast("Your practice questions are generating...");
                 router.replace('/dashboard')
             }
@@ -243,6 +265,7 @@ function Create() {
                 }
                 const res = await axios.post('/api/generate-exam',examPayload)
                 console.log("Response from API:", res.data);
+                showCreditSpentToast('1 Credits Spent')
                 showSuccessToast("Your exam is generating...");
                 router.replace('/dashboard')
             }

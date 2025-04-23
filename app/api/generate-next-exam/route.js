@@ -60,7 +60,7 @@ GRADING RULES:
 
 Your response MUST be a **100% valid, parseable JSON object** with the **exact** following structure:
 
-
+**PLS ENSURE THAT RATING IS A NUMBER AND NOT A STRING** IF OUTPUT AS A STRING, CONVERT INTO A NUMBER
 
 {
     "feedback": {

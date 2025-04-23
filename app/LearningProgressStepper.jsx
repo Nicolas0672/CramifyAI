@@ -6,7 +6,7 @@ import { useCourse } from './CourseIdProvider';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast'; // Make sure this import is added
 import { useUser } from '@clerk/nextjs';
-import { ArrowRight, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle, CreditCard, XCircle } from 'lucide-react';
 
 const LearningProgressStepper = ({ currentMode }) => {
   const { setMode, currentModes } = useLearningMode();
@@ -122,6 +122,26 @@ const [generatedModes, setGeneratedModes] = useState({
     );
   };
 
+  const showCreditSpentToast = (amount) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-blue-100 p-2 rounded-full">
+          <CreditCard className="w-5 h-5 text-blue-500" />
+        </div>
+        <span>Credits spent: ${amount}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #eff6ff, #dbeafe)',
+          border: '1px solid #93c5fd',
+          color: '#1e40af',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+
 
 
 
@@ -173,6 +193,7 @@ const [generatedModes, setGeneratedModes] = useState({
   
         const res = await axios.post('/api/vapi/generate', payload);
         console.log(res.data);
+        showCreditSpentToast('2 Credits Spent')
         showRedirectToast('Redirecting...')
         router.push('/teach-me/' + course?.courseId);
       } else {
@@ -210,6 +231,7 @@ const [generatedModes, setGeneratedModes] = useState({
   
         const res = await axios.post('/api/generate-course-outline', payload);
         console.log(res.data);
+        showCreditSpentToast('1 Credits Spent')
         showRedirectToast('Redirecting...')
         router.push('/course/' + course?.courseId);
       } else {
@@ -247,6 +269,7 @@ const [generatedModes, setGeneratedModes] = useState({
   
         const res = await axios.post('/api/generate-practice-questions', payload);
         console.log(res.data);
+        showCreditSpentToast('1 Credits Spent')
         showRedirectToast('Redirecting...')
         router.push('/quiz/' + course?.courseId);
       } else {
@@ -285,6 +308,7 @@ const [generatedModes, setGeneratedModes] = useState({
   
         const res = await axios.post('/api/generate-exam', payload);
         console.log(res.data);
+        showCreditSpentToast('1 Credits Spent')
         showRedirectToast('Redirecting...')
         router.push('/exam/' + course?.courseId);
       } else {

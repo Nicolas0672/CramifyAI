@@ -178,10 +178,12 @@ function PracticeContentCard({quizTypeContent, item, refreshData, practiceCourse
                   e.preventDefault();
                   GenerateContent();
                 }}
+                disabled={loading}
               >
                 {loading && <RefreshCcw className="w-4 h-4 animate-spin" />}
                 <span>Generate</span>
                 <ArrowRight className="w-4 h-4" />
+                
               </Button>
             )}
           </motion.div>

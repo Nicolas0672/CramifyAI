@@ -11,7 +11,7 @@ function CourseList() {
     const [courseList, setCourseList] = useState([])
     const [quizList, setQuizList] = useState([])
     const [loading, setLoading] = useState(false)
-    const [mode, setMode] = useState('study')  // NEW - Switch between Study & Practice
+    const [mode, setMode] = useState('teach Me')  // NEW - Switch between Study & Practice
     const [examList, setExamList] = useState([])
     const [teachMeList, setTeachMeList] = useState([])
     const [status, setStatus] = useState()

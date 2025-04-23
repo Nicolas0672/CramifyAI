@@ -21,11 +21,7 @@ function ExamStart() {
 
   const { courseId } = useParams()
 
-  useEffect(() => {
-    if (window.MathJax) {
-      window.MathJax.typesetPromise();
-    }
-  }, []);
+ 
 
   // Fetch the first question and initialize timer
   useEffect(() => {
@@ -72,6 +68,17 @@ function ExamStart() {
     } catch (error) {
       console.error("Error fetching exam question:", error)
     }
+  }
+
+  const GetExamDetails=async()=>{
+    const response = await axios.post('/api/study-type', {
+      courseId: courseId,
+      studyType: 'exam'
+    })
+
+    // Clone the object to remove circular references
+    const cleanedData = JSON.parse(JSON.stringify(response.data))
+    setCourse(cleanedData)
   }
 
   useEffect(()=>{
@@ -267,7 +274,7 @@ const showTimeUpToast = (message) => {
   }
   // Handle answer submission
   const handleSubmit = async () => {
-    if(userAnswer.length == 0 || userAnswer == null){
+    if(userAnswer.length == 0 || userAnswer == ""){
       showErrorToast('Invalid Answer')
       return;
     }
@@ -354,7 +361,7 @@ const showTimeUpToast = (message) => {
 
   return (
     <MathJaxContext config={{ tex: { inlineMath: [['$', '$']] } }}>
-      <div className="mt-25 mx-10 relative p-4 bg-gradient-to-br from-gray-50 to-blue-100 rounded-2xl shadow-xl overflow-hidden">
+      <div className="mt-25  relative p-4 bg-gradient-to-br from-gray-50 to-blue-100 rounded-2xl shadow-xl overflow-hidden">
         {/* Floating study elements */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Book */}

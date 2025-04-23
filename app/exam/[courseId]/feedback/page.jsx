@@ -58,9 +58,12 @@ function ViewExamFeedback() {
  
   
  
-  const averageRating = feedbackDetails.length > 0 
-  ? (feedbackDetails.reduce((sum, item) => 
-      sum + item.aiResponse.feedback.rating, 0) / feedbackDetails.length).toFixed(1)
+  const averageRating = feedbackDetails.length > 0
+  ? (feedbackDetails.reduce((sum, item) => {
+      // Extract just the numerical value from ratings
+      const ratingValue = parseFloat(item.aiResponse.feedback.rating.toString().split('/')[0]);
+      return sum + (isNaN(ratingValue) ? 0 : ratingValue);
+    }, 0) / feedbackDetails.length).toFixed(1)
   : 0;
 
 return (

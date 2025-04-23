@@ -231,6 +231,26 @@ function AgentLayout({ progress, userDetails, userName, userId, type, courseId, 
     );
   };
 
+  const showCreditSpentToast = (amount) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-blue-100 p-2 rounded-full">
+          <CreditCard className="w-5 h-5 text-blue-500" />
+        </div>
+        <span>Credits spent: ${amount}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #eff6ff, #dbeafe)',
+          border: '1px solid #93c5fd',
+          color: '#1e40af',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+
   const handleGenerateFeedback = async (messages) => {
     console.log('Full Messages Array:', messages);
     try {
@@ -255,6 +275,7 @@ function AgentLayout({ progress, userDetails, userName, userId, type, courseId, 
   useEffect(() => {
     if (callStatus === CallStatus.FINISHED) {
       if (type == 'generate') {
+        showCreditSpentToast('2 Credits Spent')
         router.push('/dashboard')
       }
       else {

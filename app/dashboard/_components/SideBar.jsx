@@ -736,7 +736,7 @@ const [dataLoaded, setDataLoaded] = useState(false);
             <DialogTitle className='text-center text-2xl font-bold text-gray-800'>
               Select Study Material Type
             </DialogTitle>
-            <DialogDescription className='text-center text-gray-600'>
+            <DialogDescription className='text-center text-md  text-gray-600'>
               {selectOption === 'Study'
                 ? "Create your own personalized study guide and flashcards (1 credit)"
                 : selectOption === 'Exam'

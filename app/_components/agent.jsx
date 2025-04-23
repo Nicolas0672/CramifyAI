@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { vapi } from '@/lib/vapi.sdk';
 import { useUser } from '@clerk/nextjs';
 import axios from 'axios';
-import { ArrowRight, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle, CreditCard, XCircle } from 'lucide-react';
 import Image from 'next/image'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'

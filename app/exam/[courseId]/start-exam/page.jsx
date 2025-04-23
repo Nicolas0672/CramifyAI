@@ -320,7 +320,7 @@ const showTimeUpToast = (message) => {
 
       const newQuestion = resUpdate.data.res.question || "";
       console.log(newQuestion)
-      setQuestionCount(questionUpdate.data.res.questionCount + 1);
+      setQuestionCount(questionUpdate.data.res.questionCount);
       setCurrentQuestion(newQuestion);
       setUserAnswer(""); // Clear input field
 

@@ -146,7 +146,7 @@ const [generatedModes, setGeneratedModes] = useState({
 
   const GetTeachFeedback=async()=>{
     const dbRes = await axios.get('/api/get-teach-feedback?courseId=' + course?.courseId)
-    setTeachFeedback(dbRes.data.result)
+    setTeachFeedback(dbRes.data.result.aiFeedback)
   }
 
 

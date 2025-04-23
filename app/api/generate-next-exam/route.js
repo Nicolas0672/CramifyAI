@@ -23,7 +23,7 @@ export async function POST(req) {
         if (!userId) return { error: "Unauthorized: No userId", status: 401 };
 
         const client = await clerkClient()
-const user = await client.users.getUser(userId)
+        const user = await client.users.getUser(userId)
         const userEmail = user.emailAddresses[0]?.emailAddress;
 
         if (!userEmail || userEmail !== createdBy) {
@@ -52,16 +52,20 @@ const user = await client.users.getUser(userId)
             const prompt = `Based on the student's answer: "${userAns}", the difficulty level: "${difficultyLevel}", and the question: "${question}", please assume the role of a professional educator grading the student's response.
 
             GRADING RULES:
+            - IF ANSWERS ARE CORRECT, THERE IS NO SHOWN WORK REQUIRED AND POINTS WILL NOT BE DEDUCTED, 
             - Correct answer: 10/10
             - Partially correct answer: 5-9/10 (depending on how close)
             - Completely incorrect answer: 0-4/10
             - Responses like "idk", "I don't know", or clearly off-topic answers: MAXIMUM 4/10
-            - For math questions: Only award 10/10 if the final numerical answer is EXACTLY correct (including units if applicable)
+            - For math questions: Only award 10/10 if the final numerical answer is EXACTLY correct (including units if applicable) AND NO WORK SHOWN IS REQUIRED AS LONG AS FINAL ANSWER IS CORRECT
             
             ADAPTIVE QUESTION GENERATION RULES:
+            - ENSURE THAT EACH QUESTION GENERATED IS NOT THE SAME AS PREVIOUS AND IS A BRAND NEW QUESTION. ALWAYS GENERATE A BRAND NEW QUESTION EACH TIME. IF PREV QUESTION UNKNOWN, MAKE SURE TO COME UP WITH NEW UNTOUCHED QUESTIONS
             - If answer is correct (rating 9-10): Generate a harder but related question that builds on the same concepts
             - If answer is partially correct (rating 5-8): Generate a question of similar difficulty that reinforces the same concepts
             - If answer is incorrect (rating 0-4): Generate an easier question that focuses on the fundamental concepts the student is struggling with
+            - IMPORTANT: Even for responses like "idk" or completely incorrect answers, the new question MUST remain in the same topic area as the original question. For example, if the original question was about calculus, the new question should still be about calculus, just simpler or more fundamental.
+            - For math topics, maintain the same branch of mathematics (e.g., calculus questions should lead to simpler calculus questions, not basic geometry)
             - Always ensure the new question relates to the same topic or concept as the original question
             
             Your response MUST be a **100% valid, parseable JSON object** with the **exact** following structure:
@@ -125,6 +129,9 @@ const user = await client.users.getUser(userId)
         let aiResult;
         try {
             const aiText = aiResp.response.text();
+            
+            // Add debug log to see raw response
+            console.log("Raw AI response:", aiText);
 
             // Step 1: Extract what appears to be JSON
             let jsonText = aiText;
@@ -141,47 +148,47 @@ const user = await client.users.getUser(userId)
             }
 
             // Step 2: Fix common JSON issues
-
-            // Fix newlines in JSON (critical fix for your example)
+            // Fix newlines in JSON
             jsonText = jsonText.replace(/\n\s*/g, ' ');
 
-            // Fix unescaped quotes within string values
-            let inString = false;
-            let fixedText = '';
-            for (let i = 0; i < jsonText.length; i++) {
-                const char = jsonText[i];
-                const nextChar = i < jsonText.length - 1 ? jsonText[i + 1] : '';
-
-                if (char === '"' && (i === 0 || jsonText[i - 1] !== '\\')) {
-                    inString = !inString;
-                    fixedText += char;
-                } else if (inString && char === '\\' && nextChar !== '\\' && nextChar !== '"' && nextChar !== 'n' && nextChar !== 't' && nextChar !== 'r') {
-                    // Add extra backslash for escape characters in strings
-                    fixedText += '\\\\';
-                } else {
-                    fixedText += char;
-                }
-            }
-
-            // Try parsing the fixed JSON
+            // Use JSON.parse with a more graceful fallback
             try {
-                aiResult = JSON.parse(fixedText);
-            } catch (innerErr) {
-                // Fallback handling - create a valid default structure
-                console.error("Error parsing fixed JSON, using fallback:", innerErr);
-
-                // Extract probable content using regex
-                const ratingMatch = fixedText.match(/"rating":\s*(\d+)/);
-                const explanationMatch = fixedText.match(/"explanation":\s*"([^"]*)"/);
-                const questionMatch = fixedText.match(/"question":\s*"([^"]*)"/);
-
-                aiResult = {
-                    feedback: {
-                        rating: ratingMatch ? parseInt(ratingMatch[1]) : 5,
-                        explanation: explanationMatch ? explanationMatch[1] : "Unable to parse explanation.",
-                        question: questionMatch ? questionMatch[1] : "What is the derivative of x²?"
+                aiResult = JSON.parse(jsonText);
+            } catch (parseErr) {
+                console.error("Initial JSON parse failed, attempting fixes:", parseErr);
+                
+                // Try more aggressive fixes if needed
+                try {
+                    // Fix common issues with backslashes in LaTeX expressions
+                    // This handles doubled backslashes in LaTeX that might be incorrectly escaped
+                    jsonText = jsonText.replace(/\\{2,}/g, '\\\\');
+                    
+                    // Fix unmatched quotes
+                    let quoteCount = (jsonText.match(/"/g) || []).length;
+                    if (quoteCount % 2 !== 0) {
+                        // Find potentially unclosed strings and fix them
+                        jsonText = jsonText.replace(/("explanation":\s*"[^"]*)((?!"}))/g, '$1"');
+                        jsonText = jsonText.replace(/("question":\s*"[^"]*)((?!"}))/g, '$1"');
                     }
-                };
+                    
+                    aiResult = JSON.parse(jsonText);
+                } catch (innerErr) {
+                    // Fallback handling - create a valid default structure
+                    console.error("Error parsing fixed JSON, using fallback:", innerErr);
+
+                    // Extract probable content using regex
+                    const ratingMatch = jsonText.match(/"rating":\s*(\d+)/);
+                    const explanationMatch = jsonText.match(/"explanation":\s*"([^"]*)"/);
+                    const questionMatch = jsonText.match(/"question":\s*"([^"]*)"/);
+
+                    aiResult = {
+                        feedback: {
+                            rating: ratingMatch ? parseInt(ratingMatch[1]) : 5,
+                            explanation: explanationMatch ? explanationMatch[1] : "Unable to parse explanation.",
+                            question: questionMatch ? questionMatch[1] : "What is the derivative of x²?"
+                        }
+                    };
+                }
             }
         } catch (err) {
             console.error("Error processing AI response:", err);

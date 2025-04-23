@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { BookOpen, Star, Brain, Zap } from 'lucide-react'
 
 function ExamPage({course}) {
-    const[progress, setProgress] = useState(null)
+    const[progress, setProgress] = useState(0)
    const containerVariants = {
      hidden: { opacity: 0 },
      visible: { 
@@ -25,7 +25,7 @@ function ExamPage({course}) {
    useEffect(()=>{
     if (course && course.questionCount) {
         console.log(course.questionCount)
-        setProgress((course.questionCount + 1) * 20); // Update the progress when questionCount changes
+        setProgress((course.questionCount) * 20); // Update the progress when questionCount changes
       }
    },[course])
  
@@ -80,12 +80,12 @@ function ExamPage({course}) {
            <motion.div variants={itemVariants} className='mb-6'>
              <div className="flex items-center justify-between mb-2">
                <span className="text-sm font-medium text-gray-600">Progress</span>
-               <span className="text-sm font-medium text-indigo-600">{progress == null ? 0 : progress == 0 ? 20 : progress}%</span>
+               <span className="text-sm font-medium text-indigo-600">{progress }%</span>
              </div>
              <div className="relative w-full h-3 bg-gray-100 rounded-full overflow-hidden">
                <div 
                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
-                 style={{ width: `${progress == null ? 0 : progress == 0 ? 20 : progress }%` }}
+                 style={{ width: `${progress }%` }}
                ></div>
                <div className="absolute top-0 left-0 h-full w-full opacity-20">
                  <div className="w-full h-full bg-[radial-gradient(circle_at_2rem_0rem,rgba(255,255,255,0.8),transparent_40%)]"></div>

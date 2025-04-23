@@ -68,7 +68,7 @@ const user = await client.users.getUser(userId)
             .where(eq(EXAM_RESPONSE_TABLE.courseId, courseId));
         }
 
-        return NextResponse.json({ res: session[0] });
+        return NextResponse.json({ res: updateDb[0] });
 
     } catch (err) {
         console.error("Error updating exam session and response:", err);

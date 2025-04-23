@@ -45,6 +45,36 @@ export async function POST(req) {
     Course Layout: ${courseLayout}
     Difficulty Level: ${difficultyLevel}
     Time to complete the question: 5 minutes
+
+         3. **MATHEMATICAL NOTATION**:
+               Use double backslashes (\\\\) for LaTeX commands (e.g., \\\\alpha for α, \\\\frac{x}{y} for fractions).
+               Avoid using triple backslashes (\\\\\\\\) unless required by JavaScript string escaping rules. Only use \\\\ inside LaTeX expressions.
+               Ensure LaTeX commands are written correctly and don't have extra spaces or escapes (e.g., use \\\\frac{x}{y}, not \\\\ frac{x}{y}).
+               Test expressions to verify they render correctly with MathJax.
+               
+            4. **STRUCTURAL INTEGRITY**:
+               - NO line breaks within string values
+               - NO trailing commas after the last element in arrays or objects
+               - Ensure all arrays and objects are properly closed with matching brackets/braces
+               - Ensure all property names are quoted
+            
+            5. **VALIDATION REQUIREMENTS**:
+               - Check that the output passes JSON.parse() without errors
+               - Verify LaTeX expressions are properly escaped for MathJax compatibility
+               - Double-check the entire structure before finalizing response
+            
+            6. **ABSOLUTELY NO**:
+               - Comments (// or /**/)
+               - Undefined values
+               - NaN or Infinity literals (use strings instead)
+               - Extra text outside the JSON structure
+               - Explanations of the JSON structure
+            
+            7. **OUTPUT VERIFICATION**:
+               - After generating JSON, mentally parse it to confirm validity
+               - If any question about validity arises, rewrite the problematic section
+            
+            Return only the JSON object. Any response that does not meet these criteria must be corrected automatically before returning.
     
     The question should require a short or long answer (no multiple choices) and should challenge the student but be solvable within 5 minutes. Only the final answer is required (no steps or intermediate reasoning needed).
     
@@ -56,6 +86,8 @@ export async function POST(req) {
     Example:
     
     {
+    "courseTitle": title here,
+    "courseSummary": summary here,
     "question": "A particle's position in space is given by the vector function $\\mathbf{r}(t) = \\langle \\cos(t^2), \\sin(t^2), t \\rangle$. Find the magnitude of the particle's acceleration vector at time $t = \\sqrt{\\frac{\\pi}{2}}$.",
     "answer": "2\\sqrt{1 + \\pi^2}"
     }`
@@ -71,12 +103,13 @@ export async function POST(req) {
             .trim();
         
         // Handle common LaTeX escape sequences that cause issues
-        cleanedText = cleanedText
-            .replace(/\\\\/g, '\\\\\\\\')  // Convert \\ to \\\\
-            .replace(/\\,/g, ' ')          // Replace \, with space
-            .replace(/\\;/g, ' ')          // Replace \; with space
-            .replace(/\\:/g, ' ')          // Replace \: with space
-            .replace(/\\\s/g, ' ');        // Replace "\ " with space
+        // Handle common LaTeX escape sequences that cause issues
+cleanedText = cleanedText
+.replace(/\\(?!\\|\{|\}|\[|\]|,|;|:|\s)/g, '\\\\') // Better escaping for LaTeX commands
+.replace(/\\,/g, ' ')      // Replace \, with space
+.replace(/\\;/g, ' ')      // Replace \; with space
+.replace(/\\:/g, ' ')      // Replace \: with space
+.replace(/\\\s/g, ' ');    // Replace "\ " with space       // Replace "\ " with space
         
         let aiRes;
         try {

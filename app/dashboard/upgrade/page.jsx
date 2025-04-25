@@ -73,14 +73,14 @@ const ViewUpgrade = () => {
           <div className={`transform transition-all duration-700 delay-100 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-16 opacity-0'}`}>
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden shadow-lg border border-gray-200 relative group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full">
               <div className="absolute top-6 right-6 bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full">
-                CURRENT PLAN
+                MY PLAN
               </div>
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="p-8 relative z-10 h-full flex flex-col">
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">Free Version</h2>
                 <div className="flex items-baseline mb-6">
                   <span className="text-5xl font-bold text-gray-900">$0</span>
-                  <span className="text-gray-500 ml-2">/month</span>
+                  
                 </div>
                 
                 <div className="space-y-4 mb-8 flex-grow">
@@ -121,7 +121,7 @@ const ViewUpgrade = () => {
                 </div>
                 
                 <button className="w-full py-3 bg-gray-200 text-gray-700 font-medium rounded-lg group-hover:bg-gray-300 transition-all duration-300 relative overflow-hidden mt-auto">
-                  <span className="relative z-10">Current Plan</span>
+                  <span className="relative z-10">Owned</span>
                 </button>
               </div>
             </div>
@@ -171,7 +171,7 @@ const ViewUpgrade = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                       </svg>
                     </div>
-                    <p className="text-gray-600 ml-3"> No ads or distractions</p>
+                    <p className="text-gray-600 ml-3"> Faster AI Response Times</p>
                   </div>
                 </div>
                 
@@ -216,12 +216,12 @@ const ViewUpgrade = () => {
             {[
               {
                 title:"More Learning Modes",
-                description: "Access exclusive study modes with premium",
+                description: "Explore advanced and AI-driven learning styles",
                 delay: "700"
               },
               {
-                title: "Custom Quizzes",
-                description: "Create and edit your own quizzes anytime",
+                title: "Custom Flashcards",
+                description: "Create and edit your own flashcards anytime",
                 delay: "800"
               },
               {

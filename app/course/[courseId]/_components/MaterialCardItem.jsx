@@ -229,7 +229,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
           >
             {studyTypeContent?.[item.type]?.length > 0 ? (
               <Button className="cursor-pointer w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-0 hover:from-blue-600 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 py-4 sm:py-5">
-                <span>View</span>
+                <span>View </span>
                 <ArrowRight className="w-4 h-4" />
               </Button>
             ) : (

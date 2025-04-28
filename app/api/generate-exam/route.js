@@ -83,6 +83,7 @@ export async function POST(req) {
     Provide the complete problem without breaking it into steps.
     Ensure that the answer is the final result, and use LaTeX formatting for rendering.
     
+    **Example of the JSON structure you should return:**
     Example:
     
     {
@@ -90,7 +91,11 @@ export async function POST(req) {
     "courseSummary": summary here,
     "question": "A particle's position in space is given by the vector function $\\mathbf{r}(t) = \\langle \\cos(t^2), \\sin(t^2), t \\rangle$. Find the magnitude of the particle's acceleration vector at time $t = \\sqrt{\\frac{\\pi}{2}}$.",
     "answer": "2\\sqrt{1 + \\pi^2}"
-    }`
+    }
+    IF NOT RETURNED IN THIS FORMAT, PLEASE REWRITE THE RESPONSE TO MEET THE CRITERIA.
+    The question should require a short or long answer (no multiple choices) and should challenge the student but be solvable within 5 minutes. Only the final answer is required (no steps or intermediate reasoning needed).
+    `
+    
     try {
         const aiResponse = await GenerateStartExam.sendMessage(prompt);
         const aiText = aiResponse.response.text();

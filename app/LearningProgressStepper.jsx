@@ -11,13 +11,13 @@ import { ArrowRight, CheckCircle, CreditCard, XCircle } from 'lucide-react';
 const LearningProgressStepper = ({ currentMode }) => {
   const { setMode, currentModes } = useLearningMode();
   const { course } = useCourse();
-// Update the state structure to include both exists flag and data
-const [generatedModes, setGeneratedModes] = useState({
-  teach: { exists: false, data: null },
-  study: { exists: false, data: null },
-  practice: { exists: false, data: null },
-  exam: { exists: false, data: null }
-});
+  // Update the state structure to include both exists flag and data
+  const [generatedModes, setGeneratedModes] = useState({
+    teach: { exists: false, data: null },
+    study: { exists: false, data: null },
+    practice: { exists: false, data: null },
+    exam: { exists: false, data: null }
+  });
   const [loading, setLoading] = useState(false);
   const [loadingMode, setLoadingMode] = useState(null); // Track which mode is loading
   const [prevMode, setPrevMode] = useState();
@@ -31,10 +31,10 @@ const [generatedModes, setGeneratedModes] = useState({
   const router = useRouter();
   const { user, isLoaded } = useUser();
   const [showIntroOverlay, setShowIntroOverlay] = useState(false);
-  const [teachFeedback,setTeachFeedback] = useState()
+  const [teachFeedback, setTeachFeedback] = useState()
   useEffect(() => {
     if (!isLoaded || !user || !course?.courseId) return;
- 
+
     GetUserDetails();
     CheckExist();
     GetTeachFeedback()
@@ -47,7 +47,7 @@ const [generatedModes, setGeneratedModes] = useState({
     }
   }, []);
 
- 
+
 
 
 
@@ -55,15 +55,15 @@ const [generatedModes, setGeneratedModes] = useState({
     setShowIntroOverlay(false);
     localStorage.setItem('cramsmartCourseIntroSeen', 'true');
   };
-  
-  const GetUserDetails=async()=>{
-    const res = await axios.post('/api/check-new-member',{
+
+  const GetUserDetails = async () => {
+    const res = await axios.post('/api/check-new-member', {
       createdBy: user?.primaryEmailAddress?.emailAddress
     })
     setUserDetails(res.data.res)
   }
 
- 
+
   const showRedirectToast = (message) => {
     toast(
       <div className="flex items-center gap-2">
@@ -103,7 +103,7 @@ const [generatedModes, setGeneratedModes] = useState({
       }
     );
   };
-  
+
   const showErrorToast = (message) => {
     toast(
       <div className="flex items-center gap-2">
@@ -144,9 +144,9 @@ const [generatedModes, setGeneratedModes] = useState({
     );
   };
 
-  const GetTeachFeedback=async()=>{
+  const GetTeachFeedback = async () => {
     const dbRes = await axios.get('/api/get-teach-feedback?courseId=' + course?.courseId)
-    setTeachFeedback(dbRes.data.result.aiFeedback)
+    setTeachFeedback(dbRes.data.result.aiFeedback || null)
   }
 
 
@@ -160,7 +160,7 @@ const [generatedModes, setGeneratedModes] = useState({
     });
     console.log(res.data)
     setGeneratedModes(res.data);
-   
+
   };
 
   useEffect(() => {
@@ -168,10 +168,10 @@ const [generatedModes, setGeneratedModes] = useState({
   }, [course]);
 
   const GenerateStudyContent = async (mode, lastMode) => {
-   
+
 
     if (mode === 'teach') {
-      if(userDetails?.remainingCredits - 2  >= 0){
+      if (userDetails?.remainingCredits - 2 >= 0) {
         setLoading(true);
         setLoadingMode(mode); // Set which mode is currently loading
         showSuccessToast('Content is generating...');
@@ -179,14 +179,14 @@ const [generatedModes, setGeneratedModes] = useState({
         const topic = await GetModeTopics(lastMode)
         console.log(summary);
         console.log(mode);
-    
+
         if (!summary) {
           alert("No content available to generate.");
           setLoading(false);
           setLoadingMode(null); // Reset loading mode
           return;
         }
-    
+
         let payload;
         payload = {
           courseId: course?.courseId,
@@ -197,19 +197,19 @@ const [generatedModes, setGeneratedModes] = useState({
           createdBy: course?.createdBy
         };
         console.log("Teach Payload: ", payload);
-  
+
         const res = await axios.post('/api/vapi/generate', payload);
         console.log(res.data);
         showCreditSpentToast('2 Credits Spent')
-        showRedirectToast('Redirecting...')
+
         router.push('/teach-me/' + course?.courseId);
       } else {
         showErrorToast('Insufficient Credit')
       }
-     
+
 
     } else if (mode === 'study') {
-      if(userDetails?.remainingCredits - 1 >= 0){
+      if (userDetails?.remainingCredits - 1 >= 0) {
         setLoading(true);
         setLoadingMode(mode); // Set which mode is currently loading
         showSuccessToast('Content is generating...');
@@ -217,14 +217,14 @@ const [generatedModes, setGeneratedModes] = useState({
         const topic = await GetModeTopics(lastMode)
         console.log(summary);
         console.log(mode);
-    
+
         if (!summary) {
           alert("No content available to generate.");
           setLoading(false);
           setLoadingMode(null); // Reset loading mode
           return;
         }
-    
+
         let payload;
         payload = {
           courseId: course?.courseId,
@@ -235,19 +235,19 @@ const [generatedModes, setGeneratedModes] = useState({
           createdBy: course?.createdBy
         };
         console.log("Study Payload: ", payload);
-  
+
         const res = await axios.post('/api/generate-course-outline', payload);
         console.log(res.data);
         showCreditSpentToast('1 Credits Spent')
-        showRedirectToast('Redirecting...')
+
         router.push('/course/' + course?.courseId);
       } else {
         showErrorToast('Insufficient Credit')
       }
-      
+
 
     } else if (mode === 'practice') {
-      if(userDetails?.remainingCredits - 1 >= 0){
+      if (userDetails?.remainingCredits - 1 >= 0) {
         setLoading(true);
         setLoadingMode(mode); // Set which mode is currently loading
         showSuccessToast('Content is generating...');
@@ -255,14 +255,14 @@ const [generatedModes, setGeneratedModes] = useState({
         const topic = await GetModeTopics(lastMode)
         console.log(summary);
         console.log(mode);
-    
+
         if (!summary) {
           alert("No content available to generate.");
           setLoading(false);
           setLoadingMode(null); // Reset loading mode
           return;
         }
-    
+
         let payload;
         payload = {
           courseId: course?.courseId,
@@ -273,19 +273,19 @@ const [generatedModes, setGeneratedModes] = useState({
           createdBy: course?.createdBy
         };
         console.log("Practice Payload: ", payload);
-  
+
         const res = await axios.post('/api/generate-practice-questions', payload);
         console.log(res.data);
         showCreditSpentToast('1 Credits Spent')
-        showRedirectToast('Redirecting...')
+
         router.push('/quiz/' + course?.courseId);
       } else {
         showErrorToast('Insufficient Credit')
       }
-  
+
 
     } else if (mode === 'exam') {
-      if(userDetails?.remainingCredits - 1 >= 0){
+      if (userDetails?.remainingCredits - 1 >= 0) {
         setLoading(true);
         setLoadingMode(mode); // Set which mode is currently loading
         showSuccessToast('Content is generating...');
@@ -293,14 +293,14 @@ const [generatedModes, setGeneratedModes] = useState({
         const topic = await GetModeTopics(lastMode)
         console.log(summary);
         console.log(mode);
-    
+
         if (!summary) {
           alert("No content available to generate.");
           setLoading(false);
           setLoadingMode(null); // Reset loading mode
           return;
         }
-    
+
         let payload;
         payload = {
           courseId: course?.courseId,
@@ -312,19 +312,19 @@ const [generatedModes, setGeneratedModes] = useState({
           exam_time: 30
         };
         console.log("Exam Payload: ", payload);
-  
+
         const res = await axios.post('/api/generate-exam', payload);
         console.log(res.data);
         showCreditSpentToast('1 Credits Spent')
-        showRedirectToast('Redirecting...')
+
         router.push('/exam/' + course?.courseId);
       } else {
         showErrorToast('Insufficient Credit')
       }
-    
+
     }
-   
-    
+
+
     setLoading(false);
     setLoadingMode(null); // Reset loading mode
   };
@@ -343,13 +343,31 @@ const [generatedModes, setGeneratedModes] = useState({
       combinedSummary = course?.aiFeedback;
     } else if (prevMode == 'practice') {
       console.log('practice');
-      combinedSummary = course?.aiResponse;
+      combinedSummary = course?.courseLayout;
     } else if (prevMode == 'exam') {
       console.log('exam');
-      combinedSummary = course?.aiResponse;
+      try {
+        const res = await axios.get('/api/get-feedback?courseId=' + course?.courseId)
+        const resData = res?.data?.result;
+        console.log(resData);
+        if (resData && Array.isArray(resData)) {
+          combinedSummary = resData
+            ?.filter(item => item?.aiResponse?.feedback?.rating < 6)
+            ?.map(item => item?.aiResponse?.feedback?.explanation)
+            ?.join(" || ");
+        }
+        console.log(combinedSummary);
+        if (!combinedSummary) {
+          console.log('No feedback data found, using course AI response.');
+          combinedSummary = course?.aiResponse
+        }
+      } catch (err) {
+        combinedSummary = course?.aiResponse;
+      }
+      
     }
     return combinedSummary;
-  };
+  }
 
   const GetModeTopics = async (prevMode) => {
     let topic = "";
@@ -357,7 +375,7 @@ const [generatedModes, setGeneratedModes] = useState({
     if (prevMode == 'study') {
       console.log('study');
       topic = course?.aiResponse?.courseTitle
-    
+
     } else if (prevMode == 'teach') {
       console.log('teach');
       topic = course?.topic;
@@ -366,7 +384,15 @@ const [generatedModes, setGeneratedModes] = useState({
       topic = course?.topic;
     } else if (prevMode == 'exam') {
       console.log('exam');
-      topic = course?.aiResponse;
+      const response = await axios.post('/api/study-type', {
+        courseId: course?.courseId,
+        studyType: 'exam'
+      })
+
+      // Clone the object to remove circular references
+      const cleanedData = JSON.parse(JSON.stringify(response.data))
+      console.log(cleanedData);
+      topic = cleanedData?.topic;
     }
     return topic;
   };
@@ -392,12 +418,12 @@ const [generatedModes, setGeneratedModes] = useState({
     if (generatedModes[mode.id].exists) {
       if (mode.id === 'teach') {
         console.log(generatedModes[mode.id]?.data?.progress)
-        if(generatedModes[mode.id]?.data?.progress >= 100){
+        if (generatedModes[mode.id]?.data?.progress >= 100) {
           router.push('/teach-me/' + course?.courseId + '/feedback');
         } else {
           router.push('/teach-me/' + course?.courseId);
         }
-       
+
       } else if (mode.id === 'practice') {
         router.push('/quiz/' + course?.courseId);
       } else if (mode.id === 'study') {
@@ -406,12 +432,12 @@ const [generatedModes, setGeneratedModes] = useState({
         console.log(generatedModes[mode.id]?.data?.questionCount)
         console.log(generatedModes[mode.id]?.data?.exam_time)
         console.log(course)
-        if(generatedModes[mode.id]?.data?.questionCount >= 5 || generatedModes[mode.id]?.data?.exam_time == 0){
+        if (generatedModes[mode.id]?.data?.questionCount >= 5 || generatedModes[mode.id]?.data?.exam_time == 0) {
           router.push('/exam/' + course?.courseId + '/feedback');
         } else {
           router.push('/exam/' + course?.courseId)
         }
-        
+
       }
     } else {
       // Pass lastMode directly instead of relying on prevMode from state
@@ -435,6 +461,52 @@ const [generatedModes, setGeneratedModes] = useState({
   const currentModeIndex = modeIndices[currentMode] || 0;
   // Calculate progress percentage (0% for teach, 33% for study, 66% for practice, 100% for exam)
   const progressWidth = currentModeIndex > 0 ? ((currentModeIndex) / (modes.length - 1)) * 100 : 0;
+
+
+  // Add this to your existing styles section
+  const goldenShimmerStyles = `
+.golden-locked {
+  background: linear-gradient(
+    45deg, 
+    #FFD700,
+    #FDB931,
+    #F0C419,
+    #FFD700
+  );
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  animation: golden-pulse 2s infinite, golden-shimmer 3s infinite;
+}
+
+@keyframes golden-pulse {
+  0% {
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  }
+}
+
+@keyframes golden-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.golden-locked:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+}
+`;
+
 
   const shimmerStyles = `
   @keyframes subtle-diamond-shine {
@@ -479,7 +551,7 @@ const [generatedModes, setGeneratedModes] = useState({
   }
 `;
 
-const calloutStyles = `
+  const calloutStyles = `
   /* Enhanced pulse effect for ALL circles */
   .diamond-shimmer {
     animation: circle-pulse 4s infinite;
@@ -542,8 +614,9 @@ const calloutStyles = `
 
   return (
     <div className="w-full max-w-3xl mx-auto mb-10">
-       <style>{shimmerStyles}</style>
-       <style>{calloutStyles}</style>
+      <style>{shimmerStyles}</style>
+      <style>{calloutStyles}</style>
+      <style>{goldenShimmerStyles}</style>
       {/* Top label showing current mode */}
       <div className="text-center mb-4">
         <motion.span
@@ -571,75 +644,83 @@ const calloutStyles = `
 
         {/* Step circles */}
         <div className="relative flex justify-between">
-        {modes.map((mode, index) => {
-          const isCompleted = index <= currentIndex && generatedModes[mode.id].exists;
-          const isActive = index === currentIndex;
-          const isGenerated = generatedModes[mode.id].exists;
-          const isLoading = loadingMode === mode.id && loading;
+          {modes.map((mode, index) => {
+            const isCompleted = index <= currentIndex && generatedModes[mode.id].exists;
+            const isActive = index === currentIndex;
+            const isGenerated = generatedModes[mode.id].exists;
+            const isLoading = loadingMode === mode.id && loading;
 
-          return (
-            <div key={mode.id} className="flex flex-col items-center">
-              {/* Circle - diamond-shimmer class applied to ALL circles */}
-              <motion.div
-                initial={{ scale: 0.8 }}
-                animate={{
-                  scale: isActive ? 1.2 : 1,
-                  boxShadow: isActive ? '0 0 0 4px rgba(99, 102, 241, 0.2)' : 'none',
-                  rotate: isLoading ? 360 : 0,
-                }}
-                transition={{
-                  rotate: isLoading ? { repeat: Infinity, duration: 1, ease: "linear" } : { duration: 0 }
-                }}
-                whileHover={{ scale: 1.1, cursor: 'pointer' }}
-                onClick={() => !loading && handleStepClick(mode)}
-                className={`w-10 h-10 rounded-full flex items-center justify-center z-10 transition-colors diamond-shimmer ${
-                  isLoading
-                    ? 'bg-indigo-300 text-white'
-                    : isActive
-                      ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+            return (
+              <div key={mode.id} className="flex flex-col items-center">
+                {/* Circle - diamond-shimmer class applied to ALL circles */}
+                <motion.div
+                  initial={{ scale: 0.8 }}
+                  animate={{
+                    scale: isActive ? 1.2 : 1,
+                    boxShadow: isActive
+                      ? '0 0 0 4px rgba(99, 102, 241, 0.2)'
+                      : 'none',
+                    rotate: isLoading ? 360 : 0,
+                  }}
+                  transition={{
+                    rotate: isLoading ? { repeat: Infinity, duration: 1, ease: "linear" } : { duration: 0 },
+                    scale: { type: "spring", stiffness: 300, damping: 20 }
+                  }}
+                  whileHover={{
+                    scale: 1.1,
+                    y: !isGenerated ? -5 : 0,
+                    transition: { duration: 0.2 }
+                  }}
+                  onClick={() => !loading && handleStepClick(mode)}
+                  className={`
+                  w-10 h-10 rounded-full flex items-center justify-center z-10 transition-all duration-300
+                  ${isLoading
+                      ? 'bg-indigo-300 text-white'
+                      : isActive
+                        ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                        : isGenerated
+                          ? 'bg-indigo-400 text-white'
+                          : isCompleted
+                            ? 'bg-gradient-to-r from-indigo-300 to-purple-400 text-white'
+                            : 'golden-locked text-yellow-900 font-bold cursor-pointer'
+                    }
+                `}
+                >
+                  {isLoading ? (
+                    <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : isActive || isGenerated || isCompleted ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  ) : (
+                    <span className="text-yellow-900 font-bold">★</span>
+                  )}
+                </motion.div>
+
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 + (index * 0.1) }}
+                  className={`mt-2 text-sm font-medium ${isActive
+                      ? 'text-indigo-600 font-semibold'
                       : isGenerated
-                        ? 'bg-indigo-400 text-white'
+                        ? 'text-indigo-500'
                         : isCompleted
-                          ? 'bg-gradient-to-r from-indigo-300 to-purple-400 text-white'
-                          : 'bg-white border-2 border-gray-200 text-gray-400'
-                }`}
-              >
-                {isLoading ? (
-                  <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : isActive || isGenerated || isCompleted ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                ) : (
-                  index + 1
-                )}
-              </motion.div>
-
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 + (index * 0.1) }}
-                className={`mt-2 text-sm font-medium ${
-                  isActive
-                    ? 'text-indigo-600 font-semibold'
-                    : isGenerated
-                      ? 'text-indigo-500'
-                      : isCompleted
-                        ? 'text-gray-600'
-                        : 'text-gray-400'
-                }`}
-              >
-                {mode.label}
-              </motion.span>
-            </div>
-          );
-        })}
+                          ? 'text-gray-600'
+                          : 'text-gray-400'
+                    }`}
+                >
+                  {mode.label}
+                </motion.span>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
-  </div>
   );
 };
 

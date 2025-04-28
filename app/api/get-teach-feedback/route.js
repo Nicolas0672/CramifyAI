@@ -30,7 +30,7 @@ const user = await client.users.getUser(userId)
     .where(eq(TEACH_ME_FEEDBACK_TABLE.courseId, courseId))
 
     const record = dbRes[0];
-    if (record.createdBy !== email) {
+    if (record != null && record.createdBy !== email) {
         return NextResponse.json({ error: "Forbidden: You are not authorized to access this record." }, { status: 403 });
     }
 

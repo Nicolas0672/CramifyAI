@@ -5,7 +5,7 @@ import { MathJax, MathJaxContext } from 'better-react-mathjax'
 import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import ExamPage from '../_components/ExamPage'
-import { ArrowRight, CheckCircle, Clock,  XCircle, BrainCircuit } from 'lucide-react'
+import { ArrowRight, CheckCircle, Clock, XCircle, BrainCircuit } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 function ExamStart() {
@@ -21,7 +21,7 @@ function ExamStart() {
 
   const { courseId } = useParams()
 
- 
+
 
   // Fetch the first question and initialize timer
   useEffect(() => {
@@ -70,7 +70,7 @@ function ExamStart() {
     }
   }
 
-  const GetExamDetails=async()=>{
+  const GetExamDetails = async () => {
     const response = await axios.post('/api/study-type', {
       courseId: courseId,
       studyType: 'exam'
@@ -81,17 +81,17 @@ function ExamStart() {
     setCourse(cleanedData)
   }
 
-  useEffect(()=>{
-    if(course != null){
-      if(course?.exam_time == 0 || course?.questionCount >= 5){
+  useEffect(() => {
+    if (course != null) {
+      if (course?.exam_time == 0 || course?.questionCount >= 5) {
         showTimeUpToast('Exam is completed!')
         router.push(`/exam/${courseId}/feedback`)
-        
+
       }
-     
+
     }
-    
-  },[userAnswer, course])
+
+  }, [userAnswer, course])
 
   // useEffect(()=>{
   //     const interval = setInterval(()=>{
@@ -133,7 +133,7 @@ function ExamStart() {
       }
     );
   };
-  
+
   const showErrorToast = (message) => {
     toast(
       <div className="flex items-center gap-2">
@@ -155,70 +155,70 @@ function ExamStart() {
   };
 
   // For redirecting
-const showRedirectToast = (message) => {
-  toast(
-    <div className="flex items-center gap-2">
-      <div className="bg-green-100 p-2 rounded-full">
-        <ArrowRight className="w-5 h-5 text-green-500" />
-      </div>
-      <span>{message}</span>
-    </div>,
-    {
-      style: {
-        background: 'linear-gradient(to right, #ecfdf5, #d1fae5)',
-        border: '1px solid #6ee7b7',
-        color: '#065f46',
-        borderRadius: '0.5rem',
-      },
-      duration: 3000,
-    }
-  );
-};
+  const showRedirectToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-green-100 p-2 rounded-full">
+          <ArrowRight className="w-5 h-5 text-green-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #ecfdf5, #d1fae5)',
+          border: '1px solid #6ee7b7',
+          color: '#065f46',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
 
-// For deciding next question
-const showThinkingToast = (message) => {
-  toast(
-    <div className="flex items-center gap-2">
-      <div className="bg-purple-100 p-2 rounded-full">
-        <BrainCircuit className="w-5 h-5 text-purple-500" />
-      </div>
-      <span>{message}</span>
-    </div>,
-    {
-      style: {
-        background: 'linear-gradient(to right, #f5f3ff, #ede9fe)',
-        border: '1px solid #c4b5fd',
-        color: '#5b21b6',
-        borderRadius: '0.5rem',
-      },
-      duration: 3000,
-    }
-  );
-};
+  // For deciding next question
+  const showThinkingToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-purple-100 p-2 rounded-full">
+          <BrainCircuit className="w-5 h-5 text-purple-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #f5f3ff, #ede9fe)',
+          border: '1px solid #c4b5fd',
+          color: '#5b21b6',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
 
-// For time's up
-const showTimeUpToast = (message) => {
-  toast(
-    <div className="flex items-center gap-2">
-      <div className="bg-amber-100 p-2 rounded-full">
-        <Clock className="w-5 h-5 text-amber-500" />
-      </div>
-      <span>{message}</span>
-    </div>,
-    {
-      style: {
-        background: 'linear-gradient(to right, #fffbeb, #fef3c7)',
-        border: '1px solid #fcd34d',
-        color: '#92400e',
-        borderRadius: '0.5rem',
-      },
-      duration: 3000,
-    }
-  );
-};
-  
+  // For time's up
+  const showTimeUpToast = (message) => {
+    toast(
+      <div className="flex items-center gap-2">
+        <div className="bg-amber-100 p-2 rounded-full">
+          <Clock className="w-5 h-5 text-amber-500" />
+        </div>
+        <span>{message}</span>
+      </div>,
+      {
+        style: {
+          background: 'linear-gradient(to right, #fffbeb, #fef3c7)',
+          border: '1px solid #fcd34d',
+          color: '#92400e',
+          borderRadius: '0.5rem',
+        },
+        duration: 3000,
+      }
+    );
+  };
+
   const handleSave = async () => {
-    if(userAnswer.length == 0){
+    if (userAnswer.length == 0) {
       showErrorToast('Invalid Answer')
       return;
     }
@@ -259,14 +259,14 @@ const showTimeUpToast = (message) => {
         showTimeUpToast('Time is up!')
         clearInterval(interval);
         router.push(`/exam/${courseId}/feedback`)
-       } // Stop timer when time is up
+      } // Stop timer when time is up
     }, 1000);
 
     return () => clearInterval(interval);
   }, [startTime, course.exam_time]);
 
-  const updateExamTime=async()=>{
-    const res = await axios.post('/api/update-exam-time',{
+  const updateExamTime = async () => {
+    const res = await axios.post('/api/update-exam-time', {
       createdBy: course?.createdBy,
       courseId: course?.courseId
     })
@@ -274,12 +274,12 @@ const showTimeUpToast = (message) => {
   }
   // Handle answer submission
   const handleSubmit = async () => {
-    if(userAnswer.length == 0 || userAnswer == ""){
+    if (userAnswer.length == 0 || userAnswer == "") {
       showErrorToast('Invalid Answer')
       return;
     }
     if (questionCount >= 5) return;
-    if(questionCount < 4){
+    if (questionCount < 4) {
       showThinkingToast('Deciding your next quesiton...')
     }
     setLoading(true);
@@ -426,16 +426,43 @@ const showTimeUpToast = (message) => {
           <div className="flex justify-between">
             {questionCount <= 5 && <Button onClick={() => handleSave()} className={`cursor-pointer bg-gradient-to-r from-blue-400 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}>Save Answer</Button>}
             {questionCount >= 4 ? (
-              <Button 
-              disabled={loading}
-              onClick={() => {
-                
-                handleSubmit();  // First, execute handleSubmit()
-                showRedirectToast('Redirecting to feedback...')
-                router.push(`/exam/${courseId}/feedback`);  // Then, navigate
-              }} className="cursor-pointer z-20 bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center">
-                <CheckCircle className="w-5 h-5 mr-2" />
-                Finish
+              <Button
+                disabled={loading}
+                onClick={async () => {
+                  try {
+                    setLoading(true);
+                    await handleSubmit();  // Wait for handleSubmit to complete
+                    showRedirectToast('Redirecting to feedback...');
+                    // Add a small delay to ensure state updates are processed
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await GetExamDetails(); // Fetch latest exam details
+
+                    // Only redirect if we have all 5 questions
+                    if (course?.questionCount >= 5) {
+                      router.push(`/exam/${courseId}/feedback`);
+                    } else {
+                      showErrorToast('Please wait for all questions to be processed');
+                      setLoading(false);
+                    }
+                  } catch (error) {
+                    console.error("Error during submission:", error);
+                    showErrorToast('Error submitting final answer');
+                    setLoading(false);
+                  }
+                }}
+                className="cursor-pointer z-20 bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                    Finish
+                  </>
+                )}
               </Button>
             ) : (
               <Button

@@ -231,10 +231,11 @@ function Create() {
                     console.log("Request Payload:", payload);
         
                     // Send the POST request
+                    showSuccessToast("Your study plan is generating...");
                     const res = await axios.post('/api/generate-course-outline', payload);
                     console.log("Response from API:", res.data);
                     showCreditSpentToast('1 Credits Spent')
-                    showSuccessToast("Your course content is generating...")
+                  
                     router.replace('/dashboard')
                 
             }
@@ -247,11 +248,11 @@ function Create() {
                     createdBy: data?.createdBy,
                     courseLayout: data?.courseLayout
                 };
-        
+                showSuccessToast("Your practice questions are generating...");
                 const res = await axios.post('/api/generate-practice-questions', practicePayload);
                 console.log("Response from API:", res.data);
                 showCreditSpentToast('1 Credits Spent')
-                showSuccessToast("Your practice questions are generating...");
+                
                 router.replace('/dashboard')
             }
             else if(data?.courseType == 'Exam'){
@@ -263,10 +264,11 @@ function Create() {
                     createdBy: data?.createdBy,
                     exam_time: 30
                 }
+                showSuccessToast("Your exam is generating...");
                 const res = await axios.post('/api/generate-exam',examPayload)
                 console.log("Response from API:", res.data);
                 showCreditSpentToast('1 Credits Spent')
-                showSuccessToast("Your exam is generating...");
+                
                 router.replace('/dashboard')
             }
     

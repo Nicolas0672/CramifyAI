@@ -582,8 +582,8 @@ const [dataLoaded, setDataLoaded] = useState(false);
 
   // Add this new function to handle insufficient credits for Teach mode
   const warnAboutLowCredits = () => {
-    if (totalCredit <= 3) {
-      showWarningToast(`You only have ${totalCredit || 0} credits remaining. Consider upgrading your plan.`);
+    if (totalCredit <= 1) {
+      showWarningToast(`You only have ${totalCredit || 0} credits remaining. Consider purchasing more credits.`);
     }
   };
 

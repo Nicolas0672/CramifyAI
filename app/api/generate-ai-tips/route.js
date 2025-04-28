@@ -5,7 +5,14 @@ import { NextResponse } from "next/server";
 export async function POST(req) {
     const {createdBy} = await req.json()
     try {
-        const prompt = 'Generate one short concise study tip to motivate students to learn and study in {motivationTips: **Place tip here**} JSON format';
+        const prompt = `
+Generate one short, motivational study tip for students.
+
+Respond ONLY with a JSON object in this exact format:
+{ "motivationTips": "Your tip here as a single sentence." }
+
+Do not include any extra text, explanation, or nested fields.
+`;
         console.log("Sending AI Request...");
         const aiResp = await GenerateStudyTip.sendMessage(prompt);
 

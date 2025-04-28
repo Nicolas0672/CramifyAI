@@ -1,83 +1,94 @@
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion'; // For animations
-import { AlertTriangle, ArrowRight, CheckCircle, Loader2, RefreshCcw, Sparkles } from 'lucide-react'; // Modern icon
+import { motion } from 'framer-motion';
+import { AlertTriangle, ArrowRight, CheckCircle, Loader2, RefreshCcw, Sparkles, XCircle } from 'lucide-react';
 import axios from 'axios';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { useUser } from '@clerk/nextjs';
 
-
 function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
   const [loading, setLoading] = useState(false);
-  const [userDetails, setUserDetails] = useState()
-  const { user, isLoaded } = useUser()
-  const [noteLoading, setNoteLoading] = useState(false)
+  const [userDetails, setUserDetails] = useState();
+  const { user, isLoaded } = useUser();
+  const [noteLoading, setNoteLoading] = useState(false);
+  const [notificationShown, setNotificationShown] = useState(false);
 
   useEffect(() => {
     if (!isLoaded || !user) return;
-    user && GetUserDetails()
-  }, [user, isLoaded])
+    user && GetUserDetails();
+  }, [user, isLoaded]);
 
   useEffect(() => {
-   course&&checkNoteStatus()
-   
-  }, [course])
+    if (course && course?.status !== 'Ready') {
+      checkNoteStatus();
+    }
+  }, [course]);
 
   const GetUserDetails = async () => {
     const res = await axios.post('/api/check-new-member', {
       createdBy: user?.primaryEmailAddress?.emailAddress
-    })
-    setUserDetails(res.data.res)
-  }
-
-  
+    });
+    setUserDetails(res.data.res);
+  };
 
   const checkNoteStatus = async () => {
-    if(course?.status != 'Ready'){
-      showWarningToast('Your content is being pulled. Please wait...')
-    // show message
-    let attempt = 0;
-    const maxAttemp = 30;
-    setNoteLoading(true)
-    while (attempt < maxAttemp) {
-      console.log('Check status')
-      const res = await axios.get(`/api/get-note-status?courseId=${course?.courseId}`)
-      if (res.data.status == 'Ready') {
-        setLoading(false)
-        setNoteLoading(false)
-        await refreshData();
-        showSuccessToast('Your content is ready to view')
-        break
+    if (course?.status !== 'Ready') {
+      // Only show warning toast once
+      if (!notificationShown) {
+        showWarningToast('Your content is being pulled. Please wait...');
+        setNotificationShown(true);
       }
-      await new Promise((res) => setTimeout(res, 2000))
-      attempt++
+      
+      let attempt = 0;
+      const maxAttempt = 30;
+      setNoteLoading(true);
+      
+      while (attempt < maxAttempt) {
+        console.log('Check status');
+        const res = await axios.get(`/api/get-note-status?courseId=${course?.courseId}`);
+        if (res.data.status === 'Ready') {
+          setLoading(false);
+          setNoteLoading(false);
+          await refreshData();
+          
+          // Show success toast only if it wasn't shown before
+          if (!notificationShown) {
+            showSuccessToast('Your content is ready to view');
+          }
+          break;
+        }
+        await new Promise((res) => setTimeout(res, 2000));
+        attempt++;
+      }
     }
-    }
-    
-
-  }
+  };
 
   const checkStatus = async (recordId) => {
-    let attemps = 0;
-    const maxAttempts = 40
+    let attempts = 0;
+    const maxAttempts = 40;
 
-    while (attemps < maxAttempts) {
-      const res = await axios.get(`/api/get-check-status?id=${recordId}`)
-      console.log('Check status')
-      if (res.data.status == 'Ready') {
-        setLoading(false)
+    while (attempts < maxAttempts) {
+      console.log('Check status');
+      const res = await axios.get(`/api/get-check-status?id=${recordId}`);
+      if (res.data.status === 'Ready') {
+        setLoading(false);
         await refreshData();
-        showSuccessToast('Your content is ready to view');
+        
+        // Only show success toast if it wasn't shown before
+        if (!notificationShown) {
+          showSuccessToast('Your content is ready to view');
+          setNotificationShown(true);
+        }
         break;
       }
-      await new Promise((res) => setTimeout(res, 2000))
-      attemps++
+      await new Promise((res) => setTimeout(res, 2000));
+      attempts++;
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const showSuccessToast = (message) => {
     toast(
@@ -140,25 +151,27 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
   };
 
   const GenerateContent = async () => {
+    // Reset notification state when generating new content
+    setNotificationShown(false);
     showSuccessToast('Generating content');
     setLoading(true);
-    const chapters = course?.aiResponse?.chapters
-
+    
+    const chapters = course?.aiResponse?.chapters;
     const combinedCourseLayout = chapters.map(chapter => {
       const title = chapter.title;
-      const summary = chapter.summary
+      const summary = chapter.summary;
       const topic = (chapter.topics || []).join(", ");
       return `${title}: ${summary}. Topics covered: ${topic}`;
-    })
-      .join(' || ')
+    }).join(' || ');
 
     const result = await axios.post('/api/generate-content', {
       courseId: course?.courseId,
       type: item.name,
       chapters: combinedCourseLayout,
     });
+    
     console.log('generating flashcards', result);
-    checkStatus(result.data.id)
+    checkStatus(result.data.id);
   };
 
   return studyTypeContent?.[item.type]?.length > 0 ? (
@@ -240,14 +253,13 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
                   } text-white border-0 shadow-md transition-all duration-300 flex items-center justify-center gap-2 py-4 sm:py-5`}
                 onClick={(e) => {
                   e.preventDefault();
-                  if (!noteLoading) {
+                  if (!noteLoading && !loading) {
                     GenerateContent();
-
                   }
                 }}
                 disabled={noteLoading || loading}
               >
-                {noteLoading || loading? (
+                {noteLoading || loading ? (
                   <>
                     <RefreshCcw className="w-4 h-4 animate-spin" />
                     <span>Generating...</span>

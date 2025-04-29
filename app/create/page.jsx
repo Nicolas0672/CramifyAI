@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import TopicInput from './_components/TopicInput'
 import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
-import { CheckCircle, CreditCard, Loader2Icon, XCircle } from 'lucide-react'
+import { AlertTriangle, CheckCircle, CreditCard, Loader2Icon, XCircle } from 'lucide-react'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { STUDY_MATERIAL_TABLE } from '@/configs/schema'
 import { db } from '@/configs/db'
@@ -31,6 +31,7 @@ function Create() {
     const GetFileUrl=useMutation(api.fileStorage.getFileUrl)
     const [fileName, setFileName] = useState()
     const[userDetails, setUserDetails] = useState()
+    const MAX_LAYOUT_LENGTH = 1000; // Set your max length here
 
 
     const { user } = useUser()
@@ -53,6 +54,15 @@ function Create() {
         setPdfFile(file)
         setHasPdf(file ? true : false)
     }
+
+    const validateLayout = (content) => {
+      if (!content) return '';
+      if (content.length > MAX_LAYOUT_LENGTH) {
+          showWarningToast(`Content has been truncated to ${MAX_LAYOUT_LENGTH} characters`);
+          return content.slice(0, MAX_LAYOUT_LENGTH);
+      }
+      return content;
+  };
 
     const GetUserDetails=async()=>{
         const res = await axios.post('/api/check-new-member',{
@@ -211,6 +221,26 @@ function Create() {
         );
       };
 
+      const showWarningToast = (message) => {
+        toast(
+            <div className="flex items-center gap-2">
+                <div className="bg-yellow-100 p-2 rounded-full">
+                    <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                </div>
+                <span>{message}</span>
+            </div>,
+            {
+                style: {
+                    background: 'linear-gradient(to right, #fefce8, #fef9c3)',
+                    border: '1px solid #fde047',
+                    color: '#854d0e',
+                    borderRadius: '0.5rem',
+                },
+                duration: 3000,
+            }
+        );
+    };
+
     const GenerateCourseOutline = async () => {
         setLoading(true);
         try {
@@ -218,6 +248,7 @@ function Create() {
             if(data?.courseType == 'Study'){
                
                     console.log("res is going thru");
+                    const validatedLayout = validateLayout(formData?.comment);
         
                     // Prepare the payload
                     const payload = {
@@ -225,7 +256,7 @@ function Create() {
                         courseType: data?.courseType,
                         topic: data?.topic,
                         difficultyLevel: data?.difficultyLevel,
-                        courseLayout: data?.courseLayout,
+                        courseLayout: `Generate a study guide: ${validatedLayout}`,
                         createdBy: data?.createdBy,
                     };
                     console.log("Request Payload:", payload);
@@ -240,13 +271,14 @@ function Create() {
                 
             }
             else if(data?.courseType == 'Practice'){
+              const validatedLayout = validateLayout(formData?.comment);
                 const practicePayload = {
                     courseId: data?.courseId,
                     courseType: data?.courseType,
                     topic: data?.topic,
                     difficultyLevel: data?.difficultyLevel,
                     createdBy: data?.createdBy,
-                    courseLayout: data?.courseLayout
+                    courseLayout: `Generate a practice guide: ${validatedLayout}`
                 };
                 showSuccessToast("Your practice questions are generating...");
                 const res = await axios.post('/api/generate-practice-questions', practicePayload);
@@ -256,9 +288,10 @@ function Create() {
                 router.replace('/dashboard')
             }
             else if(data?.courseType == 'Exam'){
+              const validatedLayout = validateLayout(formData?.comment);
                 const examPayload = {
                     courseId: data?.courseId,
-                    courseLayout: data?.courseLayout,
+                    courseLayout: `Generate an exam: ${validatedLayout}`,
                     topic: data?.topic,
                     difficultyLevel: data?.difficultyLevel,
                     createdBy: data?.createdBy,

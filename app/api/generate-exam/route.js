@@ -46,6 +46,14 @@ export async function POST(req) {
     Difficulty Level: ${difficultyLevel}
     Time to complete the question: 5 minutes
 
+    FOLLOW THESE JSON FORMAT CAREFULLY:
+    {
+    "courseTitle": "REQUIRED - Add a clear title here",
+    "courseSummary": "REQUIRED - Add a brief summary here",
+    "question": "REQUIRED - Add the question here",
+    "answer": "REQUIRED - Add the answer here"
+    }
+
          3. **MATHEMATICAL NOTATION**:
                Use double backslashes (\\\\) for LaTeX commands (e.g., \\\\alpha for α, \\\\frac{x}{y} for fractions).
                Avoid using triple backslashes (\\\\\\\\) unless required by JavaScript string escaping rules. Only use \\\\ inside LaTeX expressions.

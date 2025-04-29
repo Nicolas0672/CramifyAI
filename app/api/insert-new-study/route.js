@@ -30,7 +30,7 @@ const user = await client.users.getUser(userId)
         courseType: courseType,
         topic: topic,
         difficultyLevel: difficultyLevel,
-        courseLayout: courseLayout,
+        courseLayout: "",
         createdBy: email,
         storageId: null,  // Save only if provided
     })

@@ -52,6 +52,13 @@ function ViewNotes() {
     }
   }, [stepCount, notes]);
 
+  useEffect(() => {
+    if (window.MathJax) {
+      window.MathJax.typesetPromise?.()
+        .catch(err => console.error('MathJax completion typesetting failed:', err));
+    }
+  }, [showComplete]);
+
   const showSuccessToast = (message) => {
     toast(
       <div className="flex items-center gap-2">
@@ -99,6 +106,12 @@ function ViewNotes() {
       studyType: 'notes',
       type: 'study'
     })
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    if (window.MathJax) {
+      window.MathJax.typesetPromise();
+    }
+
     showSuccessToast('Congratulations on finishing this section!')
     setLoading(false)
     setShowComplete(false)

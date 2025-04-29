@@ -49,62 +49,51 @@ export async function POST(req) {
         
         // Generate course layout using AI with improved prompt
         const prompt = `
-Generate a high-quality study guide for the course. The topic is "${topic}", the course type is "${courseType}", the difficulty level is "${difficultyLevel}", and the course layout is provided as "${courseLayout}".
+Generate a high-quality study guide for "${topic}" (type: ${courseType}, level: ${difficultyLevel}).
 
-**IMPORTANT INSTRUCTIONS:**
-1. If courseLayout is provided as JSON containing user conversation data (summary, strengths, weaknesses, improvements, rating), parse this information and prioritize addressing the identified WEAKNESSES in your generated content.
-2. Ensure the output is valid, parseable JSON with properly escaped characters.
-3. CRITICAL: When including math expressions, DO NOT use LaTeX format with dollar signs and backslashes. Instead, write math expressions in plain text format that JSON can handle without escaping issues.
+**CRITICAL INSTRUCTIONS - READ CAREFULLY:**
+1. IMPORTANT: If ${courseLayout} contains user weaknesses, PRIORITIZE addressing these weaknesses
+2. ESSENTIAL: All math expressions MUST be written in plain text format (NO LaTeX, NO dollar signs, NO backslashes)
+3. CRITICAL: Output MUST be valid, parseable JSON with properly escaped characters
 
-**Content Requirements:**
-1. **Introduction**: Provide a clear and engaging introduction to "${topic}", explaining its importance, relevance, and learning objectives.
+**Content Structure:**
+- Introduction to "${topic}" explaining importance and learning objectives
+- 3 chapters with ${amount} topics each
+- Each chapter should target specific knowledge gaps if identified in ${courseLayout}
 
-2. **Chapter Breakdown**: Create 3 chapters with ${amount} topics each:
-   - If user weaknesses are identified on ${courseLayout}, design chapters that specifically target these weak areas
-   - Otherwise, follow the general course layout provided
+**Quality Requirements:**
+- TARGETED: Address specific weaknesses identified
+- INSIGHTFUL: Provide deep explanations beyond surface-level
+- STRUCTURED: Organize content with clear progression
 
-3. **Content Quality Standards**:
-   - **Targeted**: Address specific knowledge gaps or weaknesses identified
-   - **Insightful**: Provide deep, meaningful explanations beyond surface-level
-   - **Engaging**: Use clear language with relevant examples
-   - **Structured**: Organize content logically with clear progression
-   - **Actionable**: Include practical application tips
-
-4. **Output Format**: Provide a complete study guide in the following JSON structure:
-
+**REQUIRED JSON FORMAT:**
 {
-  "courseTitle": "Descriptive Title for ${topic} Course",
+  "courseTitle": "Descriptive Title for ${topic}",
   "courseType": "${courseType}",
   "difficultyLevel": "${difficultyLevel}",
-  "courseSummary": "Concise overview of the course focusing on addressing key weaknesses if identified",
-  "courseLayout": "Custom structure based on ${courseLayout} with focus on weak areas",
+  "courseSummary": "Concise overview focusing on key weaknesses",
   "chapters": [
     {
       "title": "Chapter Title",
       "emoji": "📊",
-      "summary": "Chapter summary with emphasis on addressing weaknesses",
+      "summary": "Chapter summary addressing weaknesses",
       "topics": [
         {
-          "topicName": "Topic 1",
-          "description": "Description of topic 1 with plain text math (if needed)"
-        },
-        {
-          "topicName": "Topic 2",
-          "description": "Description of topic 2 with plain text math (if needed)"
+          "topicName": "Topic Name",
+          "description": "Clear description with plain text math (if needed)"
         }
       ]
     }
   ]
 }
 
-**CRITICAL JSON FORMATTING INSTRUCTIONS:**
-1. Write math expressions in plain text (e.g., "summation from i=1 to n of f(x_i) * delta x" instead of "\\$\\sum_{i=1}^{n} f(x_i) \\Delta x\\$")
-2. Avoid using backslashes (\\) in your output as they cause JSON parsing issues
-3. If you need to include special characters, ensure they are properly JSON-encoded
-4. Ensure all quotes within strings are properly escaped with a single backslash
-5. Only include valid JSON syntax - no markdown code blocks, no LaTeX formatting
+**JSON FORMATTING RULES - EXTREMELY IMPORTANT:**
+1. Math expressions: Write "summation from i=1 to n" NOT "\\$\\sum_{i=1}^{n}\\$"
+2. NO backslashes (\\) in output - they cause JSON parsing errors
+3. ALL quotes within strings MUST be escaped with a single backslash
+4. NO markdown code blocks or LaTeX formatting
 
-The MOST IMPORTANT thing is to ensure your response can be correctly parsed as JSON, even if it means simplifying mathematical notation.
+REMEMBER: Valid JSON syntax is THE MOST CRITICAL requirement.
 `;
 
         console.log("Sending prompt to AI...");

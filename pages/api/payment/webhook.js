@@ -85,7 +85,7 @@ export default async function handler(req, res) {
         await db.insert(PAYMENT_USER_TABLE).values({
           createdBy: customerEmail,
           transactionId: transactionId,
-          amountPaid: data.object.amount_total / 100, // Convert from cents
+          amountPaid: data.object.amount_total, // Convert from cents
           status: data.object.payment_status,
           creditAmount: 20,
           customerId: data.object.customer || 'guest_customer'

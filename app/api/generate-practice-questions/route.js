@@ -6,37 +6,38 @@ import moment from "moment";
 import { NextResponse } from "next/server";
 import { rateLimiter } from "../rateLimiter";
 import { getAuth, clerkClient } from "@clerk/nextjs/server"
-export async function POST (req) {
-    const { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy } = await req.json();
+import { inngest } from "@/inngest/client";
+export async function POST(req) {
+  const { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy } = await req.json();
 
-    const { userId } = getAuth(req);
-    if (!userId) return { error: "Unauthorized: No userId", status: 401 };
+  const { userId } = getAuth(req);
+  if (!userId) return { error: "Unauthorized: No userId", status: 401 };
 
-    const client = await clerkClient()
-const user = await client.users.getUser(userId)
-    const userEmail = user.emailAddresses[0]?.emailAddress;
+  const client = await clerkClient()
+  const user = await client.users.getUser(userId)
+  const userEmail = user.emailAddresses[0]?.emailAddress;
 
-    if (!userEmail || userEmail !== createdBy) {
-      return {
-        error: "Unauthorized: Email mismatch",
-        status: 401,
-        debug: {
-          userEmail,
-          createdBy,
-        },
-      };
-    }
-    
-            const { success } = await rateLimiter.limit(userId);  // Check if user has exceeded the limit
-    
-            if (!success) {
-                return NextResponse.json({
-                    success: false,
-                    message: "Rate limit exceeded. Please try again later.",
-                }, { status: 429 });  // HTTP 429 Too Many Requests
-            }
-    
-            const prompt = `Generate a quiz on topic: ${topic} with difficulty level: ${difficultyLevel} that specifically targets student weaknesses based on: ${courseLayout}
+  if (!userEmail || userEmail !== createdBy) {
+    return {
+      error: "Unauthorized: Email mismatch",
+      status: 401,
+      debug: {
+        userEmail,
+        createdBy,
+      },
+    };
+  }
+
+  const { success } = await rateLimiter.limit(userId);  // Check if user has exceeded the limit
+
+  if (!success) {
+    return NextResponse.json({
+      success: false,
+      message: "Rate limit exceeded. Please try again later.",
+    }, { status: 429 });  // HTTP 429 Too Many Requests
+  }
+
+  const prompt = `Generate a quiz on topic: ${topic} with difficulty level: ${difficultyLevel} that specifically targets student weaknesses based on: ${courseLayout}
 
             WEAKNESS-TARGETING APPROACH:
             1. First, analyze ${courseLayout} for any identified weaknesses, challenging concepts, or knowledge gaps.
@@ -76,41 +77,41 @@ const user = await client.users.getUser(userId)
             ENSURE THE OUTPUT IS VALID JSON THAT CAN BE PARSED WITHOUT ERRORS. Verify all brackets, quotes, and special characters are properly formatted.
             `;
 
-    const aiResp = await GenerateQuizAiModel.sendMessage(prompt)
-    const aiText =  aiResp.response.text()
+  const initialRecord = await db.insert(PRACTICE_QUIZ_TABLE).values({
+    courseId: courseId,
+    aiResponse: {
+      quizTitle: `${topic.charAt(0).toUpperCase() + topic.slice(1)} Practice Guide`,  // Add basic info immediately
+      courseType: courseType,
+      difficultyLevel: difficultyLevel,
+      learningObjectives: "Generating content...",
+    },
+    createdBy: createdBy,
+    createdAt: moment().format("DD-MM-yyyy"),
+    courseLayout: courseLayout,
+    topic: topic,
+    difficultyLevel: difficultyLevel
+  }).returning({ resp: PRACTICE_QUIZ_TABLE });
 
-    const cleanedText = aiText
-            .replace(/^```json\n/, '')   // Remove leading ```json followed by a newline
-            .replace(/```$/, '')         // Remove trailing ```
-            .replace(/\\n/g, ' ')        // Replace escaped newlines with spaces
-            .replace(/\\"/g, '"')        // Replace escaped quotes with regular quotes
-            .trim();  
+  const userInfo = await db.select().from(USER_TABLE).where(eq(USER_TABLE?.email, createdBy))
+  const newTotal = 1 + userInfo[0]?.totalCredits
 
-    const aiResult = JSON.parse(cleanedText)
+  const remainingCredits = (userInfo[0]?.newFreeCredits + userInfo[0]?.newPurchasedCredit) - 1
+  const newFreeCredits = userInfo[0]?.newFreeCredits - 1
 
-    const dbResult = await db.insert(PRACTICE_QUIZ_TABLE).values({
-        courseId:courseId,
-        aiResponse:aiResult,
-        createdBy: createdBy,
-        createdAt: moment().format("DD-MM-yyyy"),
-        courseLayout: courseLayout,
-        topic: topic,
-        difficultyLevel: difficultyLevel
-    }).returning({ resp: PRACTICE_QUIZ_TABLE });
+  const updateCredits = await db.update(USER_TABLE).set({
+    totalCredits: newTotal,
+    newFreeCredits: newFreeCredits < 0 ? 0 : newFreeCredits,
+    remainingCredits: remainingCredits < 0 ? 0 : remainingCredits
+  }).where(eq(USER_TABLE?.email, createdBy))
 
- 
+  await inngest.send({
+    name: 'generate.quiz',
+    data: {
+      prompt,
+      recordId: initialRecord[0].id,
+      courseId,
+    }
+  })
 
-    const userInfo= await db.select().from(USER_TABLE).where(eq(USER_TABLE?.email, createdBy))
-    const newTotal = 1 + userInfo[0]?.totalCredits
-
-    const remainingCredits = (userInfo[0]?.newFreeCredits + userInfo[0]?.newPurchasedCredit) - 1
-              const newFreeCredits = userInfo[0]?.newFreeCredits - 1 
-          
-              const updateCredits = await db.update(USER_TABLE).set({
-                totalCredits: newTotal,
-                newFreeCredits: newFreeCredits < 0 ? 0 : newFreeCredits,
-                remainingCredits: remainingCredits < 0 ? 0 : remainingCredits
-              }).where(eq(USER_TABLE?.email, createdBy))
-
-     return NextResponse.json({ result: dbResult[0] });
+  return NextResponse.json({ result: initialRecord[0] });
 }

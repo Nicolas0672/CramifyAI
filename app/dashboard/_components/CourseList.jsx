@@ -27,13 +27,19 @@ function CourseList() {
     const getCourseList = async () => {
         setLoading(true);
         let attempt = 0;
-        const maxAttempt = 10;
+        const maxAttempt = 40;
         while(attempt < maxAttempt){
-            
+        console.log('Checking status')
         const result = await axios.post('/api/courses', { createdBy: user?.primaryEmailAddress.emailAddress });
         setCourseList(result.data.result);
-        await new Promise((res)=> setTimeout(res,5000))
-        attempt++
+        if(result?.data?.status == 'Ready'){
+            break;
+        }
+        else{
+            await new Promise((res)=> setTimeout(res,5000))
+            attempt++
+        }
+      
         }
         setLoading(false);
     }
@@ -41,14 +47,20 @@ function CourseList() {
     const getQuizList = async () => {
         setLoading(true);
         let attempt = 0;
-        const maxAttempt = 10
+        const maxAttempt = 40
         while(attempt < maxAttempt){
+        console.log('Checking status')
         const result = await axios.post('/api/quizzes', { createdBy: user?.primaryEmailAddress.emailAddress });
         setQuizList(result.data.result);
-        await new Promise((res)=> setTimeout(res,5000))
-        attempt++
+        if(result?.data?.status == 'Ready'){
+            break;
+        }
+        else{
+            await new Promise((res)=> setTimeout(res,5000))
+            attempt++
         }
         setLoading(false);
+    }
     }
 
     const GetExamList = async () =>{

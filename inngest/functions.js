@@ -1,9 +1,47 @@
 import { db } from "@/configs/db";
 import { inngest } from "./client";
-import { AI_TEXT_RESPONSE_TABLE, CHAPTER_NOTE_TABLE, FILL_BLANK_TABLE, FLASHCARD_CONTENT, USER_TABLE } from "@/configs/schema";
+import { AI_TEXT_RESPONSE_TABLE, CHAPTER_NOTE_TABLE, FILL_BLANK_TABLE, FLASHCARD_CONTENT, PRACTICE_QUIZ_TABLE, USER_TABLE } from "@/configs/schema";
 import { eq } from "drizzle-orm";
-import { GenerateFillBlank, GenerateFlashCardAI, generateNotesAIModel } from "@/configs/AiModel";
+import { courseOutline, GenerateFillBlank, GenerateFlashCardAI, generateNotesAIModel, GenerateQuizAiModel } from "@/configs/AiModel";
 import moment from "moment";
+
+const extractAndParseJson = (text) => {
+  // First, try to find JSON content between curly braces
+  const jsonRegex = /\{[\s\S]*\}/;
+  const match = text.match(jsonRegex);
+
+  let jsonString = match ? match[0] : text;
+
+  // Remove any code block markers
+  jsonString = jsonString
+      .replace(/```json\s*/, '')
+      .replace(/```\s*$/, '')
+      .trim();
+
+  try {
+      return JSON.parse(jsonString);
+  } catch (error) {
+      console.error("First parsing attempt failed:", error);
+
+      // Try another approach - if there are unescaped quotes or other issues
+      try {
+          // Handle common JSON formatting issues
+          const fixedJson = jsonString
+              // Fix unescaped quotes within string values
+              .replace(/(?<="[^"]*)(")(?=[^"]*")/g, '\\"')
+              // Remove any remaining markdown formatting
+              .replace(/\*\*/g, '')
+              // Remove any remaining LaTeX-style formatting
+              .replace(/\\\$/g, '')
+              .replace(/\\\\/g, '\\');
+
+          return JSON.parse(fixedJson);
+      } catch (secondError) {
+          console.error("Second parsing attempt failed:", secondError);
+          throw new Error("Unable to parse AI response as JSON");
+      }
+  }
+};
 
 export const helloWorld = inngest.createFunction(
   { id: "hello-world" },
@@ -50,6 +88,93 @@ export const CreateNewUser = inngest.createFunction(
 
 
 )
+
+export const GenerateCourseOutline = inngest.createFunction(
+  { id: "generate-course" },
+  { event: "course.generate" },
+  async ({ event, step }) => {
+    const { courseId, topic, courseType, courseLayout, difficultyLevel, createdBy, amount, recordId, prompt } = event.data;
+
+    const aiResult = await step.run('Generate Course Outline', async () => {
+      const aiResp = await courseOutline.sendMessage(prompt);
+      console.log("Received response from AI");
+
+      if (!aiResp || !aiResp.response) {
+        throw new Error("No response received from AI model");
+      }
+
+      const aiText = aiResp.response.text();
+      return extractAndParseJson(aiText);
+    });
+
+  
+    
+
+    const dbResult = await step.run('Store Course Outline', async () => {
+      console.log("Storing course outline in database");
+      return await db.update(AI_TEXT_RESPONSE_TABLE)
+        .set({
+          aiResponse: aiResult,
+         
+        })
+        .where(eq(AI_TEXT_RESPONSE_TABLE.id, recordId))
+        .returning({ resp: AI_TEXT_RESPONSE_TABLE });
+    });
+
+    await step.run('Trigger Notes Generation', async () => {
+      await inngest.send({
+        name: 'notes.generate',
+        data: {
+          course: dbResult[0].resp
+        }
+      });
+      console.log("Triggered notes generation");
+    });
+
+    return {
+      success: true,
+      result: dbResult[0]
+    };
+  }
+)
+
+export const GenerateQuiz = inngest.createFunction(
+  { id: 'generate-quiz' },
+  { event: 'generate.quiz' },
+  async ({ event, step }) => {
+    const { prompt, recordId, courseId } = event.data;
+    const existingRecord = await step.run('Verify Record', async () => {
+      const record = await db
+        .select()
+        .from(PRACTICE_QUIZ_TABLE)
+        .where(eq(PRACTICE_QUIZ_TABLE.courseId, courseId));
+      
+      console.log('Found existing record:', record?.length > 0);
+      return record;
+    });
+
+    if (!existingRecord || existingRecord.length === 0) {
+      throw new Error(`No record found for courseId: ${courseId}`);
+    }
+    const aiResult = await step.run('Generate Quiz', async () => {
+      const aiResp = await GenerateQuizAiModel.sendMessage(prompt);
+      const aiText = aiResp.response.text();
+      return extractAndParseJson(aiText);
+    })
+
+    const dbResult = await step.run('Store Quiz in DB', async () => {
+      return await db.update(PRACTICE_QUIZ_TABLE).set({
+        aiResponse: aiResult,
+        status: 'Ready'
+      }).where(eq(PRACTICE_QUIZ_TABLE.courseId, courseId))
+        .returning({ resp: PRACTICE_QUIZ_TABLE });
+    })
+    return ({
+      success: true,
+      result: dbResult[0]
+    })
+  })
+
 
 export const GenerateNotes=inngest.createFunction(
   {id:'generateCourse'},

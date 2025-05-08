@@ -58,6 +58,7 @@ const cleanedText = aiText
  const prompt2 = `Generate one courseTitle that fits the concept of ${courseLayout} and ${topic} and a summary of what will what users will gain from engaging in a conversation about this course.
     PLEASE OUTPUT IN THIS FORMAT: 
     {
+      "courseTitle" : "**CONTENT HERE**",
       "summary" : "**CONTENT HERE**"
     }
  `

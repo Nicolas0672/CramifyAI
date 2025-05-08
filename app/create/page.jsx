@@ -48,7 +48,7 @@ function Create() {
             [fieldName]: fieldValue,
             studyType: selectedStudyType || prev.studyType
         }))
-        console.log(formData)
+       
     }
     const onFileChange = (file) => {
         setPdfFile(file)
@@ -259,7 +259,7 @@ function Create() {
                         courseLayout: `Generate a study guide: ${validatedLayout}`,
                         createdBy: data?.createdBy,
                     };
-                    console.log("Request Payload:", payload);
+                   
         
                     // Send the POST request
                     showSuccessToast("Your study plan is generating...");
@@ -282,7 +282,7 @@ function Create() {
                 };
                 showSuccessToast("Your practice questions are generating...");
                 const res = await axios.post('/api/generate-practice-questions', practicePayload);
-                console.log("Response from API:", res.data);
+               
                 showCreditSpentToast('1 Credits Spent')
                 
                 router.replace('/dashboard')
@@ -299,7 +299,7 @@ function Create() {
                 }
                 showSuccessToast("Your exam is generating...");
                 const res = await axios.post('/api/generate-exam',examPayload)
-                console.log("Response from API:", res.data);
+               
                 showCreditSpentToast('1 Credits Spent')
                 
                 router.replace('/dashboard')

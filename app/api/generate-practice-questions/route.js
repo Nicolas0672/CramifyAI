@@ -79,6 +79,7 @@ export async function POST(req) {
 
   const initialRecord = await db.insert(PRACTICE_QUIZ_TABLE).values({
     courseId: courseId,
+    status: "Generating",
     aiResponse: {
       quizTitle: `${topic.charAt(0).toUpperCase() + topic.slice(1)} Practice Guide`,  // Add basic info immediately
       courseType: courseType,

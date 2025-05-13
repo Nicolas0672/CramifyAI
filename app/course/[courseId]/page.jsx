@@ -16,9 +16,20 @@ function Course() {
         GetCourse()
     }, [])
     const GetCourse = async () => {
+      let attempt = 0;
+      const maxAttempt = 20;
+      while(attempt < maxAttempt){
         const result = await axios.get('/api/courses?courseId='+courseId )
         console.log(result)
         setCourse(result.data.result)
+        if(result?.data?.result?.status === 'Ready'){
+          console.log('Ready')
+            break;
+        } else {
+            await new Promise((res)=> setTimeout(res,5000))
+            attempt++
+        }
+      }
     }
   return (
     <div>

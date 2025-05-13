@@ -163,9 +163,7 @@ const LearningProgressStepper = ({ currentMode }) => {
 
   };
 
-  useEffect(() => {
-    console.log(course);
-  }, [course]);
+
 
   const GenerateStudyContent = async (mode, lastMode) => {
 

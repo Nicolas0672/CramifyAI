@@ -55,7 +55,9 @@ function CourseList() {
        
         const result = await axios.post('/api/quizzes', { createdBy: user?.primaryEmailAddress.emailAddress });
         setQuizList(result.data.result);
+        console.log(result.data.result)
         if(result?.data?.result[0]?.status == 'Ready'){
+            console.log('Ready')
             break;
         }
         else{

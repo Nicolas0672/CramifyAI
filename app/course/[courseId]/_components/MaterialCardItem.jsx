@@ -14,6 +14,9 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
   const { user, isLoaded } = useUser();
   const [noteLoading, setNoteLoading] = useState(false);
   const [notificationShown, setNotificationShown] = useState(false);
+  const [status, setStatus] = useState(false);
+
+ 
 
   useEffect(() => {
     if (!isLoaded || !user) return;
@@ -49,6 +52,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
         console.log('Check status');
         const res = await axios.get(`/api/get-note-status?courseId=${course?.courseId}`);
         if (res.data.status === 'Ready') {
+          setStatus(true);
           setLoading(false);
           setNoteLoading(false);
           await refreshData();
@@ -59,7 +63,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
           }
           break;
         }
-        await new Promise((res) => setTimeout(res, 2000));
+        await new Promise((res) => setTimeout(res, 5000));
         attempt++;
       }
     }
@@ -78,12 +82,13 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
         
         // Only show success toast if it wasn't shown before
         if (!notificationShown) {
+          setStatus(true)
           showSuccessToast('Your content is ready to view');
           setNotificationShown(true);
         }
         break;
       }
-      await new Promise((res) => setTimeout(res, 2000));
+      await new Promise((res) => setTimeout(res, 5000));
       attempts++;
     }
 
@@ -161,7 +166,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
       const title = chapter.title;
       const summary = chapter.summary;
       const topic = (chapter.topics || []).join(", ");
-      return `${title}: ${summary}. Topics covered: ${topic}`;
+      return `${title}: ${summary}. Topics covered: ${JSON.stringify(topic)}`;
     }).join(' || ');
 
     const result = await axios.post('/api/generate-content', {
@@ -174,7 +179,26 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
     checkStatus(result.data.id);
   };
 
-  return studyTypeContent?.[item.type]?.length > 0 ? (
+const isReady = (() => {
+  switch (item.type) {
+    case 'notes':
+      const notes = studyTypeContent?.notes || [];
+      console.log(notes)
+      const lastNote = notes[notes.length - 1];
+      console.log('last note', lastNote)
+      return status || lastNote?.notes?.length > 0;
+    
+    case 'flashcard':
+      const flashcards = studyTypeContent?.flashcard || [];
+      const lastFlashcard = flashcards[flashcards.length - 1];
+      return lastFlashcard?.status === 'Ready';
+    
+    default:
+      return false;
+  }
+})();
+
+  return isReady ? (
     <Link href={'/course/' + course?.courseId + item.path}>
       {CardContent()}
     </Link>
@@ -187,7 +211,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
       <motion.div
         className={`relative mt-3 border border-gray-200 shadow-lg p-4 sm:p-6 rounded-xl
           flex flex-col items-center backdrop-blur-sm w-full
-          ${studyTypeContent?.[item.type]?.length > 0 ? 'bg-gradient-to-br from-white/80 to-blue-50/50' : 'bg-gradient-to-br from-white/80 to-purple-50/50'}
+          ${isReady   ? 'bg-gradient-to-br from-white/80 to-blue-50/50' : 'bg-gradient-to-br from-white/80 to-purple-50/50'}
           hover:shadow-xl transition-all duration-300 h-full overflow-hidden`}
         whileHover={{ scale: 1.03, boxShadow: '0px 10px 25px rgba(0, 0, 0, 0.1)' }}
         whileTap={{ scale: 0.98 }}
@@ -200,7 +224,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
         <div className="flex flex-col items-center z-10 w-full h-full">
           {/* Status Badge */}
           <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
-            {studyTypeContent?.[item.type]?.length > 0 ? (
+            {isReady  ? (
               <div className='flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full text-xs mb-4 shadow-sm'>
                 <Sparkles className="w-3 h-3" />
                 <span>Ready</span>
@@ -240,7 +264,7 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
             whileHover={{ scale: noteLoading ? 1 : 1.03 }}
             whileTap={{ scale: noteLoading ? 1 : 0.97 }}
           >
-            {studyTypeContent?.[item.type]?.length > 0 ? (
+            { isReady ? (
               <Button className="cursor-pointer w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-0 hover:from-blue-600 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 py-4 sm:py-5">
                 <span>View </span>
                 <ArrowRight className="w-4 h-4" />

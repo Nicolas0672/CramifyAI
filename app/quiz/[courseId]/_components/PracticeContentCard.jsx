@@ -108,7 +108,15 @@ function PracticeContentCard({ quizTypeContent, item, refreshData, practiceCours
     );
   };
 
-  const isReady = quizTypeContent?.[item.type]?.status == 'Ready';
+  const isReady = (()=>{
+    switch (item.type) {
+      case 'quiz':
+        return quizTypeContent?.quiz?.status == 'Ready'
+      case 'Fill':
+        return quizTypeContent?.fill?.length > 0 || quizTypeContent?.fill?.status == 'Ready'
+      default: return false
+      }
+  })()
   console.log('Quiz Type Content', quizTypeContent)
 
   return isReady ? (

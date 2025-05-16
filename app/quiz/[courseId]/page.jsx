@@ -9,6 +9,7 @@ function ViewQuiz() {
 
     const {courseId} = useParams()
     const [practiceCourse, setPracticeCourse] = useState([])
+    const [isReady, setIsReady] = useState(false)
 
     useEffect(()=>{
         GetPracticeDetails()
@@ -21,6 +22,7 @@ function ViewQuiz() {
         const res = await axios.get(`/api/quizzes?courseId=${courseId}`);
         setPracticeCourse(res.data.result)
         if(res?.data?.result?.status === 'Ready'){
+          setIsReady(true)
           console.log('Ready')
             break;
         } else {
@@ -34,7 +36,7 @@ function ViewQuiz() {
     <div>
         
         <PracticeIntroCard course={practiceCourse}/>
-        <QuizSection course={practiceCourse} courseId={courseId}/>
+        <QuizSection course={practiceCourse} courseId={courseId} isReady={isReady}/>
     </div>
   )
 }

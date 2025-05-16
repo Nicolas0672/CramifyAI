@@ -113,7 +113,7 @@ function PracticeContentCard({ quizTypeContent, item, refreshData, practiceCours
       case 'quiz':
         return quizTypeContent?.quiz?.status == 'Ready'
       case 'Fill':
-        return quizTypeContent?.fill?.length > 0 || quizTypeContent?.fill?.status == 'Ready'
+        return quizTypeContent?.Fill?.length > 0 || quizTypeContent?.Fill?.status == 'Ready'
       default: return false
       }
   })()

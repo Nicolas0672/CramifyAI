@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react'
 import PracticeIntroCard from './PracticeIntroCard'
 import axios from 'axios'
 import PracticeContentCard from './PracticeContentCard'
+import { is } from 'drizzle-orm'
 
 
-function QuizSection({courseId, course}) {
+function QuizSection({courseId, course, isReady}) {
 
     const [quizTypeContent, setQuizTypeContent] = useState()
 
@@ -36,6 +37,12 @@ function QuizSection({courseId, course}) {
         GetQuizMaterial()
         
     },[])
+
+    useEffect(()=>{
+        if(isReady){
+            GetQuizMaterial()
+        }
+    },[isReady])
 
     const GetQuizMaterial=async()=>{
         const res = await axios.post('/api/study-type',{

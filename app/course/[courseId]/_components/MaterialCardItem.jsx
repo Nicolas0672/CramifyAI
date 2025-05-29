@@ -165,8 +165,8 @@ function MaterialCardItem({ item, studyTypeContent, course, refreshData }) {
     const combinedCourseLayout = chapters.map(chapter => {
       const title = chapter.title;
       const summary = chapter.summary;
-      const topic = (chapter.topics || []).join(", ");
-      return `${title}: ${summary}. Topics covered: ${JSON.stringify(topic)}`;
+      const topic = (chapter.topics.topicName || []).join(", ");
+      return `${title}: ${summary}. Topics covered: ${(topic)}`;
     }).join(' || ');
 
     const result = await axios.post('/api/generate-content', {

@@ -1,61 +1,35 @@
-CramSmart
+**CramSmart**
 
-CramSmart is an AI-powered study app designed to help students learn more effectively through interactive modes like flashcards, quizzes, spaced repetition, and speaking exercises. The app focuses on making studying engaging, personalized, and impactful.
+CramSmart is an AI-powered study app designed to help students learn more effectively through interactive modes like flashcards, quizzes, spaced repetition, and speaking exercises. The platform makes studying engaging, personalized, and impactful, empowering learners to build confidence and retain knowledge efficiently.
 
-Live App
+**Motivation**
 
-Table of Contents
+I created CramSmart from my own experience struggling with challenging subjects like math and science. I wanted a tool that made learning interactive and adaptable to each student’s needs. The goal was simple: help students practice, test themselves, and gain confidence through multiple study modes, all in one place.
 
-Motivation
+**Features**
 
-Features
+Multiple Learning Modes: Study through flashcards, quizzes, exams, or speaking exercises.
 
-Challenges
+Spaced Repetition: Reinforce memory retention and review content efficiently.
 
-Tech Stack
-
-Installation
-
-Usage
-
-Future Improvements
-
-Motivation
-
-I created CramSmart from my own experience struggling to study challenging subjects like math and science. I wanted a tool that made learning interactive, engaging, and adaptable to each student’s needs. The goal is to empower learners to practice, test themselves, and gain confidence through multiple study modes.
-
-Features
-
-Multiple Learning Modes: Users can study through flashcards, quizzes, exams, or by speaking about topics aloud.
-
-Spaced Repetition: Reinforces memory retention and helps users review content efficiently.
-
-Interactive AI Assistance: Generates notes, quizzes, and mock exams to personalize learning.
+Interactive AI Assistance: Generate notes, quizzes, and mock exams for personalized practice.
 
 User Progress Tracking: Track performance and mastery across topics over time.
 
-Challenges
+**Challenges & Lessons Learned**
 
-Building CramSmart was a journey with many hurdles:
+Building CramSmart was a journey full of hurdles. I struggled to understand new technologies, research and design an intuitive user flow, and figure out what features would truly help students learn. After publishing the app, I realized I needed real feedback, which meant marketing it across campus and encouraging students to try it and share honest thoughts. Iterating based on that feedback taught me persistence, empathy for users, and the importance of designing with real learners in mind. Today, seeing students use CramSmart and grow through it reminds me why tackling hard problems to create meaningful impact is worth every challenge.
 
-Learning new technologies and understanding how to structure the app efficiently.
+**Tech Stack**
 
-Designing a smooth, intuitive user flow and figuring out what features would be most helpful.
+Frontend & Framework: Next.js
 
-Marketing the app across campus to get meaningful user feedback for iteration.
+AI Features: Gemini AI
 
-Iterating features based on feedback to make the app more user-friendly and engaging.
+Database & Caching: PostgreSQL, Redis, Inngest
 
-These challenges taught me persistence, empathy for users, and the importance of designing with real learners in mind.
+Deployment: Vercel
 
-Tech Stack
+**Live App**
 
-Next.js
-
-Gemini AI / AI study features
-
-PostgreSQL
-
-Redis
-
-Vercel Deployment
+Check out the project here: https://cramsmart.us
